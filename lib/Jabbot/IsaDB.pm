@@ -35,7 +35,8 @@ sub process {
             $q =~ s/^(.*)是//;
             $r = $self->queryWhatIsThat($q);
 	} elsif ($qstring =~ /是(?!什麼)/) {
-            $r = $self->_queryWhatIsWhat($qstring);
+            $r = $self->_queryWhatIsWhat($qstring)
+		if($msg->to eq $self->config->{nick})
 	} elsif ($qstring =~ /是什麼/) {
             $qstring =~ s/\s*是什麼//;
 	}
