@@ -23,6 +23,7 @@ feeds:
 - fortune
 feeds_fortune_url: http://gugod.org/fortune.cgi
 feeds_fortune_delay: 10
+feeds_fortune_appendurl: yes
 feeds_fortune_shorturl: yes
 feeds_fortune_channels:
 - freenode:jabbot3

@@ -4,6 +4,7 @@ use Jabbot::BackEnd -base;
 use POE;
 use POE::Component::RSSAggregator;
 use POE::Component::IKC::ClientLite;
+use WWW::Shorten '0rz';
 
 my $self;
 
@@ -45,6 +46,14 @@ sub handle_feed {
     my $feed_name = $feed->name;
     for my $headline ($feed->late_breaking_news) {
         my $channels = $self->config->{"feeds_${feed_name}_channels"};
+        my $text = "${feed_name} - ". $headline->headline;
+
+        if($self->config->{"feeds_${feed_name}_appendurl"}) {
+            my $url = ($self->config->{"feeds_${feed_name}_shorturl"})?
+                makeashorterlink($headline->url):$headline->url;
+            $text .= " $url";
+        }
+
 	next unless $channels;
         for(@$channels) {
             my($network,$channel) = split(/:/,$_);
@@ -52,7 +61,7 @@ sub handle_feed {
             $remote->post("irc_frontend_${network}/message",
                           {channel => $channel,
                            name => $network,
-                           text => "${feed_name} - ". $headline->headline})
+                           text => $text})
                 or die $remote->error;
         }
     }
