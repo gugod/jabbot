@@ -15,5 +15,5 @@ sub process {
         $reply = sprintf("正彩 %s, 前三彩 %s, 後三彩 %s, 前對彩 %s, 後對彩 %s.",
                          $_, substr($_,0,3), substr($_,-3,3), m/(\d\d)(\d\d)/);
     }
-    $self->reply($reply,10000);
+    $self->reply($reply,1);
 }

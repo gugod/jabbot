@@ -26,7 +26,7 @@ sub process {
         my $karma = $db->{$1} || 0;
         $reply = ($karma == 0)?"$1 has neutral karma":"$1 has karma of $karma";
     }
-    $self->reply($reply,10000);
+    $self->reply($reply,1);
 }
 
 sub getKeyword {

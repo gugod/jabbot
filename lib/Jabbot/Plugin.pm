@@ -18,9 +18,8 @@ sub init {
 }
 
 sub reply {
-    my ($text,$priority) = @_;
-    $self->message->new(text => $text,
-                        priority => (defined $text)?$priority:0);
+    my ($text,$must) = @_;
+    $self->message->new(text => $text, must_say => (defined $text)?$must:undef);
 }
 
 sub trim {

@@ -50,5 +50,3 @@ sub on_public {
 	$self->privmsg($channel,encode('big5',"$nick: $reply"));
     }
 }
-
-

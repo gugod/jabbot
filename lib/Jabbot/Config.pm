@@ -10,6 +10,7 @@ sub default_classes {
         config_class => 'Jabbot::Config',
         hooks_class => 'Spoon::Hooks',
         hub_class => 'Jabbot::Hub',
+        messages_class => 'Jabbot::Messages',
         message_class => 'Jabbot::Message',
         registry_class => 'Jabbot::Registry',
     )

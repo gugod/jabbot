@@ -43,5 +43,5 @@ sub process {
         $reply = "${target}是${reply}"
             if(defined $reply && rand(100) > 60);
     }
-    $self->reply($reply,10000);
+    $self->reply($reply,1);
 }

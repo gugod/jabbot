@@ -1,17 +1,29 @@
 package Jabbot::Hub;
 use Spoon::Hub -Base;
-use List::Util qw(shuffle reduce);
+use List::Util qw(shuffle);
+
+sub init {
+    $self->use_class('messages');
+    $self->use_class('message');
+}
 
 sub process {
     $self->preload;
     my $msg = shift;
-    my $reply = reduce {
-        $a->priority > $b->priority ? $a : $b
-    } grep {
+
+    my @replies = grep {
         defined $_->text
     } map {
-        $self->$_->process($self->hub->message->new(text => $msg))
-    } shuffle($self->all_plugin_ids);
+        $self->$_->process($self->message->new(text => $msg))
+    } $self->all_plugin_ids;
+
+    if(my @musts = grep {$_->must_say} @replies) {
+        $self->messages->append($_) for @musts;
+    } else {
+        $self->messages->append((shuffle @replies)[0]);
+    }
+
+    my $reply = $self->messages->next;
     $reply->text;
 }
 
