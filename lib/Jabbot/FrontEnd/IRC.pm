@@ -121,7 +121,13 @@ sub bot_public {
        if($_[0] =~ s/^([\d\w\|]+)\s*[:,]\s*//) { return $1; }
        return '';
     }->($pubmsg);
-    my $reply = $self->hub->process($pubmsg);
+    my $reply = $self->hub->process(
+        $self->hub->message->new(
+            text => $pubmsg,
+            from => $nick,
+            channel => $channel,
+            to => $to
+           ));
     my $reply_text = $reply->text;
     if(length($reply_text) &&
            ($to eq $self->config->{nick} || $reply->must_say)) {

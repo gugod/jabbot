@@ -13,7 +13,7 @@ sub process {
     my @replies = grep {
         defined $_->text
     } map {
-        $self->$_->process($self->message->new(text => $msg))
+        $self->$_->process($msg)
     } $self->all_plugin_ids;
     if(my @musts = grep {$_->must_say} @replies) {
         $self->messages->append($_) for @musts;
