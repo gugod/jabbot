@@ -11,6 +11,9 @@ requires(
     Net::IRC => 0,
     Chatbot::Eliza => 0,
     Date::Day => 0,
+    POE => 0,
+    POE::Component::IRC => 0,
+    POE::Component::IKC => 0,
 );
 
 check_nmake();
