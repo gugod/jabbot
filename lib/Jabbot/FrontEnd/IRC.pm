@@ -7,6 +7,7 @@ use POE qw(Session
            Component::IKC::Server
            Component::IKC::Specifier);
 use Encode qw(encode decode);
+use YAML;
 
 my $config;
 my $self;
@@ -44,7 +45,8 @@ sub process {
 
 sub jabbotmsg {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
-   my $network = $heap->{network};
+    print YAML::Dump($msg);
+    my $network = $heap->{network};
     eval {
         my $text = $msg->{text};
 	Encode::from_to($text,'utf8','big5');
