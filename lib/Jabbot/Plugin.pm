@@ -1,6 +1,5 @@
 package Jabbot::Plugin;
 use Spoon::Plugin -Base;
-our $VERSION = '0.01';
 
 stub 'class_id';
 const config_file => '';
