@@ -1,0 +1,10 @@
+#!/usr/local/bin/perl
+
+eval 'exec /usr/local/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+use strict;
+use warnings;
+use lib 'lib';
+use Jabbot;
+my @configs = qw(config.yaml -plugins plugins);
+Jabbot->new->load_hub(@configs)->command->process(@ARGV);
