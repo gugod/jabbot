@@ -248,6 +248,14 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		 sub { trim_whitespace(@_) ; @_ },
 		 sub { "聯合新聞網：「".$_[0]."」" }
 		],
+      		[
+		 'times.hinet.net' ,
+#		 sub { "為了對聯合報系的抵制不列出標題" },
+		 sub { $_[0]=~m/<title>([^<]*)<\/title>/im },
+		 sub { (split(/ [-] /,$_[0]))[-1] },
+		 sub { trim_whitespace(@_) ; @_ },
+		 sub { "Hinet 新聞網：「".$_[0]."」" }
+		],
 		[
 		  'appledaily.com.tw',
 		  sub { $_[0] =~ m/<SPAN class=ARTTEXTBOLDBIG>(.+?)<\/SPAN>/im},
