@@ -12,6 +12,6 @@ sub process {
     # only replies to English
     $self->reply(
         ($text =~ /^[\x00-\x7f]/) ?
-            $self->chatterbot->transform($text) : undef)
+            $self->chatterbot->transform($text) : '')
 }
 
