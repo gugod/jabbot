@@ -45,10 +45,10 @@ sub process {
 sub jabbotmsg {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
     eval {
-        my $utext = decode('utf8',$msg->{text});
-        my $text = encode('big5',$utext);
+        my $text = $msg->{text};
+	Encode::from_to($text,'utf8','big5');
         my $channel = $msg->{channel};
-        $kernel->post(bot => privmsg => "#$channel", $utext );
+        $kernel->post(bot => privmsg => "#$channel", $text );
         msg "[#$channel] $msg->{text} on " . localtime(time);
     };
     err "update error: $@" if $@;
