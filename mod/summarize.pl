@@ -10,6 +10,8 @@ use Encode::Guess;
 use Lingua::ZH::Numbers 'big5';
 use Lingua::ZH::Summarize ;
 
+# $Id$
+
 my $s = $MSG{body};
 my $reply;
 my $priority = 0;
