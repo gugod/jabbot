@@ -140,7 +140,7 @@ sub on_public {
 # a real dirty hack :p
 
 	if($str =~ /^reload modules$/i) {
-		if($nick eq 'zcecil') {
+		if($nick =~ /gugod|zcecil/) {
 			reload_modules();
 			$self->privmsg($channel, "$nick: ok");
 		}else {
