@@ -1,11 +1,9 @@
-package Jabbot::Console;
-use Spoon 0.21 -Base;
+package Jabbot::FrontEnd::Console;
+use Jabbot::FrontEnd -Base;
 use Term::ReadLine;
 
-const config_class => 'Kwiki::Config';
-
 sub process {
-    my $hub = $self->load_hub(@_);
+    my $hub = $self->hub;
     my $term = new Term::ReadLine 'Jabbot::Console';
     my $OUT = $term->OUT;
     while(defined($_ = $term->readline('jabbot> '))){
