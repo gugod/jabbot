@@ -10,7 +10,6 @@ field isadb => {}, -init => q{$self->load_isadb};
 sub load_isadb {
     io($self->plugin_directory)->mkpath;
     my $db = io->catfile($self->plugin_directory,'isa.db')->utf8->assert;
-    $db->{0} = 0;
     $self->isadb($db);
     return $db;
 }
@@ -76,7 +75,7 @@ sub process {
         eval { $r = $self->do_my_job($qstring,$msg) }
             or print $@;
     }
-    delete $self->isadb->{0};
+    delete $self->isadb->{''};
     $self->reply($r,1);
 }
 
