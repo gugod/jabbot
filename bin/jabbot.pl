@@ -46,7 +46,7 @@ autoflush STDERR 1;
 
 # log
 open(STDLOG, ">> ${BOT_HOME}/log/jabbot.log") ||
-  die("Failed to open log file\n");
+  die("Failed to open log file\n".">> ${BOT_HOME}/log/jabbot.log");
 sub printlog {
     print STDLOG shift;
 }
@@ -123,7 +123,7 @@ sub on_public {
     # a real dirty hack :p
 
     if($str =~ /^reload modules$/i) {
-	if($nick eq 'gugod') {
+	if($nick eq 'zcecil') {
 	    reload_modules();
 	    $self->privmsg($channel, "$nick: ok");
 	}else {

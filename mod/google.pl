@@ -70,7 +70,7 @@ sub googlefight_get_result {
  
     my $r;
     my %googlefight_cache;
-    tie %googlefight_cache, 'DB_File', "${DB_DIR}/googlefight_cache.db", O_CREAT|O_RDWR ;
+    tie %googlefight_cache, 'DB_File', "${Jabbot::DB_DIR}/googlefight_cache.db", O_CREAT|O_RDWR ;
     if($googlefight_cache{$q}) {
 	$r= $googlefight_cache{$q};
 	untie %googlefight_cache;

@@ -9,12 +9,12 @@ use Jabbot::ModLib;
 
 
 my $priority = 1000;
-my $qstring = $MSG{body}; 
+my $qstring = $Jabbot::ModLib::MSG{body}; 
 
 my @zhi = split "",$qstring;
 
 my %db;
-tie %db, 'DB_File', "${DB_DIR}/bowcounttsi.db", O_CREAT|O_RDWR;
+tie %db, 'DB_File', "${Jabbot::DB_DIR}/bowcounttsi.db", O_CREAT|O_RDWR;
 
 for my $i (0..$#zhi) {
     for my $j (0..$#zhi-$i) {
