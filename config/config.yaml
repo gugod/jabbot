@@ -1,10 +1,13 @@
 message_dispatcher_port: 65000
 irc_frontend_port: 65123
 irc_networks:
-- freenode
-- ircnet
+- localhost
+# - freenode
+# - ircnet
 irc_freenode_server: irc.freenode.net
 irc_ircnet_server: irc.ircnet.net
+irc_localhost_server: 127.0.0.1
+
 nick: jabbot3
 admin:
 - gugod
@@ -12,4 +15,15 @@ admin:
 irc_channels:
 - jabbot3
 
+irc_channels:
+- freenode:jabbot3
+- localhost:jabbot3
 
+feeds:
+- fortune
+feeds_fortune_url: http://gugod.org/fortune.cgi
+feeds_fortune_delay: 10
+feeds_fortune_shorturl: yes
+feeds_fortune_channels:
+- freenode:jabbot3
+- localhost:jabbot3
