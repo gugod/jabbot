@@ -54,7 +54,7 @@ sub handle_feed {
 
         if($self->config->{"feeds_${feed_name}_appendurl"}) {
             my $url = ($self->config->{"feeds_${feed_name}_shorturl"})?
-                makeashorterlink($headline->url):$headline->url;
+                eval 'makeashorterlink($headline->url)':$headline->url;
             $text .= " $url";
         }
 
