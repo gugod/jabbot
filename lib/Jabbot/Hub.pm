@@ -7,6 +7,8 @@ sub process {
     my $msg = shift;
     my $reply = reduce {
         $a->priority > $b->priority ? $a : $b
+    } grep {
+        defined $_->text
     } map {
         $self->$_->process($self->hub->message->new(text => $msg))
     } shuffle($self->all_plugin_ids);
