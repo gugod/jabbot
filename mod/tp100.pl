@@ -10,20 +10,26 @@ use Jabbot::ModLib;
 my $priority = 0;
 my $s = $MSG{body};
 my $r;
+my $to = $MSG{from};
 
 if($s =~ /(吃|喫)/) {
     $r = do_my_job($s);
     if($MSG{to} eq "deadhead") {
 	$r = "死頭推薦: $r";
     } else { 
-	undef "要吃就要吃$r" unless ($MSG{to} eq $BOT_NICK) ;
+	$r = "要吃就要吃$r" unless ($MSG{to} eq $BOT_NICK) ;
     }
+} elsif ($s =~ /肚子餓/) {
+    $r = do_my_job($s);
+    $r = "那就吃$r吧";
 }
 
-$priority =10000 if(length($r) > 0);
+$to = undef unless ($MSG{to} eq $BOT_NICK) 
+
+$priority =1 if(length($r) > 0);
 
 reply({ from => $BOT_NICK,
-	to   => $MSG{from},
+	to   => $to,
 	body => $r,
 	priority => $priority
     });
@@ -62,8 +68,8 @@ sub do_my_job {
 "海底椰合桃花生煲雞湯","茶樹菇雞湯","猴頭菇瘦肉湯",
 "猴頭菇桑椹子金蟬花湯","猴頭菇靈芝金霍斛湯","蓮藕章魚湯",
 "豬腳筋瘦肉湯","西湖牛肉羹","碗仔翅","雜碎麵",
-
-			"小便當", "大便當", "超大便當"
+			"小便當", "大便當", "超大便當",
+			"鐵牛運功散"
 ;
 }
 
