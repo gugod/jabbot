@@ -45,14 +45,11 @@ sub process {
 
 sub jabbotmsg {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
-    print YAML::Dump($msg);
-    my $network = $heap->{network};
+    my ($network,$text,$channel) = @$msg{qw(name text channel)};
+    Encode::from_to($text,'utf8','big5');
     eval {
-        my $text = $msg->{text};
-	Encode::from_to($text,'utf8','big5');
-        my $channel = $msg->{channel};
-        $kernel->post("irc_frontend_${network}" => privmsg => "#$channel", $text );
-        say "[#$channel] $msg->{text} on " . localtime(time);
+        $kernel->post($network => privmsg => "#$channel", $text );
+        say "[${network}/#$channel] $msg->{text} on " . localtime(time);
     };
     say "update error: $@" if $@;
 }
