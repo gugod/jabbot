@@ -1,0 +1,37 @@
+#!/usr/local/bin/perl
+
+BEGIN {push @INC, "../lib";}
+
+use strict;
+
+use Jabbot::Lib;
+use Jabbot::ModLib;
+
+my $priority = 0;
+my $s = $MSG{body};
+my $r;
+
+# This command is executed only if some user is talking to me.
+exit(0) unless ($MSG{to} eq $BOT_NICK);
+
+# Response only if the input looks like a standard "echo"
+if($s =~ /^echo (\w+)$/) {
+    $r = do_my_job($1);
+}
+
+# priority is suggest to be non-zero ONLY if you have
+# quite positive response. Lager value means higher priority.
+$priority = 10 if(length($r) > 0);
+
+# Reply it.
+reply({ from => $BOT_NICK,
+	to   => $MSG{to},
+	body => $r,
+	priority => $priority
+    });
+
+sub do_my_job {
+	my $what = shift;
+	return $what;
+}
+

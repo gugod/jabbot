@@ -1,0 +1,22 @@
+scale = 10
+define quadratic_condition_eq(a,b,c)
+{
+	t1 = (b^2 - 4*a*c);
+        return t1
+}
+
+define quadratic_root_p( a, b, c )
+{
+	t1 = (-1)*b / ( 2 * a )
+	t2 = sqrt( b*b/4 - a * c ) / a
+	t = t1 + t2
+	return t
+}
+
+define quadratic_root_n( a, b, c )
+{
+	t1 = (-1)*b / ( 2 * a )
+	t2 = sqrt( b*b/4 - a * c ) / a
+	t = t1 - t2
+	return t
+}

@@ -1,0 +1,46 @@
+Jabbot2 Architecture.
+
+/ ($BOT_HOME)
+
+/agent (agent bots)
+	irc.pl
+	ournet.pl
+	bbsagent.pl
+
+/func ($FUNC_BOT_HOME) (functional bots)
+       google.pl  (google bot)
+       message.pl (message bot)
+       game.pl    (game bot)
+
+The 'agent bot' is only a messaging agent of human (on IRC or
+something) to functional bots. Each functional bot must follow the
+protocol (see Protocol.txt) to introduce itself to the agent bot. The
+agent bot then has a mechanism to retrieve information of every
+functional bots at RUNTIME, so that the update of a bot need not to be
+offline, since it can be partially updated.
+
+Bots may be run under two kinds of mode, the batch mode and daemon
+mode. A batch mode bot doesn't run until it's triggered, called by
+some other bots or something. The communication channel between a
+batch mode and it's caller may be an unnamed pipe, or some pre-defined
+file. A daemon mode bot is like a stand-alone server program, opening
+a communication channel to talk with somebody else. The implementation
+of such channel is platform-dependent. On traditional UNIX systems,
+bots may use a AF_UNIX socket as it's communication channel. To be
+more distributed, bots may open a TCP socket as it's communication
+channel, so that it can server other bots via Internet.Some
+Authentication/Access control mechinism defined by bot's maintainer
+should be implemented to prevent malicious attacks.
+
+Generally, bots that use more memories to cache data on disk may be in
+daemon mode, or ,statistically, bots are less called might be in batch
+mode, since we want to maximize the performance of these bots.
+
+Daemon mode bots must have the ability of multi-tasking. Since
+requests comes at random. (Hence one daemon mode bot may have
+several process running simultaneously.)
+
+
+Have fun,
+Kang-min Liu <gugod@gugod.org>
+

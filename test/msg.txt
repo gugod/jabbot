@@ -1,0 +1,5 @@
+to: jabbot2
+from: gugod
+X-body: gy++ # nice gy
+
+song on µ²§ô
