@@ -236,6 +236,11 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
   my @urlmatch=(
 
 		[
+		'mypaper.pchome.com.tw',
+		sub { $_[0] =~ m/^mytitle="(.+?)"/m },
+		sub { "個人新聞站台: [ $_[0] ] "},
+		],
+		[
 		'openfoundry.org/Foundry/Project/index.html',
 		sub { $_[0] =~ m{style="color: white"><b>(.+?)</b></a></label></div></td>}mi },
 		sub { "OpenFoundry Project: [ $_[0] ]" },
