@@ -9,7 +9,7 @@ use Jabbot::ModLib;
 use Encode::Guess;
 use Lingua::ZH::Numbers 'big5';
 use Lingua::ZH::Summarize ;
-
+use Time::localtime;
 use WWW::Shorten 'TinyURL';
 
 my $s = $MSG{body};
@@ -189,17 +189,9 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
   my $response;
   eval {
     local $SIG{ALRM} = sub { die"timeout\n"};
-    if($s =~ /udn/i) {
-	# $request = HTTP::Request->new('GET', "http://gugod.org/");
-	#$request = HTTP::Request->new('GET', 'file:///tmp/antiudn');
-	alarm 5;
-	$response = $ua->request($request);
-	alarm 0;
-    } else {
-	alarm 5;
-	$response = $ua->request($request);
-	alarm 0;
-	   }
+    alarm 5;
+    $response = $ua->request($request);
+    alarm 0;
   };
   if($@) {
      die unless $@ eq "timeout\n";
@@ -251,7 +243,6 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		],
       		[
 		 'udn' ,
-#		 sub { "為了對聯合報系的抵制不列出標題" },
 		 sub { $_[0]=~m/<title>([^<]*)<\/title>/im },
 		 sub { (split(/ [|] /,$_[0]))[-1] },
 		 sub { trim_whitespace(@_) ; @_ },
@@ -259,7 +250,6 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		],
       		[
 		 'times.hinet.net' ,
-#		 sub { "為了對聯合報系的抵制不列出標題" },
 		 sub { $_[0]=~m/<title>([^<]*)<\/title>/im },
 		 sub { (split(/ [-] /,$_[0]))[-1] },
 		 sub { trim_whitespace(@_) ; @_ },
@@ -370,7 +360,9 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		]
 	       );
 
-  my $request = HTTP::Request->new('GET', "$1");
+  my $url_orig = $1;
+  my $url = remap_url($1);
+  my $request = HTTP::Request->new('GET', $url);
   $ua->max_size(40960);
   my $response;
   eval {
@@ -404,6 +396,9 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
       $to="";
       $reply = any2big5(decode_special($reply));
       $reply .= " $short_url";
+      unless($url eq $url_orig) {
+        $reply .= " ($url)";
+      }
     }
   }
 }
@@ -442,3 +437,23 @@ sub any2big5 {
     }
     return $reply;
 }
+
+sub remap_url
+{
+	my $url = shift;
+	if($url =~ m{udn.com}) {
+		return udn_archive($url);
+	}
+	return $url;
+}
+
+sub udn_archive
+{ 
+  my ($url) = @_;
+  my $date;
+  
+  $date = sprintf("%d/%d/%d/", localtime->year + 1900, localtime->mon + 1, localtime->mday);
+  $url =~ s#((?:http://)?)(udn\.com/)(.*)#$1 . "archive." . $2 . $date . $3#e;
+  return $url;
+}
+
