@@ -292,8 +292,13 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		],
 		[
 		 'tw.comic.yahoo.com/od/play' ,
-		 sub { $_[0]=~m#>([^<>]*?)</font></b></td>#im },
-		 sub { "©_¼¯¥dº©¡G[ ".$_[0]." ]" }
+		 sub { $_[0]=~m/color=#003366>([^<>]*?)<\/font><\/b><\/td>/im },
+		 sub { "©_¼¯¥dº© - River¡G[ ".$_[0]." ]" }
+		],
+		[
+		 'comics.sina.com.tw/river/' ,
+		 sub { $_[0]=~m/<input type=hidden name=title value="([^"]*)">/im },
+		 sub { "·s®öº©µe - River¡G[ ".$_[0]." ]" }
 		],
 		[
 		 'taiwan.cnet.com' ,
