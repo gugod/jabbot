@@ -4,8 +4,8 @@ use Chatbot::Eliza;
 
 const class_id => 'eliza';
 
-field chatterbot => {}.
-    -init => 'new Chatbot::Eliza';
+field chatterbot => {},
+    -init => 'Chatbot::Eliza->new()';
 
 sub process {
     $self->chatterbot->transform( shift )
