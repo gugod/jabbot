@@ -1,5 +1,6 @@
 package Jabbot::TaiwanLotto;
 use Jabbot::Plugin -Base;
+use utf8;
 
 const class_id => 'taiwanlotto';
 
@@ -8,11 +9,11 @@ sub process {
     my $reply;
     if($s =~ /^lotto$/i) {
         $reply = join(",", sort{$a<=>$b}(sort{rand()<=>rand()}(1..42))[0..5]);
-    } elsif($s =~ /^\Q¥|¬P±m\E$/) {
+    } elsif($s =~ /^\Qå››æ˜Ÿå½©\E$/) {
         warn "Matched [$s]\n";
-        my $t = sprintf"%04d",int(rand(10000));
-        $reply = sprintf("¥¿±m %s, «e¤T±m %s, «á¤T±m %s, «e¹ï±m %s, «á¹ï±m %s.",
-                         $t, substr($t,0,3), substr($t,-3,3), m/(\d\d)(\d\d)/);
+        $_ = sprintf"%04d",int(rand(10000));
+        $reply = sprintf("æ­£å½© %s, å‰ä¸‰å½© %s, å¾Œä¸‰å½© %s, å‰å°å½© %s, å¾Œå°å½© %s.",
+                         $_, substr($_,0,3), substr($_,-3,3), m/(\d\d)(\d\d)/);
     }
     $self->reply($reply,10000);
 }

@@ -1,6 +1,7 @@
 package Jabbot::IRC;
 use Jabbot::Base -Base;
 use Net::IRC;
+use Encode qw(encode decode);
 
 field nick => 'jabbot3';
 
@@ -31,10 +32,10 @@ sub on_public {
     my $event   = shift;
     my $channel = lc(( $event->to )[0]);
     my $nick    = $event->nick;
-    my $text    = ( $event->args )[0];
+    my $text    = decode('big5',( $event->args )[0]);
     my $hub     = $bot->hub;
     my $reply   = $bot->hub->process($text);
     warn "[$nick] $text\n";
     warn "[$channel] $reply\n";
-    $self->privmsg($channel,$reply);
+    $self->privmsg($channel,encode('big5',$reply));
 }

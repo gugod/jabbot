@@ -1,27 +1,28 @@
 package Jabbot::zh_tw::DateDay;
 use Jabbot::Plugin -Base;
 use Date::Day;
+use utf8;
 
 const class_id => 'zhtw_dateday';
 
 my %ZhDay = (
-    MON => "¬P´Á¤@",
-    TUE => "¬P´Á¤G",
-    WED => "¬P´Á¤T",
-    THU => "¬P´Á¥|",
-    FRI => "¬P´Á¤­",
-    SAT => "¬P´Á¤»",
-    SUN => "¬P´Á¤é",
+    MON => "æ˜ŸæœŸä¸€",
+    TUE => "æ˜ŸæœŸäºŒ",
+    WED => "æ˜ŸæœŸä¸‰",
+    THU => "æ˜ŸæœŸå››",
+    FRI => "æ˜ŸæœŸäº”",
+    SAT => "æ˜ŸæœŸå…­",
+    SUN => "æ˜ŸæœŸæ—¥",
     );
 
 sub process {
     my $msg = shift->text;
     my $reply;
-    if($msg =~ /^(.*¸¹)(?:¬O)?(?:¬P´Á´X)?/) {
+    if($msg =~ /^(.*è™Ÿ)(?:æ˜¯)?(?:æ˜ŸæœŸå¹¾)?/) {
         my $target = $1;
-        my $p = '(.+)¸¹';
-        my $p0 = '(.+)¤ë(.+)¸¹';
-        my $p1 = '(.+)¦~(.+)¤ë(.+)¸¹';
+        my $p = '(.+)è™Ÿ';
+        my $p0 = '(.+)æœˆ(.+)è™Ÿ';
+        my $p1 = '(.+)å¹´(.+)æœˆ(.+)è™Ÿ';
         my @now = localtime(time);
         if ($target =~ /$p1/) {
             my ($o,$m,$n) = ($1,$2,$3);
@@ -39,7 +40,7 @@ sub process {
             my $result = &day($now[4]+1,$n,$now[5]+1900);
             $reply = $ZhDay{$result};
         }
-        $reply = "${target}¬O${reply}"
+        $reply = "${target}æ˜¯${reply}"
             if(defined $reply && rand(100) > 60);
     }
     $self->reply($reply,10000);
