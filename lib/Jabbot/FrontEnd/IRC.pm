@@ -15,7 +15,7 @@ sub process {
     $self= shift;
     $config = $self->config;
     POE::Component::IKC::Server->spawn(
-        port => $self->config->{irc_daemon_port},
+        port => $self->config->{irc_frontend_port},
         name => $self->config->{nick}
        );
 
