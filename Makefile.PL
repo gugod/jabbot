@@ -9,6 +9,7 @@ license('perl');
 requires(
     Kwiki => '0.37',
     Net::IRC => 0,
+    Chatbot::Eliza => 0,
 );
 
 check_nmake();
