@@ -1,7 +1,13 @@
-package Jabbot::Backend::MessageDispatcher;
-use Jabbot::Backend -base;
-use POE::Component::IKC::Server;
-use POE::Component::IKC::ClientLite;
+package Jabbot::BackEnd::MessageDispatcher;
+use strict;
+use warnings;
+use Jabbot::BackEnd -base;
+use POE qw(Session
+           Component::IKC::Server
+           Component::IKC::Specifier
+           Component::IKC::ClientLite);
+
+use YAML;
 
 # This backend dispatch messages from other backends to specified
 # frontends. Therefore, this module is a ikc client and server.
@@ -11,23 +17,26 @@ my $name = 'MessageDispatcher';
 
 sub process {
     $self = shift;
-    POE::Component::IKC::Server->spawn(
+    create_ikc_server(
         port => $self->config->{message_dispatcher_port},
         name => $name
        );
     POE::Session->create(
+        heap => { frontends => [] },
         inline_states => {
-            heap => { frontends => {} },
-            _start => sub {
-                my($kernel) = @_[KERNEL];
-                $kernel->call(IKC=>publish=>$name=>['message']);
-                $kernel->call(IKC=>publish=>$name=>['register']);
-            },
+            _start => \&on_start,
             message => \&on_message,
             register => \&on_register,
            }
        );
-    POE::Kernel->run();
+    $poe_kernel->run();
+}
+
+sub on_start {
+    my ($kernel,$heap) = @_[KERNEL,HEAP];
+    $kernel->alias_set("MessageDispatcher");
+    $kernel->call(IKC => publish => $name => ['message','register']);
+    say "Message Dispatcher Started";
 }
 
 sub on_register {
@@ -41,14 +50,17 @@ sub on_register {
 sub on_message {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
 
-    for my $frontend (@{$heap->{frontends}}) {
-        my $remote = POE::Component::IKC::ClientLite::create_ikc_client(
-            port => $frontend->{port},
-            name => "CheatConsole$$",
-           ) or die $POE::Component::IKC::ClientLite::error;
-        $remote->post("$frontend->{name}/message",$msg)
-            if($frontend->{name} eq $msg->{frontend});
-    }
+    print YAML::Dump($msg);
+
+#     for my $frontend (@{$heap->{frontends}}) {
+#         my $remote = POE::Component::IKC::ClientLite::create_ikc_client(
+#             port => $frontend->{port},
+#             name => "CheatConsole$$",
+#            ) or die $POE::Component::IKC::ClientLite::error;
+#         $remote->post("$frontend->{name}/message",$msg)
+#             if($frontend->{name} eq $msg->{frontend});
+#     }
+
 }
 
 1;

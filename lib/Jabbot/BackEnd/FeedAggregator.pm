@@ -3,6 +3,7 @@ use strict;
 use Jabbot::BackEnd -base;
 use POE;
 use POE::Component::RSSAggregator;
+use POE::Component::IKC::ClientLite;
 
 my $self;
 
@@ -21,7 +22,7 @@ sub init_session {
     my @feeds = map {
         {
             url => $self->config->{"feeds_${_}_url"},
-            delay => 600,
+            delay => $self->config->{"feeds_${_}_delay"} || 600,
             name => $_,
         }
     } @{$self->config->{feeds}};
@@ -38,13 +39,9 @@ sub init_session {
 
 sub handle_feed {
     my ($kernel,$feed) = ($_[KERNEL], $_[ARG1]->[0]);
-    no warnings 'once'; # i use package variables below
-    require POE::Component::IKC::ClientLite;
-    my $remote = POE::Component::IKC::ClientLite::create_ikc_client(
-        port => $self->config->irc_daemon_port,
-        name => "FeedAggregator$$",
-        timeout => 5,
-    ) or die $POE::Component::IKC::ClientLite::error;
+    my $remote = create_ikc_client(
+        port => $self->config->{message_dispatcher_port}
+       ) or die POE::Component::IKC::ClientLite::error();
     my $feed_name = $feed->name;
     for my $headline ($feed->late_breaking_news) {
         my $channels = $self->config->{"feeds_${feed_name}_channels"};
@@ -52,9 +49,11 @@ sub handle_feed {
         for(@$channels) {
             my($network,$channel) = split(/:/,$_);
             say "Posting to $network / $channel";
-            $remote->post("${network}/message",
+            $remote->post("MessageDispatcher/message",
                           {channel => $channel,
-                           text => "$feed_name:: ". $headline->headline});
+                           network => $network,
+                           text => "$feed_name:: ". $headline->headline})
+                or die $remote->error;
         }
     }
 }
