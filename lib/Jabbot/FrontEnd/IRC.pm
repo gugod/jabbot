@@ -1,66 +1,42 @@
 package Jabbot::FrontEnd::IRC;
 use Jabbot::FrontEnd -Base;
-use Net::IRC;
-use Encode qw(encode decode);
-use YAML;
-
-field irc  => {}, -init => 'new Net::IRC';
-field conn => {};
-
-# $self in $conn handlers refers to a Net::IRC::Connection object
-# So Jabbot::IRC object is kept in this lexical variable.
-# We do love lexical scoping so much, don't we ?
-my $bot;
-my $conn;
-
-sub on_internal_messaged {
-    my $hub     = $bot->hub;
-    my $msg     = $hub->process('');
-    if(defined($msg->text)) {
-        my $reply   = $msg->text;
-        my $channel = $msg->channel || '#jabbot3';
-        warn "[$channel] $reply\n";
-        $conn->privmsg($channel,encode('big5',$reply));
-    }
-}
 
 sub process {
-    $bot = $self;
-    $self->use_class('config');
-    $conn = $self->irc->newconn(
-        Server => $self->config->{irc_server},
+    my $bot = Jabbot::FrontEnd::IRC::Bot->new(
         Nick => $self->config->{nick},
+        Server => $self->config->{irc_server},
+        Channels => $self->config->{irc_channels},
+        LogPath => '/tmp/',
        );
-    $conn->add_global_handler( 376, \&on_connect );
-    $conn->add_handler("public",\&on_public);
-    $self->conn($conn);
-#    $self->irc->addfh($self->sock,\&on_internal_messaged,"r");
-    $self->irc->start();
+    $bot->{jab} = $self;
+    $bot->run();
 }
 
-sub on_connect {
-    for(@{$bot->config->{irc_channels}}) {
-        $self->join($_);
-	warn "joined $_\n";
-    }
-}
+
+package Jabbot::FrontEnd::IRC::Bot;
+use POE;
+use base 'IRC::Bot';
+use Encode;
+use YAML;
+
+# Check POE/Session.pm for those myth values
 
 sub on_public {
-    my $event   = shift;
-    my $channel = lc(( $event->to )[0]);
-    my $nick    = $event->nick;
-    my $text    = decode('big5',( $event->args )[0]);
+    unshift(@_,'dummy');
+    my ($kernel,$who,$where,$msg) = @_[KERNEL,ARG0..$#_];
+    my $nick = ( split /!/, $who )[0];
+    my $channel = $where->[0];
+    my $pubmsg  = Encode::decode('big5',$msg);
     my $to = sub {
-	return '' if($_[0] =~ /^http/i);
-	if($_[0] =~ s/^([\d\w\|]+)\s*[:,]\s*//) { return $1; }
-	return '';
-    }->($text);
-    warn "[$nick] $text\n";
-    my $hub     = $bot->hub;
-    my $msg     = $hub->process($text);
-    if($to eq $bot->config->{nick} || $msg->must_say) {
-        my $reply   = $msg->text;
-	warn "[$channel] $reply\n";
-	$self->privmsg($channel,encode('big5',"$nick: $reply"));
+       return '' if($_[0] =~ /^http/i);
+       if($_[0] =~ s/^([\d\w\|]+)\s*[:,]\s*//) { return $1; }
+       return '';
+    }->($pubmsg);
+    my $reply = $self->{jab}->hub->process($pubmsg);
+    my $reply_text = $reply->text;
+    if(length($reply_text) &&
+           ($to eq $self->{jab}->config->{nick} || $reply->must_say)) {
+        $reply_text = Encode::encode('big5',"$to: $reply_text");
+        $self->botspeak($kernel,$channel,$reply_text);
     }
 }
