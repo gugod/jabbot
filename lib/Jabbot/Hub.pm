@@ -11,7 +11,7 @@ sub process {
     $self->preload;
     my $msg = shift;
     my @replies = grep {
-        defined $_->text
+        defined $_->text && $_->text ne '' && !($_->text =~ /^\s+$/)
     } map {
         eval { $self->$_->process($msg) } or $self->message->new;
     } $self->all_plugin_ids;
