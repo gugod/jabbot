@@ -159,6 +159,7 @@ sub on_public {
 	my @r;
 	foreach ( @bot_module ){
 #		next if (rand(10) > 50);
+		next unless(-x "${MOD_DIR}/$_");
 		my $pid = open2(\*RDRFH, \*WTRFH, "${MOD_DIR}/$_");
 		print WTRFH msg2txt({ from => $nick,
 				to   => $to,
