@@ -8,9 +8,6 @@ use POE qw(Session
            Component::IKC::Specifier);
 use Encode qw(encode decode);
 
-sub msg { print " * @_\n" }
-sub err { print " * @_\n" }
-
 my $config;
 my $self;
 
@@ -58,21 +55,21 @@ sub jabbotmsg {
         }
         $kernel->post(bot => privmsg => "#$_", $text )
             for(@channels);
-        msg "[#$channel] $msg->{text} on " . localtime(time);
+        say "[#$channel] $msg->{text} on " . localtime(time);
     };
-    err "update error: $@" if $@;
+    say "update error: $@" if $@;
 }
 
 sub bot_default {
     my ($event,$args) = @_[ ARG0 .. $#_ ];
-    err "unhandled $event";
-    err "  - $_" foreach @$args;
+    say "unhandled $event";
+    say "  - $_" foreach @$args;
     return 0;
 };
 
 sub bot_start {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
-    msg "starting irc session";
+    say "starting irc session";
     $kernel->alias_set('frontend_irc');
     $kernel->call( IKC => publish => frontend_irc => ['update'] );
     $kernel->post( bot => register => 'all' );
@@ -83,13 +80,13 @@ sub bot_start {
 }
 
 sub bot_stop {
-    msg "stopping bot";
+    say "stopping bot";
 }
 
 sub bot_connected {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
     foreach (@{$config->{irc_channels}}) {
-        msg "joining channel #$_";
+        say "joining channel #$_";
         $kernel->post(bot=>join=>"#$_")
     }
 }
@@ -104,7 +101,7 @@ sub bot_do_autoping {
 
 sub bot_reconnect {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
-    err "reconnect: ".$_[ARG0];
+    say "reconnect: ".$_[ARG0];
     $kernel->delay(autoping=>undef);
     $kernel->delay(connect=>60);
 }
