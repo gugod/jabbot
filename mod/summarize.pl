@@ -233,7 +233,13 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 			       timeout => 30,
 			      );
 			      #$ua->proxy('http',$http_proxy);
-  my @urlmatch=([
+  my @urlmatch=(
+		[
+		'openfoundry.org/Foundry/Project/index.html',
+		sub { $_[0] =~ m{style="color: white"><b>(.+?)</b></a></label></div></td>}mi },
+		sub { "OpenFoundry Project: [ $_[0] ]" },
+		],
+		[
 		 'udn' ,
 #		 sub { "為了對聯合報系的抵制不列出標題" },
 		 sub { $_[0]=~m/<title>([^<]*)<\/title>/im },
