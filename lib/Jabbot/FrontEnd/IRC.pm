@@ -87,9 +87,11 @@ sub bot_connected {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
     my $network = $heap->{network};
     say "Connected to $network";
-    foreach (@{$config->{"irc_${network}_channels"}}) {
+    foreach (map {
+        s/${network}://; $_
+    } grep { /^${network}:/ } @{$config->{"irc_channels"}}) {
         say "Joining channel #$_";
-        $kernel->post($network=>join=>"#$_")
+        $kernel->post($network=>join=>"#$_");
     }
 }
 
