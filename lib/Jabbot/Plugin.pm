@@ -15,4 +15,3 @@ sub init {
     $self->use_class('config');
     $self->config->add_file($self->config_file);
 }
-
