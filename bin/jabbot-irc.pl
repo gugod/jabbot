@@ -8,5 +8,5 @@ use lib 'lib';
 use Jabbot;
 my @configs = qw(config.yaml -plugins plugins);
 
-Jabbot->new->load_hub('config.yaml')->irc->process(@ARGV);
+Jabbot->new->load_hub(@configs)->irc->process(@ARGV);
 
