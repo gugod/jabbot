@@ -17,7 +17,7 @@ sub process {
        );
     POE::Session->create(
         inline_states => {
-            heap => { frontends => {} }
+            heap => { frontends => {} },
             _start => sub {
                 my($kernel) = @_[KERNEL];
                 $kernel->call(IKC=>publish=>$name=>['message']);
