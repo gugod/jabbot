@@ -10,6 +10,8 @@ use Encode::Guess;
 use Lingua::ZH::Numbers 'big5';
 use Lingua::ZH::Summarize ;
 
+use WWW::Shorten 'TinyURL';
+
 my $s = $MSG{body};
 my $reply;
 my $priority = 0;
@@ -225,8 +227,10 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
       $reply = any2big5(decode_special($reply));
     }
   }
-}elsif($s =~ /(http:\S+)\s*/) {
+}elsif($s =~ /(http:\S+)/) {
 ## Contributed by kcwu
+
+  my $short_url = makeashorterlink($1);
   require LWP::UserAgent;
   my $ua = LWP::UserAgent->new(env_proxy => 1,
 			       keep_alive => 1,
@@ -399,6 +403,7 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
       $reply=$content[0];
       $to="";
       $reply = any2big5(decode_special($reply));
+      $reply .= " $short_url";
     }
   }
 }
