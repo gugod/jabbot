@@ -19,7 +19,7 @@ sub process {
     my $msg = shift;
     my $qstring = $msg->text;
     my $r;
-
+    return unless($msg->to eq $self->config->{nick});
     $qstring =~ s/^(.*)是誰\s*(\?|？)$/誰是$1？/;
 
     if ($qstring =~ /^誰是/) {$qstring .= "？"}
@@ -115,7 +115,7 @@ sub do_my_job {
             $r = $self->rand_choose(@rdb);
         }
     }
-    return $r if($msg->to eq $self->config->{nick});
+    return $r;
 }
 
 sub strip_meanless_tsi {

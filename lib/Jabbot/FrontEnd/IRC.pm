@@ -116,6 +116,7 @@ sub bot_public {
     my $nick = ( split /!/, $who )[0];
     my $channel = $where->[0];
     my $pubmsg  = decode('big5',$msg);
+    say "[$network/$channel] ". encode('utf8',$pubmsg);
     my $to = sub {
        return '' if($_[0] =~ /^http/i);
        if($_[0] =~ s/^([\d\w\|]+)\s*[:,]\s*//) { return $1; }
