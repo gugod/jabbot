@@ -1,5 +1,9 @@
 irc_daemon_port: 65123
-irc_server: irc.freenode.net
+irc_networks:
+- freenode
+- ircnet
+irc_freenode_server: irc.freenode.net
+irc_ircnet_server: irc.ircnet.net
 nick: jabbot3
 admin:
 - gugod

@@ -19,23 +19,26 @@ sub process {
         name => $self->config->{nick}
        );
 
-    POE::Component::IRC->new('bot')
-            or die "Couldn't create IRC POE session: $!";
+    for my $network (@{$config->{irc_networks}}) {
+        POE::Component::IRC->new($network)
+                or die "Couldn't create IRC POE session: $!";
+        POE::Session->create(
+            heap => { network => $network },
+            inline_states => {
+                _start           => \&bot_start,
+                _stop            => sub { say "stopping bot" },
+                irc_001          => \&bot_connected,
+                irc_disconnected => \&bot_reconnect,
+                irc_error        => \&bot_reconnect,
+                irc_socketerr    => \&bot_reconnect,
+                irc_public       => \&bot_public,
+                autoping         => \&bot_do_autoping,
+                message          => \&jabbotmsg,
+                _default         => $ENV{DEBUG} ? \&bot_default : sub {},
+            }
+           );
+    }
 
-    POE::Session->create(
-        inline_states => {
-            _start           => \&bot_start,
-            _stop            => \&bot_stop,
-            irc_001          => \&bot_connected,
-            irc_disconnected => \&bot_reconnect,
-            irc_error        => \&bot_reconnect,
-            irc_socketerr    => \&bot_reconnect,
-            irc_public       => \&bot_public,
-            autoping         => \&bot_do_autoping,
-            update           => \&jabbotmsg,
-            _default         => $ENV{DEBUG} ? \&bot_default : sub {},
-        }
-       );
     POE::Kernel->run();
 }
 
@@ -69,32 +72,32 @@ sub bot_default {
 
 sub bot_start {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
-    say "starting irc session";
+    my $network = $heap->{network};
+    say "Starting irc session, Connecting to $network";
     $kernel->alias_set('frontend_irc');
-    $kernel->call( IKC => publish => frontend_irc => ['update'] );
-    $kernel->post( bot => register => 'all' );
-    $kernel->post( bot => connect => {
-        Nick=>$config->{nick},
-        Server=>$config->{irc_server},
+    $kernel->call( IKC => publish => "frontend_irc" => ['message'] );
+    $kernel->post( $network => register => 'all' );
+    $kernel->post( $network => connect => {
+        Nick =>   $config->{nick},
+        Server => $config->{"irc_${network}_server"}
     });
-}
-
-sub bot_stop {
-    say "stopping bot";
 }
 
 sub bot_connected {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
-    foreach (@{$config->{irc_channels}}) {
-        say "joining channel #$_";
-        $kernel->post(bot=>join=>"#$_")
+    my $network = $heap->{network};
+    say "Connected to $network";
+    foreach (@{$config->{"irc_${network}_channels"}}) {
+        say "Joining channel #$_";
+        $kernel->post($network=>join=>"#$_")
     }
 }
 
 sub bot_do_autoping {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
-    $kernel->post(bot=>userhost=>$config->{notify_irc_nickname})
-      unless $heap->{seen_traffic};
+    my $network = $heap->{network};
+    $kernel->post($network=>userhost=>$config->{notify_irc_nickname})
+        unless $heap->{seen_traffic};
     $heap->{seen_traffic} = 0;
     $kernel->delay(autoping=>300);
 }
@@ -108,6 +111,7 @@ sub bot_reconnect {
 
 sub bot_public {
     my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
+    my $network = $heap->{network};
     my $nick = ( split /!/, $who )[0];
     my $channel = $where->[0];
     my $pubmsg  = decode('big5',$msg);
@@ -121,9 +125,8 @@ sub bot_public {
     if(length($reply_text) &&
            ($to eq $self->config->{nick} || $reply->must_say)) {
         $reply_text = encode('big5',"$nick: $reply_text");
-        $kernel->post(bot => privmsg => $channel, $reply_text);
+        $kernel->post($network => privmsg => $channel, $reply_text);
     }
 }
-
 
 1;
