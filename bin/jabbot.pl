@@ -218,7 +218,7 @@ sub on_public {
 		foreach(@msgs);
 	}
     }
-    wait foreach(@bot_module);
+    #wait foreach(@bot_module);
 }
 
 
