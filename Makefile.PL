@@ -14,6 +14,7 @@ requires(
     POE => 0,
     POE::Component::IRC => 0,
     POE::Component::IKC => 0,
+    POE::Component::RSSAggregator => 0,
 );
 
 check_nmake();
