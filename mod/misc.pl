@@ -19,7 +19,7 @@ if($s =~ /^date\?*$/i) {
 } elsif($s =~ /^nslookup\s+([\w\.]+)\?*$/i) {
     $reply = `/usr/bin/host $1`;
     $reply =~ s/\n/ , /gs;
-} elsif( $s =~ /^!+$/ ) {
+} elsif( (($MSG{to} eq $BOT_NICK )|| ($MSG{to} eq "" )) && $s =~ /^!+$/ ) {
     $c = $s =~ tr/!/!/;
     if( $c == 1 ) {
 	$reply = "Åå¹Ä¸¹¬O´Îºl¡C";
