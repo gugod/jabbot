@@ -290,9 +290,15 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		 sub { "The Register: [ ".$_[0]." ]" }
 		],
 		[
-		 'tw.comic.yahoo.com/od/play' ,
-		 sub { $_[0]=~m/color=#003366>([^<>]*?)<\/font><\/b><\/td>/im },
+		 'tw.comics.yahoo.com' ,
+		 sub { $_[0]=~m/<font color="#336699"><strong>\n([^<>]*?)<!--
+		 /im },
 		 sub { "奇摩卡漫 - River：[ ".$_[0]." ]" }
+		],
+		[
+		 'mobile01.com' ,
+		 sub { $_[0] =~ m/<span class="topic"><font color="#[0-9A-Fa-f]+">(.+?)<\/font>/im ;},
+		 sub { "Mobile01: [ ".$_[0]." ]" }
 		],
 		[
 		 'comics.sina.com.tw/river/' ,
@@ -320,7 +326,7 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		],
 		[
 		  'www.ettoday.com',
-		  sub {$_[0]=~m/<td height="25"><font size="4" color="#0000ff"><b>([^<]*)<\/b>/im},
+		  sub {$_[0]=~m/<Title>([^<]*)<\/Title>/m},
 		  sub { trim_whitespace(@_) ; @_ },
 		  sub { "東森新聞報：[ ".$_[0]." ]" }
 		],
