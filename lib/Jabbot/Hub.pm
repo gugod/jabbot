@@ -1,14 +1,16 @@
 package Jabbot::Hub;
 use Spoon::Hub -Base;
-use List::Util qw(shuffle);
+use List::Util qw(shuffle reduce);
 
 sub process {
-    my $msg = shift;
     $self->preload;
-    my @reply = map {
-        $self->$_->process($msg);
-    } $self->all_plugin_ids;
-    return (shuffle @reply)[0];
+    my $msg = shift;
+    my $reply = reduce {
+        $a->priority > $b->priority ? $a : $b
+    } map {
+        $self->$_->process($self->hub->message->new(text => $msg))
+    } shuffle($self->all_plugin_ids);
+    $reply->text;
 }
 
 sub all_plugin_ids {

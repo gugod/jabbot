@@ -13,5 +13,6 @@ sub new {
 
 sub init {
     $self->use_class('config');
+    $self->use_class('message');
     $self->config->add_file($self->config_file);
 }

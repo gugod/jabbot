@@ -8,6 +8,7 @@ field chatterbot => {},
     -init => 'Chatbot::Eliza->new()';
 
 sub process {
-    $self->chatterbot->transform( shift )
+    return $self->message->new(
+        text => $self->chatterbot->transform(shift->text));
 }
 

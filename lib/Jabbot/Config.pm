@@ -1,6 +1,6 @@
 package Jabbot::Config;
 use Kwiki::Config -Base;
-our $VERSION = '0.01';
+
 
 sub default_classes {
     (
@@ -10,6 +10,7 @@ sub default_classes {
         config_class => 'Jabbot::Config',
         hooks_class => 'Spoon::Hooks',
         hub_class => 'Jabbot::Hub',
+        message_class => 'Jabbot::Message',
         registry_class => 'Jabbot::Registry',
     )
 }
