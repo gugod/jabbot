@@ -49,8 +49,13 @@ sub handle_feed {
     for my $headline ($feed->late_breaking_news) {
         my $channels = $self->config->{"feeds_${feed_name}_channels"};
 	next unless $channels;
-        $remote->post('frontend_irc/update', {channel => $channels,
-                                              text => "$feed_name:: ". $headline->headline});
+        for(@$channels) {
+            my($network,$channel) = split(/:/,$_);
+            say "Posting to $network / $channel";
+            $remote->post("$network/message",
+                          {channel => $channel,
+                           text => "$feed_name:: ". $headline->headline});
+        }
     }
 }
 
