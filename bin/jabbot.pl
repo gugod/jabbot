@@ -17,47 +17,12 @@ use POSIX ":sys_wait_h";
 my %Kid_Status;
 sub REAPER {
     my $child;
-    # If a second child dies while
-    # in the signal handler caused
-    # by the
-    #                # first death,
-    #                we won't get
-    #                another signal.
-    #                So must loop
-    #                here else
-    #                               #
-    #                               we
-    #                               will
-    #                               leave
-    #                               the
-    #                               unreaped
-    #                               child
-    #                               as
-    #                               a
-    #                               zombie.
-    #                               And
-    #                               the
-    #                               next
-    #                               time
-    #                                              #
-    #                                              two
-    #                                              children
-    #                                              die
-    #                                              we
-    #                                              get
-    #                                              another
-    #                                              zombie.
-    #                                              And
-    #                                              so
-    #                                              on.
     while (($child = waitpid(-1,WNOHANG)) > 0) {
-	$Kid_Status{$child} = $?; }
-	$SIG{CHLD} = \&REAPER; #
-	#                                                                                                              still
-	#                                                                                                              loathe
-	#                                                                                                              sysV
+	$Kid_Status{$child} = $?;
     }
-    $SIG{CHLD} = \&REAPER; 
+	$SIG{CHLD} = \&REAPER;
+}
+$SIG{CHLD} = \&REAPER; 
 
 $|++;
 local $/;
