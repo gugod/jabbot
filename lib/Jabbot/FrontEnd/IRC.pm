@@ -13,7 +13,7 @@ field conn => {};
 my $bot;
 my $conn;
 
-sub on_alarm {
+sub on_internal_messaged {
     my $hub     = $bot->hub;
     my $msg     = $hub->process('');
     if(defined($msg->text)) {
@@ -21,13 +21,10 @@ sub on_alarm {
         my $channel = $msg->channel || '#jabbot3';
         warn "[$channel] $reply\n";
         $conn->privmsg($channel,encode('big5',$reply));
-        $conn->privmsg($channel,'dood');
     }
-    alarm(10);
 }
 
 sub process {
-    $SIG{ALRM} = \&on_alarm;
     $bot = $self;
     $self->use_class('config');
     $conn = $self->irc->newconn(
@@ -37,8 +34,8 @@ sub process {
     $conn->add_global_handler( 376, \&on_connect );
     $conn->add_handler("public",\&on_public);
     $self->conn($conn);
-    alarm(10);
-    $self->irc->start;
+#    $self->irc->addfh($self->sock,\&on_internal_messaged,"r");
+    $self->irc->start();
 }
 
 sub on_connect {
