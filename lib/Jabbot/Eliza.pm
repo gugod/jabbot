@@ -8,6 +8,10 @@ field chatterbot => {},
     -init => 'Chatbot::Eliza->new()';
 
 sub process {
-    $self->reply($self->chatterbot->transform(shift->text));
+    my $text = shift->text;
+    # only replies to English
+    $self->reply(
+        ($text =~ /^[\x00-\x7f]/) ?
+            $self->chatterbot->transform($text) : undef)
 }
 
