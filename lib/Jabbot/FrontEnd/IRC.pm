@@ -1,5 +1,6 @@
 package Jabbot::FrontEnd::IRC;
-use YAML;
+use strict;
+use warnings;
 use Jabbot::FrontEnd -base;
 use POE qw(Session
            Component::IRC
