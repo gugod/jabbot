@@ -22,8 +22,12 @@ sub reply {
 }
 
 sub trim {
-    foreach(@_) {
+    for(@_) {
         s/^\s+//;
         s/\s+$//;
     }
+}
+
+sub rand_choose {
+    $_[int(rand($#_+1))];
 }
