@@ -52,7 +52,7 @@ sub handle_feed {
         for(@$channels) {
             my($network,$channel) = split(/:/,$_);
             say "Posting to $network / $channel";
-            $remote->post("$network/message",
+            $remote->post("${network}/message",
                           {channel => $channel,
                            text => "$feed_name:: ". $headline->headline});
         }

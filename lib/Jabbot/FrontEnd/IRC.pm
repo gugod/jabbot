@@ -44,6 +44,7 @@ sub process {
 
 sub jabbotmsg {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
+   my $network = $heap->{network};
     eval {
         my $text = $msg->{text};
 	Encode::from_to($text,'utf8','big5');
@@ -56,7 +57,7 @@ sub jabbotmsg {
         } else {
             @channels = [$channel];
         }
-        $kernel->post(bot => privmsg => "#$_", $text )
+        $kernel->post("${network}" => privmsg => "#$_", $text )
             for(@channels);
         say "[#$channel] $msg->{text} on " . localtime(time);
     };
@@ -74,8 +75,7 @@ sub bot_start {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
     my $network = $heap->{network};
     say "Starting irc session, Connecting to $network";
-    $kernel->alias_set('frontend_irc');
-    $kernel->call( IKC => publish => "frontend_irc" => ['message'] );
+    $kernel->call( IKC => publish => "${network}" => ['message'] );
     $kernel->post( $network => register => 'all' );
     $kernel->post( $network => connect => {
         Nick =>   $config->{nick},
