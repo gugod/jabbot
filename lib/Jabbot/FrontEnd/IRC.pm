@@ -39,7 +39,7 @@ sub process {
            );
     }
 
-    POE::Kernel->run();
+    $poe_kernel->run();
 }
 
 sub jabbotmsg {
