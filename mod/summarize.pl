@@ -17,6 +17,11 @@ my $to       = $MSG{from};
 my $c;
 my $sumlen = 75;
 my $public = 1;
+
+## Configurable Variable
+my $http_proxy = "http://192.168.10.201:3128/";
+####
+
 if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 ## Contributed by kcwu
   require LWP::UserAgent;
@@ -25,7 +30,7 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 			       keep_alive => 1,
 			       timeout => 30,
 			      );
-	$ua->proxy('http','http://192.168.10.201:3128/');
+	$ua->proxy('http',$http_proxy);
   my @urlmatch=(		[
 		  'www.ettoday.com',
 		  sub {($title) = ($_[0]=~m/<td height="25"><font size="4" color="#0000ff"><b>([^<]*)<\/b>/im); $_[0]=~m/<font color="#4B4B4B" class="text">(.+)<\/font>/im},
@@ -140,7 +145,7 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 			       keep_alive => 1,
 			       timeout => 30,
 			      );
-	$ua->proxy('http','http://192.168.10.201:3128/');
+	$ua->proxy('http',$http_proxy);
   my @urlmatch=(		[
 		  'www.ettoday.com',
 		  sub {($title) = ($_[0]=~m/<td height="25"><font size="4" color="#0000ff"><b>([^<]*)<\/b>/im); $_[0]=~m/<font color="#4B4B4B" class="text">(.+)<\/font>/im},
@@ -253,7 +258,7 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 			       keep_alive => 1,
 			       timeout => 30,
 			      );
-	$ua->proxy('http','http://192.168.10.201:3128/');
+	$ua->proxy('http',$http_proxy);
   my @urlmatch=([
 		 'udn' ,
 #		 sub { "為了對聯合報系的抵制不列出標題" },
