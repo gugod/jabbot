@@ -1,8 +1,10 @@
+irc_daemon_port: 65123
 irc_server: irc.freenode.net
 nick: jabbot3
 admin:
 - gugod
 - zcecil
 irc_channels:
-- #jabbot3
+- jabbot3
+
 
