@@ -16,7 +16,7 @@ if($s =~ /(吃|喫)/) {
     if($MSG{to} eq "deadhead") {
 	$r = "死頭推薦: $r";
     } else { 
-	undef $r unless ($MSG{to} eq $BOT_NICK) ;
+	undef "要吃就要吃$r" unless ($MSG{to} eq $BOT_NICK) ;
     }
 }
 

@@ -397,7 +397,7 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
       $reply = any2big5(decode_special($reply));
       $reply .= " $short_url";
       unless($url eq $url_orig) {
-        $reply .= " ($url)";
+        $reply .= " ( $url )";
       }
     }
   }
