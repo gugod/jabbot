@@ -19,12 +19,10 @@ sub process {
 
 sub init_session {
     my @feeds = map {
-        my $name = $_;
-        $name =~ s{/}{.}g;
         {
-            url => $_,
+            url => $self->config->{"feeds_${_}_url"},
             delay => 600,
-            name => $name,
+            name => $_,
         }
     } @{$self->config->{feeds}};
 
@@ -48,7 +46,9 @@ sub handle_feed {
         timeout => 5,
     ) or die $POE::Component::IKC::ClientLite::error;
     for my $headline ($feed->late_breaking_news) {
-        $remote->post('frontend_irc/update', {channel => '-ALL',
+        my $feed_name = $headline->name;
+        my $channels = $self->config->{"feeds_${feed_name}_channels"};
+        $remote->post('frontend_irc/update', {channel => $channels,
                                               text => $headline->headline});
     }
 }
