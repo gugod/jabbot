@@ -5,7 +5,7 @@ use POE qw(Session
            Component::IRC
            Component::IKC::Server
            Component::IKC::Specifier);
-use Encode;
+use Encode qw(encode decode);
 
 sub msg { print " * @_\n" }
 sub err { print " * @_\n" }
@@ -45,10 +45,11 @@ sub process {
 sub jabbotmsg {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
     eval {
-        my $text = Encode::encode('big5',$msg->{text});
+        my $utext = decode('utf8',$msg->{text});
+        my $text = encode('big5',$utext);
         my $channel = $msg->{channel};
-        $kernel->post(bot => privmsg => "#$channel", $text );
-        msg "[#$channel] $text on " . localtime(time);
+        $kernel->post(bot => privmsg => "#$channel", $utext );
+        msg "[#$channel] $msg->{text} on " . localtime(time);
     };
     err "update error: $@" if $@;
 }
@@ -107,7 +108,7 @@ sub bot_public {
     my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
     my $nick = ( split /!/, $who )[0];
     my $channel = $where->[0];
-    my $pubmsg  = Encode::decode('big5',$msg);
+    my $pubmsg  = decode('big5',$msg);
     my $to = sub {
        return '' if($_[0] =~ /^http/i);
        if($_[0] =~ s/^([\d\w\|]+)\s*[:,]\s*//) { return $1; }
@@ -117,7 +118,7 @@ sub bot_public {
     my $reply_text = $reply->text;
     if(length($reply_text) &&
            ($to eq $self->config->{nick} || $reply->must_say)) {
-        $reply_text = Encode::encode('big5',"$to: $reply_text");
+        $reply_text = encode('big5',"$to: $reply_text");
         $kernel->post(bot => privmsg => $channel, $reply_text);
     }
 }
