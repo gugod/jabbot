@@ -9,15 +9,15 @@ use Jabbot::ModLib;
 
 my $priority = 0;
 my $s = $MSG{body};
-my $r;
+my $r = '';
 my $to = $MSG{from};
 
-if($s =~ /(吃|喫)/) {
+if($s =~ /(吃|喫)/ && ($MSG{to} eq $BOT_NICK )) {
     $r = do_my_job($s);
     if($MSG{to} eq "deadhead") {
 	$r = "死頭推薦: $r";
     } else { 
-	$r = "要吃就要吃$r" unless ($MSG{to} eq $BOT_NICK) ;
+	$r = "要吃就要吃$r" if ($MSG{to} eq $BOT_NICK) ;
     }
 } elsif ($s =~ /肚子餓/) {
     $r = do_my_job($s);
