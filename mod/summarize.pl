@@ -87,25 +87,16 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
   my $response;
   eval {
     local $SIG{ALRM} = sub { die"timeout\n"};
-    if($s =~ /udn/i) {
-	# $request = HTTP::Request->new('GET', "http://gugod.org/");
-	#$request = HTTP::Request->new('GET', 'file:///tmp/antiudn');
-	alarm 5;
-	$response = $ua->request($request);
-	alarm 0;
-    } else {
-	alarm 5;
-	$response = $ua->request($request);
-	alarm 0;
-	   }
+    alarm 5;
+    $response = $ua->request($request);
+    alarm 0;
   };
   if($@) {
      die unless $@ eq "timeout\n";
   }
   unless($response->is_success) {
-    if($MSG{to} eq $BOT_NICK) {
-      $reply = "this url is broken";
-    }
+      $reply = "this url is broken"
+	if($MSG{to} eq $BOT_NICK);
   } else {
     my @content=();
     eval {
@@ -126,22 +117,7 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 	if(defined $content[0]) {
 	    $reply=$content[0];
 	    $to="";
-
-	    # Decode special characters 
-	    $reply =~ s/&#(\d+);/pack('U*', $1)/eg;
-	    $reply =~ s/&gt;/>/g;
-	    $reply =~ s/&lt;/</g;
-	    $reply =~ s/&amp;/&/g;
-
-	    foreach(qw/big5 big5-eten shiftjis gb2312-raw gb12345-raw hz iso-ir-165 cp936 utf8/) {
-		my $decoder = guess_encoding($reply, ($_));
-		if(ref($decoder)) {
-		    my $utf8 = $decoder->decode($reply);
-		    $reply = Encode::encode("big5", $utf8);
-		    last;
-		}
-	    }
-
+	    $reply = any2big5(decode_special($reply));
 	}
     };
     if ($@) {
@@ -246,22 +222,7 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
     if(defined $content[0]) {
       $reply=$content[0];
       $to="";
-
-      # Decode special characters 
-      $reply =~ s/&#(\d+);/pack('U*', $1)/eg;
-      $reply =~ s/&gt;/>/g;
-      $reply =~ s/&lt;/</g;
-      $reply =~ s/&amp;/&/g;
-
-      foreach(qw/big5 big5-eten shiftjis gb2312-raw gb12345-raw hz iso-ir-165 cp936 utf8/) {
-        my $decoder = guess_encoding($reply, ($_));
-        if(ref($decoder)) {
-	  my $utf8 = $decoder->decode($reply);
-	  $reply = Encode::encode("big5", $utf8);
-          last;
-        }
-      }
-
+      $reply = any2big5(decode_special($reply));
     }
   }
 }elsif($s =~ /(http:\S+)\s*/) {
@@ -352,23 +313,15 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		   sub { $MSG{from} . "'s URL: [ " . $_[0] . " ]" },
 		]
 	       );
-  
+
   my $request = HTTP::Request->new('GET', "$1");
   $ua->max_size(40960);
   my $response;
   eval {
-    local $SIG{ALRM} = sub { die"timeout\n"};
-    if($s =~ /udn/i) {
-	# $request = HTTP::Request->new('GET', "http://gugod.org/");
-	#$request = HTTP::Request->new('GET', 'file:///tmp/antiudn');
-	alarm 5;
-	$response = $ua->request($request);
-	alarm 0;
-    } else {
-	alarm 5;
-	$response = $ua->request($request);
-	alarm 0;
-	   }
+      local $SIG{ALRM} = sub { die"timeout\n"};
+      alarm 5;
+      $response = $ua->request($request);
+      alarm 0;
   };
   if($@) {
      die unless $@ eq "timeout\n";
@@ -393,22 +346,7 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
     if(defined $content[0]) {
       $reply=$content[0];
       $to="";
-
-      # Decode special characters 
-      $reply =~ s/&#(\d+);/pack('U*', $1)/eg;
-      $reply =~ s/&gt;/>/g;
-      $reply =~ s/&lt;/</g;
-      $reply =~ s/&amp;/&/g;
-
-      foreach(qw/big5 big5-eten shiftjis gb2312-raw gb12345-raw hz iso-ir-165 cp936 utf8/) {
-        my $decoder = guess_encoding($reply, ($_));
-        if(ref($decoder)) {
-	  my $utf8 = $decoder->decode($reply);
-	  $reply = Encode::encode("big5", $utf8);
-          last;
-        }
-      }
-
+      $reply = any2big5(decode_special($reply));
     }
   }
 }
@@ -424,3 +362,26 @@ my %rmsg = (
     );
 
 reply (\%rmsg);
+
+sub decode_special {
+    # Decode special characters
+    my $reply = shift;
+    $reply =~ s/&#(\d+);/pack('U*', $1)/eg;
+    $reply =~ s/&gt;/>/g;
+    $reply =~ s/&lt;/</g;
+    $reply =~ s/&amp;/&/g;
+    return $reply;
+}
+
+sub any2big5 {
+    my $reply = shift;
+    foreach(qw/big5 big5-eten shiftjis gb2312-raw gb12345-raw hz iso-ir-165 cp936 utf8/) {
+	my $decoder = guess_encoding($reply, ($_));
+	if(ref($decoder)) {
+	    my $utf8 = $decoder->decode($reply);
+	    $reply = Encode::encode("big5", $utf8);
+	    last;
+	}
+    }
+    return $reply;
+}
