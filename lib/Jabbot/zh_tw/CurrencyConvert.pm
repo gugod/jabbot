@@ -30,7 +30,7 @@ my %coin = (
     CLP => "26", VEB => "27", ZAR => "28", RUR => "29", NZD => "30"
    );
 
-my %calias = ( EUR => "ECU", "RMB" => "MCY", "YEN" => "JPY", "CHF" =>"SWF");
+my %calias = ( GBP => 'GRP', EUR => "ECU", "RMB" => "MCY", "YEN" => "JPY", "CHF" =>"SWF");
 
 
 sub process {
