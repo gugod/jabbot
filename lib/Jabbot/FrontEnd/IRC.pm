@@ -51,16 +51,7 @@ sub jabbotmsg {
         my $text = $msg->{text};
 	Encode::from_to($text,'utf8','big5');
         my $channel = $msg->{channel};
-        my @channels;
-        if($channel eq '-ALL') {
-            @channels = @{$self->config->{irc_channels}};
-        } elsif(ref($channel) eq 'ARRAY') {
-            @channels = @$channel;
-        } else {
-            @channels = [$channel];
-        }
-        $kernel->post("${network}" => privmsg => "#$_", $text )
-            for(@channels);
+        $kernel->post("irc_frontend_${network}" => privmsg => "#$channel", $text );
         say "[#$channel] $msg->{text} on " . localtime(time);
     };
     say "update error: $@" if $@;
@@ -77,7 +68,8 @@ sub bot_start {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
     my $network = $heap->{network};
     say "Starting irc session, Connecting to $network";
-    $kernel->call( IKC => publish => "${network}" => ['message'] );
+    $kernel->alias_set("irc_frontend_${network}");
+    $kernel->call( IKC => publish => "irc_frontend_${network}" => ['message'] );
     $kernel->post( $network => register => 'all' );
     $kernel->post( $network => connect => {
         Nick =>   $config->{nick},
