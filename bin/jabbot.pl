@@ -38,6 +38,7 @@ my $config = YAML::LoadFile('config.yaml');
 
 my $server     = $config->{server};
 my $mynick     = $config->{nick} || $BOT_NICK;
+my $port       = $config->{port};
 
 my  %channels;
 $channels{botchat} = 1;
@@ -46,7 +47,7 @@ my $irc  = new Net::IRC;
 my $conn = $irc->newconn(
 		Nick      => $mynick,
 		Server    => $server,
-		Port      => 6666,
+		Port      => $port,
 		Ircname   => "Bato Ro",
 		Username  => "jabo"
 		);
