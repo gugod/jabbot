@@ -275,6 +275,13 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 			sub { "CNET¡G[ ".$_[0]." ]" }
 			],
 			[
+				'frostyplace.com' ,
+			sub { $_[0]=~m/<span class="title_item">([^<]*)<\/span>/im },
+			sub { trim_whitespace(@_) ; @_ },
+			sub { "FrostyPlace: [ ".$_[0]." ]" }
+			],
+
+			[
 				'bid.yahoo.com' ,
 			sub { $_[0]=~m/<font size="4"><b>([^<]*)<\/b>/im },
 			sub { trim_whitespace(@_) ; @_ },
