@@ -24,7 +24,7 @@ if($s =~ /(吃|喫)/) {
     $r = "那就吃$r吧";
 }
 
-$to = undef unless ($MSG{to} eq $BOT_NICK) 
+$to = undef unless ($MSG{to} eq $BOT_NICK) ;
 
 $priority =1 if(length($r) > 0);
 
