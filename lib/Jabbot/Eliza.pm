@@ -10,8 +10,17 @@ field chatterbot => {},
 sub process {
     my $text = shift->text;
     # only replies to English
-    $self->reply(
-        ($text =~ /^[\x00-\x7f]/) ?
-            $self->chatterbot->transform($text) : '')
+    
+    my $r = $self->chatterbot->transform($text) if $text =~ /^\p{IsASCII}+$/;
+    print STDERR "r= $r\n";
+    if (defined($r) && $text =~ /thou|thy|thee|thine/)
+    {
+        print STDERR "[match oldenglish]\n";
+        $r =~ s/have you/hast thou/gi;
+        $r =~ s/your/thy/gi;
+        $r =~ s/yours/thine/gi;
+        $r =~ s/you/thou/gi;
+    }
+    $self->reply($r);
 }
 
