@@ -16,3 +16,16 @@ sub init {
     $self->use_class('message');
     $self->config->add_file($self->config_file);
 }
+
+sub reply {
+    my ($text,$priority) = @_;
+    $self->message->new(text => $text,
+                        priority => (defined $text)?$priority:0);
+}
+
+sub trim {
+    foreach(@_) {
+        s/^\s+//;
+        s/\s+$//;
+    }
+}

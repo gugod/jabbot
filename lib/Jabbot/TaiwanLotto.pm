@@ -14,6 +14,5 @@ sub process {
         $reply = sprintf("正彩 %s, 前三彩 %s, 後三彩 %s, 前對彩 %s, 後對彩 %s.",
                          $t, substr($t,0,3), substr($t,-3,3), m/(\d\d)(\d\d)/);
     }
-    $self->message->new(text => $reply,
-                        priority => (defined $reply)?10000:0);
+    $self->reply($reply,10000);
 }
