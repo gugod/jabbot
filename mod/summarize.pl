@@ -234,12 +234,13 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 			      );
 			      #$ua->proxy('http',$http_proxy);
   my @urlmatch=(
+
 		[
 		'openfoundry.org/Foundry/Project/index.html',
 		sub { $_[0] =~ m{style="color: white"><b>(.+?)</b></a></label></div></td>}mi },
 		sub { "OpenFoundry Project: [ $_[0] ]" },
 		],
-		[
+      		[
 		 'udn' ,
 #		 sub { "為了對聯合報系的抵制不列出標題" },
 		 sub { $_[0]=~m/<title>([^<]*)<\/title>/im },
@@ -253,6 +254,13 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		  sub { $_[0] =~ s/<br>/ /mg; @_ },
 		 sub { trim_whitespace(@_) ; @_ },
 		 sub { "蘋果日報：「".$_[0]."」" }
+		],
+		[
+		  'tw.match.yahoo.com',
+		  sub { $_[0] =~ m/暱　稱：<\/font><\/td>\n\s*<td align="left" height="25" width="100%">(.+?)<\/td>/im},
+		  #sub { $_[0] =~ s/<br>/ /mg; @_ },
+		 sub { trim_whitespace(@_) ; @_ },
+		 sub { "Yahoo! 奇摩交友：「".$_[0]."」" }
 		],
 		[
 		 'tw.news.yahoo.com',
