@@ -44,13 +44,13 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		],
 		[
 			'tw.news.yahoo.com',
-		   sub { ($title) = ($_[0]=~m/<font face="夹发砰" size="5" color="#0000cc">\n([^<]*)\n\s*<\/font>/is); $_[0] =~ m/<!--== article begin ==-->(.+)<!--== article end ==-->/is },
+		   sub { ($title) = ($_[0]=~m/<font color="#0000CC">([^<]*)\s*<\/font>/is); $_[0] =~ m/<big>(.+)<\/big>/is },
 		   sub { $_[0] =~ s/<script.+<\/script>//mg ; $_[0]},
 		   sub { $_[0] =~ s/<[^<]+>//mg ; $_[0]},
 		   sub { $_[0] =~ s/\n//mg; $_[0] },
 		   sub { trim_whitespace(@_) ; @_ },
 		  sub { Lingua::ZH::Summarize::summarize($_[0],maxlength=>$sumlen)},
-		   sub { "[ ".$title." ] ".$_[0]." " }
+		   sub { "Yahoo! 集穝籇: [ ".$title." ] ".$_[0]." " }
 		],
 		[
 			'yam.udn.com',
@@ -147,12 +147,12 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		],
 		[
 			'tw.news.yahoo.com',
-		   sub { ($title) = ($_[0]=~m/<font face="夹发砰" size="5" color="#0000cc">\n([^<]*)\n\s*<\/font>/is); $_[0] =~ m/<!--== article begin ==-->(.+)<!--== article end ==-->/is },
+		   sub { ($title) = ($_[0]=~m/<font color="#0000CC">([^<]*)\s*<\/font>/is); $_[0] =~ m/<big>(.+)<\/big>/is },
 		   sub { $_[0] =~ s/<script.+<\/script>//mg ; $_[0]},
 		   sub { $_[0] =~ s/<[^<]+>//mg ; $_[0]},
 		   sub { $_[0] =~ s/\n//mg; $_[0] },
 		   sub { trim_whitespace(@_) ; @_ },
-		   sub { "[ ".$title." ] ".$_[0]." " }
+		   sub { "Yahoo! 集穝籇: [ ".$title." ] ".$_[0]." " }
 		],
 		[
 		 'taiwan.cnet.com' ,
@@ -250,10 +250,11 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		],
 		[
 		 'tw.news.yahoo.com',
-		   sub { $_[0]=~m/<title>([^<]*)<\/title>/im },
+		 #sub { $_[0]=~m/<title>([^<]*)<\/title>/im },
+		   sub { $_[0]=~m/<font color="#0000CC">([^<]*)\s*<\/font>/is },
 #		   sub { ($_[0]=~m/[:|]/ and (split /[:|]/,$_[0])[-1]) or () },
 		   sub { $_[0] =~ s/\n+/ /gm; @_ },
-		   sub { "[ " . $_[0] . " ]" }
+		   sub { "Yahoo! 集穝籇: [ " . $_[0] . " ]" }
 		],
 		[
 		 'www.theregister.co.uk' ,
