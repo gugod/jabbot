@@ -128,7 +128,7 @@ sub bot_public {
     my $reply_text = $reply->text;
     if(length($reply_text) &&
            ($to eq $self->config->{nick} || $reply->must_say)) {
-        $reply_text = encode('big5',"$to: $reply_text");
+        $reply_text = encode('big5',"$nick: $reply_text");
         $kernel->post(bot => privmsg => $channel, $reply_text);
     }
 }
