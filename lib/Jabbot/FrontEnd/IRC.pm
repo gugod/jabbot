@@ -30,7 +30,6 @@ sub process {
             _start           => \&bot_start,
             _stop            => \&bot_stop,
             irc_001          => \&bot_connected,
-            irc_372          => \&bot_motd,
             irc_disconnected => \&bot_reconnect,
             irc_error        => \&bot_reconnect,
             irc_socketerr    => \&bot_reconnect,
@@ -93,10 +92,6 @@ sub bot_connected {
         msg "joining channel #$_";
         $kernel->post(bot=>join=>"#$_")
     }
-}
-
-sub bot_motd {
-    msg '[motd] ' . $_[ARG1];
 }
 
 sub bot_do_autoping {
