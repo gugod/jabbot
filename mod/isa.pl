@@ -196,8 +196,7 @@ sub _queryWhatIsWhat {
 		. rand_choose("是","")
 		. rand_choose("吧","喔","呢");
 	} else {
-	    $r = rand_choose("不是","搞錯了")
-		. rand_choose("啦","吧?");
+	    $r = rand_choose("不是吧？","搞錯啦","不是這樣子的","並不是","是嗎？");
 	}	
     }
     return $r;
