@@ -1,5 +1,5 @@
 message_dispatcher_port: 65000
-irc_daemon_port: 65123
+irc_frontend_port: 65123
 irc_networks:
 - freenode
 - ircnet
