@@ -6,6 +6,8 @@ first, run "perl bin/jabbot -update", and run
 
 All mod/*.pl will be gradually migrated as a .pm plugin module.
 
+doc/* are all deprecated. Do trust them.
+
 --
 Cheers,
 Kang-min "Gugod" Liu
