@@ -11,17 +11,33 @@ field conn => {};
 # So Jabbot::IRC object is kept in this lexical variable.
 # We do love lexical scoping so much, don't we ?
 my $bot;
+my $conn;
+
+sub on_alarm {
+    my $hub     = $bot->hub;
+    my $msg     = $hub->process('');
+    if(defined($msg->text)) {
+        my $reply   = $msg->text;
+        my $channel = $msg->channel || '#jabbot3';
+        warn "[$channel] $reply\n";
+        $self->privmsg($channel,encode('big5',"$nick: $reply"));
+        $conn->privmsg($channel,'dood');
+        alarm(10);
+    }
+}
 
 sub process {
+    $SIG{ALRM} = \&on_alarm;
     $bot = $self;
     $self->use_class('config');
-    my $conn = $self->irc->newconn(
+    $conn = $self->irc->newconn(
         Server => $self->config->{irc_server},
         Nick => $self->config->{nick},
        );
     $conn->add_global_handler( 376, \&on_connect );
     $conn->add_handler("public",\&on_public);
     $self->conn($conn);
+    alarm(10);
     $self->irc->start;
 }
 
