@@ -84,7 +84,7 @@ sub do_my_job {
     my ($what,$msg) = @_;
     my $db = $self->isadb;
     $self->strip_meanless_tsi($what);
-    if($msg->to eq $self->config->{nick}) {$what =~ s/你/我/g;}
+    $what =~ s/你/我/g if $msg->to eq $self->config->{nick};
     my @sentances = split(/。/, $what);
     my $r;
     my @rdb =qw(ok hmm 喔 了解 原來如此 我知道了 原來如此阿！ 記住了 所以？);
