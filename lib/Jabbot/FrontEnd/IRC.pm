@@ -35,11 +35,22 @@ sub process {
             irc_socketerr    => \&bot_reconnect,
             irc_public       => \&bot_public,
             autoping         => \&bot_do_autoping,
-            update           => \&update,
+            update           => \&jabbotmsg,
             _default         => $ENV{DEBUG} ? \&bot_default : sub {},
         }
        );
     POE::Kernel->run();
+}
+
+sub jabbotmsg {
+    my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
+    eval {
+        my $text = Encode::encode('big5',$msg->{text});
+        my $channel = $msg->{channel};
+        $kernel->post(bot => privmsg => "#$channel", $text );
+        msg "[#$channel] $text on " . localtime(time);
+    };
+    err "update error: $@" if $@;
 }
 
 sub bot_default {
@@ -49,23 +60,11 @@ sub bot_default {
     return 0;
 };
 
-sub update {
-    my ($kernel,$heap,$meta) = @_[KERNEL,HEAP,ARG0];
-    eval {
-        my $msg = sprintf('action update: %s by %s', 
-            $meta->{id}, $meta->{edit_by} );
-        $kernel->post(bot=>ctcp=>"#$_",$msg)
-            foreach split /,\s+/, $config->{notify_irc_server_channels};
-        msg "$msg on " . localtime(time);
-    };
-    err "update error: $@" if $@;
-}
-
 sub bot_start {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
     msg "starting irc session";
-    $kernel->alias_set('notify_irc');
-    $kernel->call( IKC => publish => notify_irc => ['update'] );
+    $kernel->alias_set('frontend_irc');
+    $kernel->call( IKC => publish => frontend_irc => ['update'] );
     $kernel->post( bot => register => 'all' );
     $kernel->post( bot => connect => {
         Nick=>$config->{nick},
