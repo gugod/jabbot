@@ -49,7 +49,16 @@ sub jabbotmsg {
         my $text = $msg->{text};
 	Encode::from_to($text,'utf8','big5');
         my $channel = $msg->{channel};
-        $kernel->post(bot => privmsg => "#$channel", $text );
+        my @channels;
+        if($channel eq '-ALL') {
+            @channels = @{$self->config->{irc_channels}};
+        } elsif(ref($channel) eq 'ARRAY') {
+            @channels = @$channel;
+        } else {
+            @channels = [$channel];
+        }
+        $kernel->post(bot => privmsg => "#$_", $text )
+            for(@channels);
         msg "[#$channel] $msg->{text} on " . localtime(time);
     };
     err "update error: $@" if $@;
