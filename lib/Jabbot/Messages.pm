@@ -14,5 +14,6 @@ sub append {
 }
 
 sub next {
-    shift(@{$self->must_say}) || shift(@{$self->normal})
+    shift(@{$self->must_say}) || shift(@{$self->normal});
 }
+

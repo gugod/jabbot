@@ -13,6 +13,8 @@ sub default_classes {
         messages_class => 'Jabbot::Messages',
         message_class => 'Jabbot::Message',
         registry_class => 'Jabbot::Registry',
+        frontend_class => 'Jabbot::FrontEnd',
+        backend_class => 'Jabbot::BackEnd',
     )
 }
 
