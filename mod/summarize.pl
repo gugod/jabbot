@@ -15,7 +15,7 @@ my $reply;
 my $priority = 0;
 my $to       = $MSG{from};
 my $c;
-my $sumlen = 75;
+my $sumlen = 120;
 my $public = 1;
 
 ## Configurable Variable
@@ -38,7 +38,8 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		  sub { $_[0] =~ s/<[^<]+>//mg ; $_[0]},
 		  sub { $_[0] =~ s/\n//mg; $_[0] },
 		  sub { trim_whitespace(@_) ; @_ },
-		  sub { "東森新聞報 - [ ".$title." ]： ".Lingua::ZH::Summarize::summarize($_[0],maxlength => $sumlen )." " }
+		  sub { Lingua::ZH::Summarize::summarize($_[0],maxlength=>$sumlen)},
+		  sub { "東森新聞報 - [ ".$title." ]： ".$_[0]." " }
 		  #sub { "東森新聞報：[ ".$_[0]." ]" }
 		],
 		[
@@ -48,7 +49,8 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		   sub { $_[0] =~ s/<[^<]+>//mg ; $_[0]},
 		   sub { $_[0] =~ s/\n//mg; $_[0] },
 		   sub { trim_whitespace(@_) ; @_ },
-		   sub { "[ ".$title." ]： ".Lingua::ZH::Summarize::summarize($_[0],maxlength => $sumlen )." " }
+		  sub { Lingua::ZH::Summarize::summarize($_[0],maxlength=>$sumlen)},
+		   sub { "[ ".$title." ]： ".$_[0]." " }
 		],
 		[
 			'yam.udn.com',
@@ -59,7 +61,8 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		   sub { $_[0] =~ s/\n//mg; $_[0] },
 		   sub { $_[0] =~ s/\t//mg; $_[0] },
 		   sub { trim_whitespace(@_) ; @_ },
-		 sub { "[ ".$title." ]: ".Lingua::ZH::Summarize::summarize($_[0],maxlength => $sumlen )." " }
+		  sub { Lingua::ZH::Summarize::summarize($_[0],maxlength=>$sumlen)},
+		 sub { "[ ".$title." ]: ".$_[0]." " }
 
 		],
 		[
@@ -69,7 +72,8 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		   sub { $_[0] =~ s/<[^<]+>//mg ; $_[0]},
 		   #sub { $_[0] =~ s/\n//mg; $_[0] },
 		   sub { trim_whitespace(@_) ; @_ },
-		 sub { "CNET：[ ".$title." ]:".Lingua::ZH::Summarize::summarize($_[0],maxlength => $sumlen )." " }
+		  sub { Lingua::ZH::Summarize::summarize($_[0],maxlength=>$sumlen)},
+		 sub { "CNET：[ ".$title." ]:".$_[0]." " }
 		],
 		  [
 		  'http://',
@@ -104,36 +108,45 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
     }
   } else {
     my @content=();
-    foreach (@urlmatch) {
-      my $k = @$_[0];
-      my @v = @$_[1 .. (@$_-1)];
-      next unless $s =~ /\Q$k/m;
-      @content=($response->content);
-      foreach(@v) {
-	@content=$_->(@content);
-	last unless @content;
-      }
-      last;
-    }
-    if(defined $content[0]) {
-      $reply=$content[0];
-      $to="";
+    eval {
+	local $SIG{ALRM} = sub { die"timeout\n"};
+	foreach (@urlmatch) {
+	    my $k = @$_[0];
+	    my @v = @$_[1 .. (@$_-1)];
+	    next unless $s =~ /\Q$k/m;
+	    @content=($response->content);
+	    foreach(@v) {
+		alarm 45;
+		@content=$_->(@content);
+		alarm 0;
+		last unless @content;
+	    }
+	    last;
+	}
+	if(defined $content[0]) {
+	    $reply=$content[0];
+	    $to="";
 
-      # Decode special characters 
-      $reply =~ s/&#(\d+);/pack('U*', $1)/eg;
-      $reply =~ s/&gt;/>/g;
-      $reply =~ s/&lt;/</g;
-      $reply =~ s/&amp;/&/g;
+	    # Decode special characters 
+	    $reply =~ s/&#(\d+);/pack('U*', $1)/eg;
+	    $reply =~ s/&gt;/>/g;
+	    $reply =~ s/&lt;/</g;
+	    $reply =~ s/&amp;/&/g;
 
-      foreach(qw/big5 big5-eten shiftjis gb2312-raw gb12345-raw hz iso-ir-165 cp936 utf8/) {
-        my $decoder = guess_encoding($reply, ($_));
-        if(ref($decoder)) {
-	  my $utf8 = $decoder->decode($reply);
-	  $reply = Encode::encode("big5", $utf8);
-          last;
-        }
-      }
+	    foreach(qw/big5 big5-eten shiftjis gb2312-raw gb12345-raw hz iso-ir-165 cp936 utf8/) {
+		my $decoder = guess_encoding($reply, ($_));
+		if(ref($decoder)) {
+		    my $utf8 = $decoder->decode($reply);
+		    $reply = Encode::encode("big5", $utf8);
+		    last;
+		}
+	    }
 
+	}
+    };
+    if ($@) {
+	die unless $@ eq "timeout\n";
+	$reply = "對不起，我做不完摘要，換個別的試試。";
     }
   }
 }elsif($s =~ /^content\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
