@@ -10,21 +10,17 @@ sub init {
 sub process {
     $self->preload;
     my $msg = shift;
-
     my @replies = grep {
         defined $_->text
     } map {
         $self->$_->process($self->message->new(text => $msg))
     } $self->all_plugin_ids;
-
     if(my @musts = grep {$_->must_say} @replies) {
         $self->messages->append($_) for @musts;
     } else {
         $self->messages->append((shuffle @replies)[0]);
     }
-
-    my $reply = $self->messages->next;
-    $reply->text;
+    $self->messages->next;
 }
 
 sub all_plugin_ids {

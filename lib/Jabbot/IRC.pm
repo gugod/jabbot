@@ -43,9 +43,10 @@ sub on_public {
 	return '';
     }->($text);
     warn "[$nick] $text\n";
-    if($to eq $bot->config->{nick}) {
-	my $hub     = $bot->hub;
-	my $reply   = $bot->hub->process($text);
+    my $hub     = $bot->hub;
+    my $msg     = $hub->process($text);
+    if($to eq $bot->config->{nick} || $msg->must_say) {
+        my $reply   = $msg->text;
 	warn "[$channel] $reply\n";
 	$self->privmsg($channel,encode('big5',"$nick: $reply"));
     }

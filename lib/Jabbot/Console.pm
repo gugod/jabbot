@@ -11,7 +11,7 @@ sub process {
     while(defined($_ = $term->readline('jabbot> '))){
         $hub->pre_process;
         my $reply = $hub->process($_);
-        print $OUT "$reply \n" if(defined $reply);
+        print $OUT $reply->text," \n" if(defined $reply->text);
         $hub->post_process;
     }
 }
