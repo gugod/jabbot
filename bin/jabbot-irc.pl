@@ -1,12 +1,12 @@
 #!/usr/local/bin/perl
-
 use strict;
 use warnings;
-our $VERSION = '3.0';
-
 use lib 'lib';
 use Jabbot;
 my @configs = qw(config.yaml -plugins plugins);
 
-Jabbot->new->load_hub(@configs)->irc->process(@ARGV);
+my $j = Jabbot->new;
+$j->load_hub(@configs);
+$j->hub->config->{frontend_class} = 'Jabbot::FrontEnd::IRC';
+$j->hub->frontend->process(@ARGV);
 

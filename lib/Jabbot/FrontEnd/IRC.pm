@@ -1,5 +1,5 @@
-package Jabbot::IRC;
-use Jabbot::Base -Base;
+package Jabbot::FrontEnd::IRC;
+use Jabbot::FrontEnd -Base;
 use Net::IRC;
 use Encode qw(encode decode);
 use YAML;
