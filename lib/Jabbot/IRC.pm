@@ -2,20 +2,22 @@ package Jabbot::IRC;
 use Jabbot::Base -Base;
 use Net::IRC;
 use Encode qw(encode decode);
+use YAML;
 
-field nick => 'jabbot3';
-
-field server => 'irc.freenode.net';
 field irc  => {}, -init => 'new Net::IRC';
 field conn => {};
 
+# $self in $conn handlers refers to a Net::IRC::Connection object
+# So Jabbot::IRC object is kept in this lexical variable.
+# We do love lexical scoping so much, don't we ?
 my $bot;
 
 sub process {
     $bot = $self;
+    $self->use_class('config');
     my $conn = $self->irc->newconn(
-        Nick => $self->nick,
-        Server => $self->server,
+        Server => $self->config->{irc_server},
+        Nick => $self->config->{nick},
        );
     $conn->add_global_handler( 376, \&on_connect );
     $conn->add_handler("public",\&on_public);

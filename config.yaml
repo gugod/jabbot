@@ -1,5 +1,5 @@
-server: irc.tw.freebsd.org
-nick: jabbot
+irc_server: irc.freenode.net
+nick: jabbot3
 admin:
   - gugod
   - zcecil
