@@ -26,8 +26,10 @@ sub process {
 }
 
 sub on_connect {
-    $self->join("#jabbot3");
-    warn "joined #jabbot3\n";
+    for(@{$bot->config->{irc_channels}}) {
+        $self->join($_);
+	warn "joined $_\n";
+    }
 }
 
 sub on_public {
