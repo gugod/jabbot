@@ -32,6 +32,10 @@ if($qstring =~ /(\?|¡H)$/ ) {
 	}
 	if ($qstring =~ /^½Ö¬O\s*(.*?)\s*$/) {
 		$r = _queryWhoIsWhat($qstring);
+	} elsif ($qstring =~ /^(¤°|¬Æ)»ò¬O(?!¤°»ò)/) {
+		my $q = $qstring;
+		$q =~ s/^(.*)¬O//;
+		$r = _queryWhatIsThat($q);
 	} elsif ($qstring =~ /¬O(?!¤°»ò)/) {
 		$r = _queryWhatIsWhat($qstring);
 	} elsif ($qstring =~ /¬O¤°»ò/) {
@@ -98,14 +102,18 @@ sub do_my_job {
 	}
 	my @sentances = split(/¡C/, $what);
 	my $r;
-	my @rdb =qw(ok ¤F¸Ñ ÁA¸Ñ ­ì¨Ó¦p¦¹ §Úª¾¹D¤F ­ì¨Ó¦p¦¹ªü¡I °O¦í¤F);
+	my @rdb =qw(ok ¤F¸Ñ Á ­ì¨Ó¦p¦¹ §Úª¾¹D¤F ­ì¨Ó¦p¦¹ªü¡I °O¦í¤F ©Ò¥H¡H);
 	my $TOKEN = '(?:¬O|«Ü)';
 	foreach (@sentances) {
 		if (/$TOKEN/) {
 			my ($k,$v) = split(/(?:¤£)?(?:$ymodifiers)?$TOKEN/ , $_, 2);
 			$k =~ s/\s+$//;
-			$isadb{"$k"} = $_;
-			$r = rand_choose(@rdb);
+			if(exists $isadb{"$k"}) {
+				$r = "¤£¹L¡A¾Ú§Ú©Òª¾¡A$isadb{$k}";
+			} else {
+				$isadb{"$k"} = $_;
+				$r = rand_choose(@rdb);
+			}
 		} elsif (/(.+)\sis\salso\s(.+)/i) {
 			my ($k,$v) = ($1,$2);
 			$k =~ s/\s+$//;
@@ -165,6 +173,12 @@ sub _queryWhoIsWhat {
 	$r = "§Ú¤£ª¾¹D \@_\@";
     }
     return $r;
+}
+
+sub _queryWhatIsThat {
+    my $qstring = shift;
+    my $realv = $isadb{"$qstring"};
+    return $realv|| rand_choose("¤£²M·¡","¨SÅ¥¹L","§Ú¤]¤£ª¾¹D");
 }
 
 sub _queryWhatIsWhat {
