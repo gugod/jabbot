@@ -52,7 +52,7 @@ sub handle_feed {
             $remote->post("irc_frontend_${network}/message",
                           {channel => $channel,
                            name => $network,
-                           text => "$feed_name:: ". $headline->headline})
+                           text => "${feed_name} - ". $headline->headline})
                 or die $remote->error;
         }
     }
