@@ -18,18 +18,15 @@ sub db_connect {
 
 sub dbinit {
     my $dbfile = shift;
+    io($self->plugin_directory)->mkdir;
     my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile","","",
                            { RaiseError => 1, AutoCommit => 1});
     $dbh->do('CREATE TABLE messages (id,text,channel,to)');
     $dbh->disconnect;
 }
 
-sub register {
-    io($self->plugin_directory)->mkdir;
-}
-
 sub process {
-    $self->next;
+    $self->reply('');
 }
 
 sub append {
