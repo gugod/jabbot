@@ -1,25 +1,24 @@
 package Jabbot::FrontEnd::Console;
 use Jabbot::FrontEnd -Base;
-use Term::ReadLine;
 
-my $term;
+my $alarm_timer = 3;
 
 sub on_alarm {
-    my $OUT = $term->OUT || \*STDOUT;
-    print $OUT "1\n";
-    alarm 10;
+    print "1\n";
+    alarm $alarm_timer;
 }
 
 sub process {
     local $SIG{ALRM} = \&on_alarm;
     my $hub = $self->hub;
-    $term = new Term::ReadLine(__PACKAGE__);
-    my $OUT = $term->OUT || \*STDOUT;
-    alarm(10);
-    while(defined($_ = $term->readline('jabbot> '))){
+    alarm($alarm_timer);
+    $| = 1;
+    print "jabbot> ";
+    while(<>){
         $hub->pre_process;
         my $reply = $hub->process($_);
-        print $OUT $reply->text," \n" if(defined $reply->text);
+        print $reply->text," \n" if(defined $reply->text);
         $hub->post_process;
+        print "jabbot> ";
     }
 }
