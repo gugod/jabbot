@@ -140,7 +140,7 @@ sub on_public {
 	    $self->privmsg($channel, "$nick: no way.");
 	}
 	return;
-    }elsif($str =~/^part$/i) {
+    }elsif(($str =~/^part$/i)&& $to eq $mynick) {
 
 	tie %channels, 'DB_File', "${DB_DIR}/channels.db", O_CREAT|O_RDWR ;
 	delete $channels{$channel} ;
