@@ -20,10 +20,10 @@ sub on_alarm {
         my $reply   = $msg->text;
         my $channel = $msg->channel || '#jabbot3';
         warn "[$channel] $reply\n";
-        $self->privmsg($channel,encode('big5',"$nick: $reply"));
+        $conn->privmsg($channel,encode('big5',$reply));
         $conn->privmsg($channel,'dood');
-        alarm(10);
     }
+    alarm(10);
 }
 
 sub process {
