@@ -37,9 +37,18 @@ sub on_public {
     my $channel = lc(( $event->to )[0]);
     my $nick    = $event->nick;
     my $text    = decode('big5',( $event->args )[0]);
-    my $hub     = $bot->hub;
-    my $reply   = $bot->hub->process($text);
+    my $to = sub {
+	return '' if($_[0] =~ /^http/i);
+	if($_[0] =~ s/^([\d\w\|]+)\s*[:,]\s*//) { return $1; }
+	return '';
+    }->($text);
     warn "[$nick] $text\n";
-    warn "[$channel] $reply\n";
-    $self->privmsg($channel,encode('big5',$reply));
+    if($to eq $bot->config->{nick}) {
+	my $hub     = $bot->hub;
+	my $reply   = $bot->hub->process($text);
+	warn "[$channel] $reply\n";
+	$self->privmsg($channel,encode('big5',"$nick: $reply"));
+    }
 }
+
+
