@@ -6,7 +6,7 @@ sub process {
     no warnings 'once';
     require POE::Component::IKC::ClientLite;
     my $remote = POE::Component::IKC::ClientLite::create_ikc_client(
-        port => $self->config->irc_daemon_port,
+        port => $self->config->irc_frontend_port,
         name => "CheatConsole$$",
         timeout => 5,
     ) or die $POE::Component::IKC::ClientLite::error;
@@ -17,7 +17,7 @@ sub process {
     while(defined ($_ = $term->readline('cheat> '))) {
         my ($channel,$text) = split(/[,\s]+/,$_,2);
         next unless defined($text);
-        $remote->post('frontend_irc/update',
+        $remote->post('localhost/message',
                       {channel => $channel,
                        text =>$text});
         $term->addhistory($_)
