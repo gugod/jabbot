@@ -29,7 +29,7 @@ if(/^(.+?)=>(.+)$/) {
     my $val = $1;
     trim_whitespace($val);
     $db->insert($val,$val);
-}elsif(/^(.+)(?:[?\s]|¡H)+$/ && $MSG{to} eq $BOT_NICK) {
+}elsif(/^(.+)(?:[?\s]|¡H)?$/ && $MSG{to} eq $BOT_NICK) {
     ($r,$priority) = getQueryResult($1);
 } else {
     exit(0);
