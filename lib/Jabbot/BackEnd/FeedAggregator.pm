@@ -5,6 +5,7 @@ use POE;
 use POE::Component::RSSAggregator;
 use POE::Component::IKC::ClientLite;
 use WWW::Shorten '0rz';
+use Encode;
 
 my $self;
 
@@ -41,12 +42,15 @@ sub init_session {
 sub handle_feed {
     my ($kernel,$feed) = ($_[KERNEL], $_[ARG1]->[0]);
     my $remote = create_ikc_client(
-        port => $self->config->{irc_frontend_port}
+        port => $self->config->{irc_frontend_port},
+	serialiser => 'FreezeThaw'
        ) or die POE::Component::IKC::ClientLite::error();
+
     my $feed_name = $feed->name;
     for my $headline ($feed->late_breaking_news) {
         my $channels = $self->config->{"feeds_${feed_name}_channels"};
-        my $text = "${feed_name} - ". $headline->headline;
+        my $headline_text = $headline->headline;
+        my $text = "${feed_name} - " . $headline_text;
 
         if($self->config->{"feeds_${feed_name}_appendurl"}) {
             my $url = ($self->config->{"feeds_${feed_name}_shorturl"})?
@@ -54,14 +58,15 @@ sub handle_feed {
             $text .= " $url";
         }
 
+	my $utf8_text = Encode::encode('utf8',$text);
 	next unless $channels;
         for(@$channels) {
             my($network,$channel) = split(/:/,$_);
-            say "Posting to $network / $channel";
+            say "Posting to $network/$channel: $utf8_text";
             $remote->post("irc_frontend_${network}/message",
                           {channel => $channel,
                            name => $network,
-                           text => $text})
+                           text => $utf8_text})
                 or die $remote->error;
         }
     }

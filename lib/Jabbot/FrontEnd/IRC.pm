@@ -6,7 +6,7 @@ use POE qw(Session
            Component::IRC
            Component::IKC::Server
            Component::IKC::Specifier);
-use Encode qw(encode decode);
+use Encode qw(encode decode from_to);
 use YAML;
 
 my $config;
@@ -45,13 +45,21 @@ sub process {
 
 sub jabbotmsg {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
-    my ($network,$text,$channel) = @$msg{qw(name text channel)};
-    Encode::from_to($text,'utf8','big5');
-    eval {
-        $kernel->post($network => privmsg => "#$channel", $text );
-        say "[${network}/#$channel] $msg->{text} on " . localtime(time);
-    };
-    say "update error: $@" if $@;
+    my ($network,$channel) = @$msg{qw(name channel)};
+
+# Notice:
+# IKC-ClientLite has to use FreezeThaw as serializer instead of Storable.
+# So that the scalar we get here are just bytes. Without utf8 flag turned on.
+# Otherwise it turns encoding strings all mess!
+
+# The $msg->{text} has utf8 flag off, but it's a valid utf8 sequence
+    my $text = decode('utf8',$msg->{text});
+    my $utf8_text = encode('utf8',$text);
+    my $big5_text = encode('big5-hkscs',$text);
+
+    $kernel->post($network, privmsg => "#$channel", $big5_text );
+    say "[${network}/#$channel] on $utf8_text " . localtime(time);
+    return 0;
 }
 
 sub bot_default {
