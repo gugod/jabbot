@@ -40,7 +40,7 @@ sub init_session {
 sub handle_feed {
     my ($kernel,$feed) = ($_[KERNEL], $_[ARG1]->[0]);
     my $remote = create_ikc_client(
-        port => $self->config->{message_dispatcher_port}
+        port => $self->config->{irc_frontend_port}
        ) or die POE::Component::IKC::ClientLite::error();
     my $feed_name = $feed->name;
     for my $headline ($feed->late_breaking_news) {
@@ -49,9 +49,9 @@ sub handle_feed {
         for(@$channels) {
             my($network,$channel) = split(/:/,$_);
             say "Posting to $network / $channel";
-            $remote->post("MessageDispatcher/message",
+            $remote->post("irc_frontend_${network}/message",
                           {channel => $channel,
-                           network => $network,
+                           name => $network,
                            text => "$feed_name:: ". $headline->headline})
                 or die $remote->error;
         }
