@@ -48,6 +48,7 @@ sub handle_feed {
     for my $headline ($feed->late_breaking_news) {
         my $feed_name = $headline->name;
         my $channels = $self->config->{"feeds_${feed_name}_channels"};
+	next unless $channels;
         $remote->post('frontend_irc/update', {channel => $channels,
                                               text => $headline->headline});
     }
