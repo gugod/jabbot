@@ -25,7 +25,13 @@ if($s =~ /^date\?*$/i) {
 	$reply = "佩鼓腹琌次簂";
     }	
     else {
-	$reply = number_to_zh($c) . "次簂";
+	if( $c > 50 ) {
+	    $reply = rand_choose(
+		"琌次簂",
+		number_to_zh($c) . "次簂",
+		number_to_zh($c) . "次簂"
+	    );
+	}
     }
 } elsif($s =~ /^ping\s+([\w\.]+)\?*$/i) {
 #    use Net::Ping;
