@@ -46,6 +46,18 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		   sub { "[ ".$title." ]： ".Lingua::ZH::Summarize::summarize($_[0],maxlength => $sumlen )." " }
 		],
 		[
+			'yam.udn.com',
+		   sub { ($title) = ($_[0]=~m/<title>([^<]*)<\/title>/im); $_[0] =~ m/<!-- YamTextStart -->(.+)<!-- YamTextEnd -->/is },
+		   sub { $_[0] =~ s/<script.+<\/script>//mg ; $_[0]},
+		   sub { $_[0] =~ s/<!--(.*?)-->//sg ; $_[0]},
+		   sub { $_[0] =~ s/<[^<]+>//mg ; $_[0]},
+		   sub { $_[0] =~ s/\n//mg; $_[0] },
+		   sub { $_[0] =~ s/\t//mg; $_[0] },
+		   sub { trim_whitespace(@_) ; @_ },
+		 sub { "[ ".$title." ]: ".Lingua::ZH::Summarize::summarize($_[0],maxlength => $sumlen )." " }
+
+		],
+		[
 		 'taiwan.cnet.com' ,
 		 sub { ($title) = ($_[0]=~m/<title>([^<]*)<\/title>/im); $title = (split(/[:]/,$title))[-1]; $_[0]=~ m/<!-- story body start -->(.+)<!-- story body end -->/is },
 		   sub { $_[0] =~ s/<script.+<\/script>//mg ; $_[0]},
@@ -157,6 +169,18 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		   sub { trim_whitespace(@_) ; @_ },
 		 sub { "CNET：[ ".$title." ]:".$_[0]." " }
 		],
+		[
+			'yam.udn.com',
+		   sub { ($title) = ($_[0]=~m/<title>([^<]*)<\/title>/im); $_[0] =~ m/<!-- YamTextStart -->(.+)<!-- YamTextEnd -->/is },
+		   sub { $_[0] =~ s/<script.+<\/script>//mg ; $_[0]},
+		   sub { $_[0] =~ s/<!--(.*?)-->//sg ; $_[0]},
+		   sub { $_[0] =~ s/<[^<]+>//mg ; $_[0]},
+		   sub { $_[0] =~ s/\n//mg; $_[0] },
+		   sub { $_[0] =~ s/\t//mg; $_[0] },
+		   sub { trim_whitespace(@_) ; @_ },
+		 sub { "[ ".$title." ]: ".$_[0]." " }
+
+		],
 		  [
 		  'http://',
 #		   sub { ($_[0]=~m/[：:|]/ and (split /[：:|]/,$_[0])[-1]) or () },
@@ -237,6 +261,13 @@ if($s =~ /^summarize\s+(http:\S+)\s*/ && $MSG{to} eq $BOT_NICK) {
 		 sub { (split(/ [|] /,$_[0]))[-1] },
 		 sub { trim_whitespace(@_) ; @_ },
 		 sub { "聯合新聞網：「".$_[0]."」" }
+		],
+		[
+		  'appledaily.com.tw',
+		  sub { $_[0] =~ m/<SPAN class=ARTTEXTBOLDBIG>(.+?)<\/SPAN>/im},
+		  sub { $_[0] =~ s/<br>/ /mg; @_ },
+		 sub { trim_whitespace(@_) ; @_ },
+		 sub { "蘋果日報：「".$_[0]."」" }
 		],
 		[
 		 'tw.news.yahoo.com',
