@@ -102,7 +102,7 @@ sub do_my_job {
 	}
 	my @sentances = split(/¡C/, $what);
 	my $r;
-	my @rdb =qw(ok ¤F¸Ñ Á ­ì¨Ó¦p¦¹ §Úª¾¹D¤F ­ì¨Ó¦p¦¹ªü¡I °O¦í¤F ©Ò¥H¡H);
+	my @rdb =qw(ok hmm ³á ¤F¸Ñ Á ­ì¨Ó¦p¦¹ §Úª¾¹D¤F ­ì¨Ó¦p¦¹ªü¡I °O¦í¤F ©Ò¥H¡H);
 	my $TOKEN = '(?:¬O|«Ü)';
 	foreach (@sentances) {
 		if (/$TOKEN/) {
