@@ -16,10 +16,10 @@ use Jabbot::Lib;
 use POSIX ":sys_wait_h";
 my %Kid_Status;
 sub REAPER {
-    my $child;
-    while (($child = waitpid(-1,WNOHANG)) > 0) {
-	$Kid_Status{$child} = $?;
-    }
+	my $child;
+	while (($child = waitpid(-1,WNOHANG)) > 0) {
+		$Kid_Status{$child} = $?;
+	}
 	$SIG{CHLD} = \&REAPER;
 }
 $SIG{CHLD} = \&REAPER; 
@@ -41,12 +41,12 @@ $channels{botchat} = 1;
 
 my $irc  = new Net::IRC;
 my $conn = $irc->newconn(
-			 Nick      => $mynick,
-			 Server    => $server,
-			 Port      => 6668,
-			 Ircname   => "Bato Ro",
-			 Username  => "jabo"
-			 );
+		Nick      => $mynick,
+		Server    => $server,
+		Port      => 6668,
+		Ircname   => "Bato Ro",
+		Username  => "jabo"
+		);
 
 my @bot_module;
 reload_modules();
@@ -56,9 +56,9 @@ autoflush STDERR 1;
 
 # log
 open(STDLOG, ">> ${BOT_HOME}/log/jabbot.log") ||
-  die("Failed to open log file\n".">> ${BOT_HOME}/log/jabbot.log");
+die("Failed to open log file\n".">> ${BOT_HOME}/log/jabbot.log");
 sub printlog {
-    print STDLOG shift;
+	print STDLOG shift;
 }
 
 $conn->add_handler("public",   \&on_public);
@@ -69,121 +69,131 @@ $conn->add_handler("invite",  \&on_invite);
 $SIG{INT} = \&shutdown_bot;
 $SIG{USR1} = \&reconnect_bot;
 
-# $irc->start;
+my %ignores;
+tie %ignores, 'DB_File', "${DB_DIR}/ignorenicks.db", O_CREAT|O_RDWR ;
 
-while(1) {
-    $irc->do_one_loop;
-}
-
+$irc->start;
 # 
 sub reconnect_bot {
-        $conn->quit("Bye");
-        print_log("$mynick reconnect\n");
+	$conn->quit("Bye");
+	print_log("$mynick reconnect\n");
 	reload_modules();
+	untie %ignores;
+	tie %ignores, 'DB_File', "${DB_DIR}/ignorenicks.db", O_CREAT|O_RDWR ;
 }
 
 sub shutdown_bot {
-        $conn->quit("Bye");
-        printlog "$mynick exit\n";
-        exit;
+	$conn->quit("Bye");
+	printlog "$mynick exit\n";
+	exit;
 }
 
 
 # Setup bot's module.
 sub reload_modules {
-    chdir(${MOD_DIR});
-    @bot_module = bsd_glob("*.pl");
-    chdir("-");
+	chdir(${MOD_DIR});
+	@bot_module = bsd_glob("*.pl");
+	chdir("-");
+
 }
 
 sub on_invite {
-    my ( $self, $event ) = @_;
-    my $channel     = lc(( $event->args )[0]);
-    my $nick    = $event->nick;
-    tie %channels, 'DB_File', "${DB_DIR}/channels.db", O_CREAT|O_RDWR ;
-    $channels{$channel} = 1;
-    untie %channels;
-    $self->join($channel);
+	my ( $self, $event ) = @_;
+	my $channel     = lc(( $event->args )[0]);
+	my $nick    = $event->nick;
+	tie %channels, 'DB_File', "${DB_DIR}/channels.db", O_CREAT|O_RDWR ;
+	$channels{$channel} = 1;
+	untie %channels;
+	$self->join($channel);
 }
 
 sub on_disconnect {
-    my ( $self, $event ) = @_;
-    $self->connect();
+	my ( $self, $event ) = @_;
+	$self->connect();
 }
 
 sub on_connect {
-    my $self = shift;
-    tie %channels, 'DB_File', "${DB_DIR}/channels.db", O_CREAT|O_RDWR ;
-    foreach (keys %channels) {
-	$self->join($_);
-    }
-    untie %channels;
-    printlog "$mynick has joined $server\n";
+	my $self = shift;
+	tie %channels, 'DB_File', "${DB_DIR}/channels.db", O_CREAT|O_RDWR ;
+	foreach (keys %channels) {
+		$self->join($_);
+	}
+	untie %channels;
+	printlog "$mynick has joined $server\n";
 }
 
 sub on_public {
-    my ( $self, $event ) = @_;
-    my $channel = lc(( $event->to )[0]);
-    my $nick    = $event->nick;
-    my $str     = ( $event->args )[0];
-    my $time = sprintf( "%02d:%02d", localtime->hour(), localtime->min() );
-    printlog "($channel) $time <$nick> $str\n";
-    my $to = strip_leading_nick($str);
+	my ( $self, $event ) = @_;
+	my $channel = lc(( $event->to )[0]);
+	my $nick    = $event->nick;
+	my $str     = ( $event->args )[0];
+	my $time = sprintf( "%02d:%02d", localtime->hour(), localtime->min() );
+	printlog "($channel) $time <$nick> $str\n";
+	my $to = strip_leading_nick($str);
 
-    # a real dirty hack :p
-
-    if($str =~ /^reload modules$/i) {
-	if($nick eq 'zcecil') {
-	    reload_modules();
-	    $self->privmsg($channel, "$nick: ok");
-	}else {
-	    $self->privmsg($channel, "$nick: no way.");
+	foreach (keys %ignores) {
+		if ($nick eq $_){
+			return;
+		}
 	}
-	return;
-    }elsif(($str =~/^part$/i)&& $to eq $mynick) {
 
-	tie %channels, 'DB_File', "${DB_DIR}/channels.db", O_CREAT|O_RDWR ;
-	delete $channels{$channel} ;
-	untie %channels;
-	$self->part($channel);
-	return;
-    }
+# a real dirty hack :p
 
-    my @r = sort { $b->{priority} <=> $a->{priority} }
-    grep { length($_->{body}) > 0 }
-    map {
-	my $pid = open2(\*RDRFH, \*WTRFH, "${MOD_DIR}/$_");
-	print WTRFH msg2txt({ from => $nick,
-			      to   => $to,
-			      body => $str
-			      });
-	close(WTRFH);
-	undef $/;
-	my $r = <RDRFH>;
-	my %rmsg = txt2msg($r);
-	close(RDRFH);
-	\%rmsg;
-    } @bot_module ;
+	if($str =~ /^reload modules$/i) {
+		if($nick eq 'zcecil') {
+			reload_modules();
+			$self->privmsg($channel, "$nick: ok");
+		}else {
+			$self->privmsg($channel, "$nick: no way.");
+		}
+		return;
+	}elsif(($str =~/^part$/i)&& $to eq $mynick) {
 
-   my $reply ;
-    if ($r[0]->{priority} == 0 ) {
-	$reply = $r[int(rand($#r))];
-    } else {
-	$reply = $r[0];
-    }
-    my @msgs = split(/\n/,$reply->{body});
-    if ($#msgs > 3) {
-	$self->privmsg($nick, $_) foreach(@msgs);
-    } else {
-	if(length($reply->{to}) >0 ) {
-	    $self->privmsg($channel, "$nick: $_")
-		foreach(@msgs);
-	} elsif($reply->{public} || ($reply->{priority} > 0) ) {
-	    $self->privmsg($channel, $_)
-		foreach(@msgs);
+		tie %channels, 'DB_File', "${DB_DIR}/channels.db", O_CREAT|O_RDWR ;
+		delete $channels{$channel} ;
+		untie %channels;
+		$self->part($channel);
+		return;
 	}
-    }
-    #wait foreach(@bot_module);
+
+	my @r;
+	foreach ( @bot_module ){
+#		next if (rand(10) > 50);
+		my $pid = open2(\*RDRFH, \*WTRFH, "${MOD_DIR}/$_");
+		print WTRFH msg2txt({ from => $nick,
+				to   => $to,
+				body => $str
+				});
+		close(WTRFH);
+		undef $/;
+		my $r = <RDRFH>;
+		my %rmsg = txt2msg($r);
+		close(RDRFH);
+		push @r,\%rmsg;
+	}
+
+	@r = sort { $b->{priority} <=> $a->{priority} }
+	grep { length($_->{body}) > 0 } @r;
+
+	my $reply ;
+	if ($r[0]->{priority} == 0 ) {
+		$reply = $r[int(rand($#r))];
+	} else {
+		$reply = $r[0];
+	}
+	my @msgs = split(/\n/,$reply->{body});
+	if ($#msgs > 3) {
+		$self->privmsg($nick, $_) foreach(@msgs);
+	} else {
+		if(length($reply->{to}) >0 ) {
+			$self->privmsg($channel, "$nick: $_")
+				foreach(@msgs);
+		} elsif($reply->{public} || ($reply->{priority} > 0) ) {
+			$self->privmsg($channel, $_)
+				foreach(@msgs);
+		}
+	}
+#wait foreach(@bot_module);
 }
 
 
