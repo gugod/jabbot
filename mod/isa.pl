@@ -107,6 +107,9 @@ sub do_my_job {
 	foreach (@sentances) {
 		if (/$TOKEN/) {
 			my ($k,$v) = split(/(?:不)?(?:$ymodifiers)?$TOKEN/ , $_, 2);
+			# ignore punctuations..
+			next unless $k =~  /[\w\xa4-\xfe]/ ;
+
 			$k =~ s/\s+$//;
 			if(exists $isadb{"$k"}) {
 				$r = "不過，據我所知，$isadb{$k}";
