@@ -3,6 +3,7 @@ use Jabbot::Plugin -Base;
 use HTTP::Request::Common qw(GET);
 use LWP::UserAgent;
 use Encode;
+use List::Util qw(shuffle);
 
 # This .pm has to be in big5 otherwise http request failed.
 
@@ -58,7 +59,7 @@ sub get_ex_money {
     $from = $self->expand_alias(uc($from));
     $to   = $self->expand_alias(uc($to));
     # Random answer :-/
-    while($from eq $to) {$to = rand_choose(keys %coin);}
+    while($from eq $to) {$to = (shuffle(keys %coin))[0];}
     my $ua = LWP::UserAgent->new(timeout => 300) or die $!;;
     my $res;
     eval {
