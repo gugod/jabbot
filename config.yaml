@@ -1,0 +1,6 @@
+server: irc.tw.freebsd.org
+nick: jabbot
+admin:
+  - gugod
+  - zcecil
+

@@ -11,6 +11,8 @@ use DB_File;
 use IPC::Open2;
 use File::Glob ':glob';
 use POSIX ":sys_wait_h";
+use IO::All;
+use YAML;
 
 use Jabbot::Lib;
 use POSIX ":sys_wait_h";
@@ -32,9 +34,10 @@ my $DEBUG = 1;
 my $reply;
 my $verbose = 0;
 
+my $config = YAML::LoadFile('config.yaml');
 
-my $server     = "irc.tw.freebsd.org";
-my $mynick     = $BOT_NICK;
+my $server     = $config->{server};
+my $mynick     = $config->{nick} || $BOT_NICK;
 
 my  %channels;
 $channels{botchat} = 1;
@@ -43,7 +46,7 @@ my $irc  = new Net::IRC;
 my $conn = $irc->newconn(
 		Nick      => $mynick,
 		Server    => $server,
-		Port      => 6668,
+		Port      => 6666,
 		Ircname   => "Bato Ro",
 		Username  => "jabo"
 		);
@@ -55,11 +58,8 @@ autoflush STDOUT 1;
 autoflush STDERR 1;
 
 # log
-open(STDLOG, ">> ${BOT_HOME}/log/jabbot.log") ||
-die("Failed to open log file\n".">> ${BOT_HOME}/log/jabbot.log");
-sub printlog {
-	print STDLOG shift;
-}
+my $logfh = io("${BOT_HOME}/log/jabbot.log")->assert;
+sub printlog { $logfh->append(shift); }
 
 $conn->add_handler("public",   \&on_public);
 $conn->add_global_handler( 376, \&on_connect );
@@ -140,7 +140,7 @@ sub on_public {
 # a real dirty hack :p
 
 	if($str =~ /^reload modules$/i) {
-		if($nick =~ /gugod|zcecil/) {
+		if(grep /^$nick$/,@{$config->{admin}}) {
 			reload_modules();
 			$self->privmsg($channel, "$nick: ok");
 		}else {
