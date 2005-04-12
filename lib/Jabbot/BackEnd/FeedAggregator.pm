@@ -47,7 +47,7 @@ sub handle_feed {
        ) or die POE::Component::IKC::ClientLite::error();
 
     my $feed_name = $feed->name;
-    for my $headline ($feed->late_breaking_news) {
+    for my $headline (reverse $feed->late_breaking_news) {
         my $channels = $self->config->{"feeds_${feed_name}_channels"};
         my $headline_text = $headline->headline;
         my $text = "${feed_name} - " . $headline_text;
