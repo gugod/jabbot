@@ -6,9 +6,8 @@ const class_id => 'OldEnglish';
 sub process {
     my $text = shift->text;
     
-    if ($text =~ /thou/)
-    {
-        $self->reply('thou speakst also ye olde English?', 1);
+    if ($text =~ /\bthou\b/) {
+        $self->reply('thou speakst also ye olde English?');
     }
 }
 
