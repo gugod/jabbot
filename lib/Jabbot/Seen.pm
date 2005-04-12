@@ -10,8 +10,9 @@ sub process {
     my $now = time;
     my $reply;
     if($msg->text =~ /^seen\s+([^\s\?]+)\s*\?*/) {
+	my $t = gmtime($db->{$1}) . " GMT";
         $reply = defined($db->{$1})?
-            "$1 was seen on " . localtime($db->{$1}) :
+            "$1 was seen on $t":
             "I havn't seen $1 , $nick";
     }
     $db->{$nick} = time;
