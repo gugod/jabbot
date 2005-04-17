@@ -14,10 +14,10 @@ my $self;
 
 sub process {
     $self= shift;
-    $config = $self->config;
+    $config = $self->hub->config;
     POE::Component::IKC::Server->spawn(
-        port => $self->config->{irc_frontend_port},
-        name => $self->config->{nick}
+        port => $config->{irc_frontend_port},
+        name => $config->{nick}
        );
 
     for my $network (@{$config->{irc_networks}}) {
@@ -115,10 +115,13 @@ sub bot_public {
     my $network = $heap->{network};
     my $nick = ( split /!/, $who )[0];
     my $channel = $where->[0];
-    my $pubmsg  = decode('big5',$msg);
-    say "[$network/$channel] ". encode('utf8',$pubmsg);
+    $channel =~ s{^\#}{};
+    my $encoding = $self->hub->config->{"channel_encoding_${network}_${channel}"} || $self->hub->config->default_encoding || 'utf8';
+    $channel = '#'.$channel;
+    my $pubmsg  = decode($encoding,$msg);
+    say "[$network/$channel encoding=\"$encoding\"] ". encode('utf8',$pubmsg);
     my $to = sub {
-       return '' if($_[0] =~ /^http/i);
+       return '' if($_[0] =~ /^\s*http/i);
        if($_[0] =~ s/^([\d\w\|]+)\s*[:,]\s*//) { return $1; }
        return '';
     }->($pubmsg);
@@ -130,9 +133,10 @@ sub bot_public {
             to => $to
            ));
     my $reply_text = $reply->text;
+    say encode('utf8',$reply_text);
     if(length($reply_text) &&
-           ($to eq $self->config->{nick} || $reply->must_say)) {
-        $reply_text = encode('big5',"$nick: $reply_text");
+           ($to eq $self->hub->config->nick || $reply->must_say)) {
+        $reply_text = encode($encoding,"$nick: $reply_text");
         $kernel->post($network => privmsg => $channel, $reply_text);
     }
 }
