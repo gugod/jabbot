@@ -8,6 +8,7 @@ license('perl');
 
 requires(
     Kwiki => '0.37',
+    Spoon => '0,23',
     Net::IRC => 0,
     Chatbot::Eliza => 0,
     Date::Day => 0,
