@@ -55,9 +55,12 @@ sub jabbotmsg {
 # The $msg->{text} has utf8 flag off, but it's a valid utf8 sequence
     my $text = decode('utf8',$msg->{text});
     my $utf8_text = encode('utf8',$text);
-    my $big5_text = encode('big5-hkscs',$text);
 
-    $kernel->post($network, privmsg => "#$channel", $big5_text );
+    my $encoding = $self->hub->config->{"channel_encoding_${network}_${channel}"} || $self->hub->config->default_encoding || 'utf8';
+
+    my $channel_text = encode($encoding,$text);
+
+    $kernel->post($network, privmsg => "#$channel", $channel_text );
     say "[${network}/#$channel] on $utf8_text " . localtime(time);
     return 0;
 }
@@ -133,7 +136,6 @@ sub bot_public {
             to => $to
            ));
     my $reply_text = $reply->text;
-    say encode('utf8',$reply_text);
     if(length($reply_text) &&
            ($to eq $self->hub->config->nick || $reply->must_say)) {
         $reply_text = encode($encoding,"$nick: $reply_text");

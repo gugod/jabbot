@@ -8,7 +8,6 @@ sub init {
     $self->use_class('message');
 }
 
-use YAML;
 sub process {
     $self->preload;
     my $msg = shift;
