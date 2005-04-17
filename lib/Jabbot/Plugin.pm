@@ -5,15 +5,16 @@ stub 'class_id';
 const config_file => '';
 const class_title_prefix => 'Jabbot';
 
+field config  => -init => '$self->hub->config';
+field message => -init => '$self->hub->message';
+
 sub new {
     return $self if ref $self;
     super;
 }
 
 sub init {
-    $self->use_class('config');
-    $self->use_class('message');
-    $self->config->add_file($self->config_file);
+    $self->hub->config->add_file($self->config_file);
 }
 
 sub reply {

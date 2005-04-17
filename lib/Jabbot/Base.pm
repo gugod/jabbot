@@ -6,6 +6,5 @@ use Perl6::Say;
 
 our @EXPORT = qw(say);
 
-sub init {
-    $self->use_class('config');
-}
+field config => -init => '$self->hub->config';
+
