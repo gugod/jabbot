@@ -19,6 +19,7 @@ requires(
     Perl6::Say => 0,
     WWW::Shorten::0rz => 0,
     OurNet::Chatbot => 0,
+    Time::Interval => 0,
 );
 
 check_nmake();
