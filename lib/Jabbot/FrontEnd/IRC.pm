@@ -45,7 +45,7 @@ sub process {
 
 sub jabbotmsg {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
-    my ($network,$channel) = @$msg{qw(name channel)};
+    my ($network,$channel) = @$msg{qw(network channel)};
 
 # Notice:
 # IKC-ClientLite has to use FreezeThaw as serializer instead of Storable.

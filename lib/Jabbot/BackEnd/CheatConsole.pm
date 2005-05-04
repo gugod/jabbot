@@ -17,9 +17,12 @@ sub process {
     while(defined ($_ = $term->readline('cheat> '))) {
         my ($channel,$text) = split(/[,\s]+/,$_,2);
         next unless defined($text);
-        $remote->post('localhost/message',
-                      {channel => $channel,
-                       text =>$text});
+        for my $network (@{$self->config->{irc_networks}}) {
+            $remote->post("irc_frontend_${network}/message",
+                          {channel => $channel,
+                           text =>$text,
+                           network => $network });
+        }  
         $term->addhistory($_)
     }
 }
