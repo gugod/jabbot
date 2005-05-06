@@ -65,7 +65,7 @@ sub handle_feed {
             say "Posting to $network/$channel: $utf8_text";
             $remote->post("irc_frontend_${network}/message",
                           {channel => $channel,
-                           name => $network,
+                           network => $network,
                            text => $utf8_text})
                 or die $remote->error;
         }
