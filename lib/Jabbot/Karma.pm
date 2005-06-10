@@ -23,10 +23,21 @@ sub process {
             "$_(" . $db->{$_} .")"
         } grep {defined$_} (sort { $db->{$a} <=> $db->{$b} } keys %$db)[0..10]);
     } elsif ($s =~ /^karma\s+(.+)\s*$/) {
-        my $karma = $db->{$1} || 0;
+        my $nword = lc($1);
+        my $karma = $db->{$nword} || sub {
+                    for(keys %$db) {
+                        return $db->{$_} if(normalizeWord($_) eq $nword);
+                    }
+                    return 0; 
+		}->();
         $reply = ($karma == 0)?"$1 has neutral karma":"$1 has karma of $karma";
     }
     $self->reply($reply,1);
+}
+
+sub normalizeWord {
+	my $str = shift;
+	return lc($str);
 }
 
 sub getKeyword {
@@ -38,6 +49,6 @@ sub getKeyword {
     } else {
 	$str = (split(/ /,$str))[-1];
     }
-    return $str;
+    return normalizeWord($str);
 }
 
