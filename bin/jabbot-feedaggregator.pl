@@ -3,9 +3,10 @@ use strict;
 use warnings;
 use lib 'lib';
 use Jabbot;
+my @configs = qw(config.yaml -plugins plugins);
 
 my $j = Jabbot->new;
-$j->load_hub(qw(config.yaml -plugins plugins));
+$j->load_hub(@configs);
 $j->hub->config->{backend_class} = 'Jabbot::BackEnd::FeedAggregator';
 $j->hub->backend->process(@ARGV);
 
