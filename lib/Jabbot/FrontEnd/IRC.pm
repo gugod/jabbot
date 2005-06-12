@@ -33,6 +33,7 @@ sub process {
                 irc_error        => \&bot_reconnect,
                 irc_socketerr    => \&bot_reconnect,
                 irc_public       => \&bot_public,
+                irc_msg          => \&bot_msg,
                 autoping         => \&bot_do_autoping,
                 message          => \&jabbotmsg,
                 _default         => $ENV{DEBUG} ? \&bot_default : sub {},
@@ -113,11 +114,18 @@ sub bot_reconnect {
     $kernel->delay(connect=>60);
 }
 
+sub bot_msg {
+    my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
+    my $network = $heap->{network};
+    my $nick = ( split /!/, $who )[0];
+    my $channel = lc($where->[0]);
+}
+
 sub bot_public {
     my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
     my $network = $heap->{network};
     my $nick = ( split /!/, $who )[0];
-    my $channel = $where->[0];
+    my $channel = lc($where->[0]);
     $channel =~ s{^\#}{};
     my $encoding = $self->hub->config->{"channel_encoding_${network}_${channel}"} || $self->hub->config->default_encoding || 'utf8';
     $channel = '#'.$channel;
