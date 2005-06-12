@@ -117,8 +117,24 @@ sub bot_reconnect {
 sub bot_msg {
     my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
     my $network = $heap->{network};
+    my $encoding = "utf8";
+    my $pubmsg  = decode($encoding,$msg);
     my $nick = ( split /!/, $who )[0];
-    my $channel = lc($where->[0]);
+
+    say "[$network/$who encoding=\"$encoding\"] ". encode('utf8',$pubmsg);
+    my $reply = $self->hub->process(
+        $self->hub->message->new(
+            text => $pubmsg,
+            from => $nick,
+            channel => '',
+            to => $self->hub->config->nick,
+           ));
+
+    my $reply_text = $reply->text;
+    if(length($reply_text)) {
+        $reply_text = encode($encoding,$reply_text);
+        $kernel->post($network => privmsg => $nick, $reply_text);
+    }
 }
 
 sub bot_public {
