@@ -22,7 +22,7 @@ sub process {
 	    }
 	    $reply .= 'ago';
 	} else {
-	    $reply = "I havn't seen $1 , $nick";
+	    $reply = "I havn't seen $1, $nick";
 	}
     }
     $db->{$nick} = time;
