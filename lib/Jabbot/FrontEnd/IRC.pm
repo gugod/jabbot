@@ -35,10 +35,10 @@ sub process {
                 irc_public       => \&bot_public,
                 irc_msg          => \&bot_msg,
                 autoping         => \&bot_do_autoping,
-                message          => \&jabbotmsg,
-                _default         => $ENV{DEBUG} ? \&bot_default : sub {},
-            }
-           );
+		message          => \&jabbotmsg,
+		_default         => $ENV{DEBUG} ? \&bot_default : sub {},
+		}
+	);
     }
 
     $poe_kernel->run();
@@ -80,6 +80,8 @@ sub bot_start {
     $kernel->alias_set("irc_frontend_${network}");
     $kernel->call( IKC => publish => "irc_frontend_${network}" => ['message'] );
     $kernel->post( $network => register => 'all' );
+    $kernel->delay( autoping => 300 );
+
     $kernel->post( $network => connect => {
         Nick =>   $config->{nick},
         Server => $config->{"irc_${network}_server"}
@@ -110,7 +112,7 @@ sub bot_do_autoping {
 sub bot_reconnect {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
     say "reconnect: ".$_[ARG0];
-    $kernel->delay(autoping=>undef);
+    $kernel->delay(autoping=>300);
     $kernel->delay(connect=>60);
 }
 
