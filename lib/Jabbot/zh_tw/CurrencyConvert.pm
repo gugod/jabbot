@@ -38,9 +38,9 @@ sub process {
     my $reply;
     my $allsymbol = join("|",keys %coin) . "|" . join("|",keys %calias);
     my $qmark = '(?:[\s\?]|¡H)*';
-    if ( $s =~ /^([\d\.]+)\s*($allsymbol)\s+to\s+($allsymbol)$qmark$/i ) {
+    if ( $s =~ /^([\d\.\+\-\*\/]+)\s*($allsymbol)\s+to\s+($allsymbol)$qmark$/i ) {
         $reply = $self->get_ex_money($1,$2,$3);
-    } elsif ( $s =~ /^([\d\.]+)\s*($allsymbol)$qmark$/i ) {
+    } elsif ( $s =~ /^([\d\.\+\-\*\/]+)\s*($allsymbol)$qmark$/i ) {
         $reply = $self->get_ex_money($1,$2);
     } elsif ( $s =~ /^currency\s+list([\s\?])*?/i ) {
         $reply = "You may ask my to exchange these currency: "
@@ -58,6 +58,7 @@ sub get_ex_money {
     $to ||= "NTD"; # Default to NTD
     $from = $self->expand_alias(uc($from));
     $to   = $self->expand_alias(uc($to));
+    eval"\$money = $money";
     # Random answer :-/
     while($from eq $to) {$to = (shuffle(keys %coin))[0];}
     my $ua = LWP::UserAgent->new(timeout => 300) or die $!;;
