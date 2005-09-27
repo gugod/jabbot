@@ -5,6 +5,7 @@ irc_networks:
 - freenode
 # - ircnet
 irc_freenode_server: irc.freenode.net
+irc_freenode_port: 6667
 irc_ircnet_server: irc.ircnet.net
 irc_localhost_server: 127.0.0.1
 

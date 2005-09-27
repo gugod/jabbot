@@ -84,7 +84,8 @@ sub bot_start {
 
     $kernel->post( $network => connect => {
         Nick =>   $config->{nick},
-        Server => $config->{"irc_${network}_server"}
+        Server => $config->{"irc_${network}_server"},
+        Port =>   $config->{"irc_${network}_port"},
     });
 }
 
