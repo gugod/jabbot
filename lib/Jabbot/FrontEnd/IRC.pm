@@ -83,9 +83,9 @@ sub bot_start {
     $kernel->delay( autoping => 300 );
 
     $kernel->post( $network => connect => {
-        Nick =>   $config->{nick},
+        Nick   => $config->{nick},
         Server => $config->{"irc_${network}_server"},
-        Port =>   $config->{"irc_${network}_port"},
+        Port   => $config->{"irc_${network}_port"},
     });
 }
 
