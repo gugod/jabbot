@@ -1,39 +1,47 @@
 package Jabbot::FrontEnd::AIM;
 use Jabbot::FrontEnd -base;
-
-use Net::AIM;
+use Net::OSCAR qw(:standard);
+use HTML::Strip;
 use YAML;
 
 my $self;
+my $hs;
+
 sub process {
     $self = shift;
+
+
     my $config = $self->hub->config;
-    my $aim = new Net::AIM;
-    $aim->newconn(Screenname => $config->{aim_username},
-		  Password   => $config->{aim_password})
+    my $aim = Net::OSCAR->new();
+
+    $aim->set_callback_im_in(\&on_im);
+
+    $aim->signon($config->{aim_username}, $config->{aim_password})
 	or die "Cannot connect to AIM";
-    my $conn = $aim->getconn();
-    $conn->set_handler('IM_IN', \&on_im);
-    $conn->set_handler('ERROR', \&on_error);
-    print "Logged on to AIM!\n";
-    $aim->start;
+
+    $hs = HTML::Strip->new();
+
+    while(1) {
+	$aim->do_one_loop();
+    }
 }
 
 sub on_im {
-    my ($aim, $evt, $from, $to) = @_;
-    my $args = $evt->args();
-    ($from, my $friend, my $msg) = @$args;
-    $msg =~ s/<(.|\n)+?>//g;
-    print STDERR "==> $from $friend $msg\n";
-}
+    my($aim, $sender, $message, $is_away) = @_;
+    my $msg_text = $hs->parse( $message );
+    print STDERR "==> $sender: $msg_text\n ==== $message\n";
 
-sub on_error {
-    my ($aim,$evt) = @_;
-    my ($error, @stuff) = @{$evt->args()};
-    my $errstr = $evt->trans($error);
-    $errstr =~ s/\$(\d+)/$stuff[$1]/ge;
-    print "ERROR: $errstr\n";
+     my $reply = $self->hub->process (
+	  $self->hub->message->new (
+	   text => $msg_text,
+	   from => $sender,
+	   channel => $sender,
+	   to => $self->hub->config->{aim_username}
+	  ));
+    my $reply_text = $reply->text;
+    if(length($reply_text)) {
+	$aim->send_im($sender,$reply_text);
+    }
 }
-
 
 1;
