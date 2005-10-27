@@ -2,6 +2,7 @@ package Jabbot::FrontEnd::AIM;
 use Jabbot::FrontEnd -base;
 use Net::OSCAR qw(:standard);
 use HTML::Strip;
+use Encode qw(encode decode from_to);
 use YAML;
 
 my $self;
@@ -15,6 +16,7 @@ sub process {
     my $aim = Net::OSCAR->new();
 
     $aim->set_callback_im_in(\&on_im);
+    $aim->set_callback_error(\&on_error);
 
     $aim->signon($config->{aim_username}, $config->{aim_password})
 	or die "Cannot connect to AIM";
@@ -40,8 +42,14 @@ sub on_im {
 	  ));
     my $reply_text = $reply->text;
     if(length($reply_text)) {
+	$reply_text = encode('utf8',$reply_text);
 	$aim->send_im($sender,$reply_text);
     }
+}
+
+sub on_error {
+    my ($aim, $conn, $error, $description, $fatal) = @_;
+    print STDERR "Error: $description\n";
 }
 
 1;
