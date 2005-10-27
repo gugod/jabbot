@@ -20,6 +20,7 @@ requires(
     WWW::Shorten::0rz => 0,
     OurNet::Chatbot => 0,
     Time::Interval => 0,
+    Net::OSCAR => 0,
 );
 
 check_nmake();

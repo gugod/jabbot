@@ -3,15 +3,15 @@ use Jabbot::FrontEnd -base;
 use Net::OSCAR qw(:standard);
 use HTML::Strip;
 use Encode qw(encode decode from_to);
+use Encode::Guess qw/utf16-be iso-8859-1/;
 use YAML;
+use IO::All;
 
 my $self;
 my $hs;
 
 sub process {
     $self = shift;
-
-
     my $config = $self->hub->config;
     my $aim = Net::OSCAR->new();
 
@@ -30,8 +30,15 @@ sub process {
 
 sub on_im {
     my($aim, $sender, $message, $is_away) = @_;
-    my $msg_text = $hs->parse( $message );
-    print STDERR "==> $sender: $msg_text\n ==== $message\n";
+
+    my $enc = guess_encoding($message, qw(utf16-be iso-8859-1));
+    ref($enc) or return;
+
+    my $u_message = $enc->decode($message);
+
+    my $msg_text = $self->html_strip( $u_message );
+
+    print YAML::Dump(sender => $sender, message => $u_message, txt => $msg_text);
 
      my $reply = $self->hub->process (
 	  $self->hub->message->new (
@@ -42,14 +49,26 @@ sub on_im {
 	  ));
     my $reply_text = $reply->text;
     if(length($reply_text)) {
-	$reply_text = encode('utf8',$reply_text);
-	$aim->send_im($sender,$reply_text);
+	my $u8_reply_text = encode('utf8', $reply_text);
+	print STDERR "<== $u8_reply_text\n";
+	if(grep {ord($_) > 127} split("",$reply_text)) {
+	    my $u_reply_text = encode('utf16', $reply_text);
+	    $aim->send_im($sender,$u_reply_text);
+	} else {
+	    $aim->send_im($sender,$reply_text);
+	}
     }
 }
 
 sub on_error {
     my ($aim, $conn, $error, $description, $fatal) = @_;
     print STDERR "Error: $description\n";
+}
+
+sub html_strip {
+    my ($self,$text) = @_;
+    $text =~ s/<[^<]*>//g;
+    return $text;
 }
 
 1;
