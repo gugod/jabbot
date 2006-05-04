@@ -26,7 +26,7 @@ sub process {
         my $nword = lc($1);
         my $karma = $db->{$nword} || sub {
                     for(keys %$db) {
-                        return $db->{$_} if(normalizeWord($_) eq $nword);
+                        return $db->{$_} if($self->normalizeWord($_) eq $nword);
                     }
                     return 0; 
 		}->();
@@ -36,8 +36,8 @@ sub process {
 }
 
 sub normalizeWord {
-	my $str = shift;
-	return lc($str);
+	my $str = lc(shift);
+        return $str;
 }
 
 sub getKeyword {
@@ -49,6 +49,6 @@ sub getKeyword {
     } else {
 	$str = (split(/ /,$str))[-1];
     }
-    return normalizeWord($str);
+    return $self->normalizeWord($str);
 }
 
