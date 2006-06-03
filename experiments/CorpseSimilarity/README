@@ -1,0 +1,25 @@
+###  README --- jabbot/experiments/CorpseSimilarity/
+
+Given any two text files, determine their similaritiy.
+
+Method 1: Bigram frequency vector dot product
+
+Principle: If two corpse has similar bigram distribution, they
+are similar to each other.
+
+ similarity :: range 0..1
+ similarity :=bfv(a) dot bfv(2)
+
+ bfv :: bigram vector of all possible bigrams in unicode character set.
+ bfv := ordered normalized bigram
+
+
+## Copyright 2006 Liu Kang-min
+##
+## Author: gugod@gugod.org
+## Keywords: 
+
+
+
+
+
