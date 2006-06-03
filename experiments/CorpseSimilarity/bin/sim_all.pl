@@ -12,25 +12,34 @@ use Text::Ngrams;
 use Text::Ngrams::Extensions;
 use Perl6::Say;
 use File::Basename;
-
-my $dir = shift;
+use IO::All;
 
 my @ng = map {
-    my $ng = Text::Ngrams->new( type => 'utf8');
-    $ng->process_files($_);
+    my $ng = Text::Ngrams->new;
     $ng->{file_name} = basename($_);
+    my $text = io($_)->utf8->all;
+    # $text =~ s/\s+//gs;
+    for (split /\s+/,$text) {
+        if (/^[a-zA-Z0-9]+$/) {
+            $ng->feed_tokens($_)
+        } else {
+            $ng->feed_tokens($_) for split "",$_ ;
+        }
+    }
     $ng;
-} <$dir/*.txt>;
+} @ARGV;
 
-my $dp={};
+$, = " ";
+
 for my $i (0..$#ng) {
     for my $j ($i+1..$#ng) {
-        $dp->{$ng[$i]->{file_name}}{$ng[$j]->{file_name}} = $ng[$i]->dot_product_with($ng[$j]);
+        print($ng[$i]->dot_product_with($ng[$j]),
+              $ng[$i]->{file_name},
+              $ng[$j]->{file_name},
+              "\n"
+          );
     }
 }
-
-use YAML;
-say YAML::Dump($dp);
 
 __END__
 

@@ -18,11 +18,17 @@ sub dot_product_with {
 
 sub get_normalized_ngrams {
     my ($self) = @_;
+    if (defined $self->{_normalized_ngrams}) {
+        return %{$self->{_normalized_ngrams}};
+    }
     my %ng = $self->get_ngrams;
     my @k = keys %ng;
     my @v = values %ng;
-    my @normalized_v = @{normalize([@v])};
-    @ng{@k} = @normalized_v;
+    if (@v) {
+        my @normalized_v = @{normalize([@v])};
+        @ng{@k} = @normalized_v;
+    }
+    $self->{_normalized_ngrams} = \%ng;
     return %ng;
 }
 
