@@ -10,7 +10,6 @@ use Pod::Usage;
 
 use Text::Ngrams;
 use Text::Ngrams::Extensions;
-use Perl6::Say;
 use File::Basename;
 use IO::All;
 

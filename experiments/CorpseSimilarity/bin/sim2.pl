@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -l
 
 eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
     if 0; # not running under some shell
@@ -9,7 +9,6 @@ use warnings;
 use Pod::Usage;
 use Text::Ngrams;
 use Text::Ngrams::Extensions;
-use Perl6::Say;
 
 my @ng = map {
     my $ng = Text::Ngrams->new( type => 'utf8');
@@ -19,7 +18,7 @@ my @ng = map {
 
 my $dp = $ng[0]->dot_product_with($ng[1]);
 
-say "Similarity $dp";
+print "Similarity $dp";
 
 __END__
 
