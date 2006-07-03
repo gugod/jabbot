@@ -6,7 +6,7 @@ irc_networks:
 # - ircnet
 irc_freenode_server: chat.freenode.net
 irc_freenode_port: 6667
-irc_ircnet_server: irc.ircnet.net
+irc_ircnet_server: ircnet.choopa.net
 irc_ircnet_port: 6666
 irc_localhost_server: 127.0.0.1
 
