@@ -34,6 +34,7 @@ sub process {
                 irc_socketerr    => \&bot_reconnect,
                 irc_public       => \&bot_public,
                 irc_msg          => \&bot_msg,
+                irc_ping         => \&bot_ping,
                 autoping         => \&bot_do_autoping,
 		message          => \&jabbotmsg,
 		_default         => \&bot_default,
@@ -170,6 +171,12 @@ sub bot_public {
         $reply_text = encode($encoding,"$nick: $reply_text");
         $kernel->post($network => privmsg => $channel, $reply_text);
     }
+}
+
+sub bot_ping {
+    my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
+    my $network = $heap->{network};
+    $heap->{seen_traffic} = 1;
 }
 
 1;
