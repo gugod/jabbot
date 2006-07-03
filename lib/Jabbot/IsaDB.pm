@@ -2,7 +2,7 @@ package Jabbot::IsaDB;
 use Jabbot::Plugin -Base;
 use utf8;
 
-my $ymodifiers = "好像|應該|就|乃|只|衹|真的|真";
+my $ymodifiers = "好像|應該|就|也|乃|只|衹|真的|真";
 
 const class_id => 'isa_db';
 field isadb => {}, -init => q{$self->load_isadb};
@@ -15,7 +15,6 @@ sub load_isadb {
 }
 
 sub process {
-#    eval { $self->load_isadb } or print $@;
     my $msg = shift;
     my $qstring = $msg->text;
     my $r;
