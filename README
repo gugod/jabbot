@@ -1,41 +1,13 @@
-A Kwiki Welcome
-===============
+Jabbot is now under 3.0 developement.
+It'll be very similar to kwiki architecture.
 
-Welcome to Kwiki. Obviously you have installed a kwiki. Good job. If it's not
-working properly, check the Installation Notes below. Remember that the
-primary source of Kwiki help is:
+first, run "perl bin/jabbot -update", and run
+"perl bin/jabbot-console.pl" to test.
 
-    http://www.kwiki.org
+All mod/*.pl will be gradually migrated as a .pm plugin module.
 
-Cheers, Brian Ingerson (That Kwiki Guy)
+doc/* are all deprecated. Do trust them.
 
-
-Kwiki Installation Notes
-========================
-
-If you are running an Apache web server, you'll want to add a section like
-this to your httpd.conf file:
-
-    Alias /kwiki/ <%PWD%>/
-    <Directory <%PWD%>/>
-        Order allow,deny
-        Allow from all
-        AllowOverride All
-        Options ExecCGI
-        AddHandler cgi-script .cgi
-        DirectoryIndex index.cgi
-    </Directory>
-
-Make all your overrides in:
-
-    config.yaml
-    plugins
-
-Don't touch the other files unless you know what you are doing.
-
-Kwiki Plugin Installation Notes
-===============================
-
-1) Download and install plugins from CPAN
-2) Add the new module names to the 'plugins' config file
-3) Type 'kwiki -update'
+--
+Cheers,
+Kang-min "Gugod" Liu
