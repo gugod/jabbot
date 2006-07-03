@@ -74,6 +74,7 @@ sub on_message {
         );
     my $reply = $self->hub->process($msg);
 
+    binmode(STDOUT,":utf8");
     print "<< $body\n";
     print ">> " . $reply->text . "\n";
 
