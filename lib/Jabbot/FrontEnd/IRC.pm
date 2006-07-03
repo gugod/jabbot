@@ -36,7 +36,7 @@ sub process {
                 irc_msg          => \&bot_msg,
                 autoping         => \&bot_do_autoping,
 		message          => \&jabbotmsg,
-		_default         => $ENV{DEBUG} ? \&bot_default : sub {},
+		_default         => \&bot_default,
 		}
 	);
     }
@@ -67,10 +67,10 @@ sub jabbotmsg {
 }
 
 sub bot_default {
-    my ($event,$args) = @_[ ARG0 .. $#_ ];
-    say "unhandled $event";
-    say "  - $_" foreach @$args;
-    return 0;
+    my ($state, $event, $args, $heap) = @_[STATE, ARG0, ARG1, HEAP];
+    $args ||= [ ];
+    say "default $state = $event (@$args)";
+    $heap->{seen_traffic} = 1;
 };
 
 sub bot_start {
@@ -143,6 +143,8 @@ sub bot_msg {
 sub bot_public {
     my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
     my $network = $heap->{network};
+    $heap->{seen_traffic} = 1;
+
     my $nick = ( split /!/, $who )[0];
     my $channel = lc($where->[0]);
     $channel =~ s{^\#}{};
