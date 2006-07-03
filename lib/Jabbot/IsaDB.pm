@@ -171,9 +171,9 @@ sub _queryWhatIsWhat {
     my $r;
     my ($k,$v) = split(/(?:不)?(?:$ymodifiers)?是/ , $qstring, 2);
     $k =~ s/\s+$//;
-    my $realv; $realv = $self->isadb->{$k};
-    my ($k2,$v2) = split(/(?:不)?(?:$ymodifiers)?是/ , $realv, 2);
+    my $realv = $self->isadb->{$k};
     if(length($realv) > 0 && length($v) > 0) {
+	my (undef,$v2) = split(/(?:不)?(?:$ymodifiers)?是/ , $realv, 2);
 	if ($qstring eq $realv) {
 	    $r = "是啊";
 	} elsif ( $v2 =~ m/$v/ || $v =~ m/$v2/ ) {
