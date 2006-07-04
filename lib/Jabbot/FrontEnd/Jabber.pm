@@ -4,7 +4,7 @@ use warnings;
 
 use Jabbot::FrontEnd -base;
 
-use Net::XMPP;
+use Net::Jabber;
 
 use Encode qw(encode decode from_to);
 
@@ -15,10 +15,10 @@ sub process {
     my $config = $self->hub->config;
     my $jabber_conf = {
                        hostname => $config->{jabber_server},
-                       port => 5222,
+                       port => $config->{jabber_port},
                        username => $config->{jabber_username},
                        password => $config->{jabber_password},
-                       tls => 0,
+                       tls => $config->{jabber_tls},
                       };
     my $client = $self->init_client($jabber_conf);
     $client->SetCallBacks(message => \&on_message);
@@ -29,7 +29,7 @@ sub process {
 sub init_client {
     my $self   = shift;
     my $config = shift;
-    my $client = new Net::XMPP::Client();
+    my $client = new Net::Jabber::Client();
     $self->{client} = $client;
 
     my $status = $client->Connect(

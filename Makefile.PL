@@ -21,7 +21,7 @@ requires(
          OurNet::Chatbot => 0,
          Time::Interval => 0,
          Net::OSCAR => 0,
-         Bot::JabberBot => 0,
+         Net::Jabber => 0,
          Perl6::Say => 0,
         );
 
