@@ -1,6 +1,6 @@
 package Jabbot::Config;
 use Kwiki::Config -Base;
-use mixin 'Kwiki::installer';
+use mixin 'Kwiki::Installer';
 
 sub default_classes {
     (
