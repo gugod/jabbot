@@ -8,4 +8,5 @@ Jabbot::OurNetChatBot
 Jabbot::Seen
 Jabbot::IsaDB
 Jabbot::OldEnglish
+Jabbot::RomanizeJapanese
 

@@ -23,6 +23,7 @@ requires(
          Net::OSCAR => 0,
          Net::Jabber => 0,
          Perl6::Say => 0,
+         Lingua::JA::Romanize::Japanese => 0,
         );
 
 check_nmake();
