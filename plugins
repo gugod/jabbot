@@ -9,4 +9,5 @@ Jabbot::Seen
 Jabbot::IsaDB
 Jabbot::OldEnglish
 Jabbot::RomanizeJapanese
+Jabbot::UniversalLog
 
