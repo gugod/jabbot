@@ -166,8 +166,11 @@ sub bot_public {
             to => $to
            ));
     my $reply_text = $reply->text;
-    if(length($reply_text) &&
-           ($to eq $self->hub->config->nick || $reply->must_say)) {
+
+    if ($reply_text &&
+        (($reply->must_say) ||
+         ($to eq $self->hub->config->nick))
+    ) {
         $reply_text = encode($encoding,"$nick: $reply_text");
         $kernel->post($network => privmsg => $channel, $reply_text);
     }
