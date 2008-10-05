@@ -6,17 +6,16 @@ irc_networks:
 # - ircnet
 irc_freenode_server: chat.freenode.net
 irc_freenode_port: 6667
-irc_ircnet_server: ircnet.choopa.net
-irc_ircnet_port: 6666
-irc_localhost_server: 127.0.0.1
+# irc_ircnet_server: ircnet.choopa.net
+# irc_ircnet_port: 6666
+# irc_localhost_server: 127.0.0.1
 
-nick: jabbot3
+nick: jabbot
 admin:
 - gugod
-- zcecil
 
 irc_channels:
-- freenode:jabbot3
+- freenode:jabbot
 # - localhost:jabbot3
 
 feeds:
@@ -26,9 +25,8 @@ feeds_fortune_delay: 10
 feeds_fortune_appendurl: yes
 feeds_fortune_shorturl: yes
 feeds_fortune_channels:
-- freenode:jabbot3
-- localhost:jabbot3
+- freenode:jabbot
+- localhost:jabbot
 
 default_encoding: utf8
 # channel_encoding_freenode_jabbot3: big5
-
