@@ -16,7 +16,7 @@ sub create_db {
     return $dbh if ( $db_exists );
 
     $dbh->begin_work;
-    $dbh->do(qq{CREATE TABLE universal_log ('id', 'created_at', 'channel', 'from', 'to', 'text');});
+    $dbh->do(qq{CREATE TABLE universal_log (id INTEGER PRIMARY KEY AUTOINCREMENT, 'created_at', 'channel', 'from', 'to', 'text');});
     $dbh->commit;
     return $dbh;
 };
