@@ -1,7 +1,7 @@
 message_dispatcher_port: 65000
 irc_frontend_port: 65123
 irc_networks:
-- freenode
+  - freenode
 # - localhost
 # - ircnet
 irc_freenode_server: chat.freenode.net
@@ -12,21 +12,21 @@ irc_freenode_port: 6667
 
 nick: jabbot
 admin:
-- gugod
+  - gugod
 
 irc_channels:
-- freenode:jabbot
+  - freenode:jabbot
 # - localhost:jabbot3
 
 feeds:
-- fortune
+  - fortune
 feeds_fortune_url: http://gugod.org/fortune.cgi
 feeds_fortune_delay: 10
 feeds_fortune_appendurl: yes
 feeds_fortune_shorturl: yes
 feeds_fortune_channels:
-- freenode:jabbot
-- localhost:jabbot
+  - freenode:jabbot
+  - localhost:jabbot
 
 default_encoding: utf8
 # channel_encoding_freenode_jabbot3: big5

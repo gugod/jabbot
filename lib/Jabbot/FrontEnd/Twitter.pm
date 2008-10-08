@@ -21,8 +21,8 @@ sub read_public_timeline {
     my $state = YAML::Load(io("var/run/twitter_state.yml")->assert->utf8->all);
 
     my $twit = Net::Twitter->new(
-        useranme => $config->{twitter_username},
-        password => $config->{twitter_password}
+        useranme => $config->{twitter}{username},
+        password => $config->{twitter}{password}
     );
 
     my $status_id = $state->{last_read_public_timeline_status_id} ||= 1;

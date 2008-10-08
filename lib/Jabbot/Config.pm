@@ -1,6 +1,7 @@
 package Jabbot::Config;
 use Kwiki::Config -Base;
 use mixin 'Kwiki::Installer';
+use YAML;
 
 sub default_classes {
     (
@@ -16,6 +17,11 @@ sub default_classes {
     )
 }
 
+sub parse_yaml {
+    my $str = shift;
+    print STDERR "\n\n$str\n\n";
+    YAML::Load($str);
+}
 
 __DATA__
 __config/config.yaml__
