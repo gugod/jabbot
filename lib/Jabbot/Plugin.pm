@@ -19,7 +19,10 @@ sub init {
 
 sub reply {
     my ($text,$must) = @_;
-    $self->message->new(text => $text, must_say => (defined $text)?$must:undef);
+    return $self->message->new(
+        text => $text,
+        (must_say => (defined $text) ? $must : undef)
+    );
 }
 
 sub trim {

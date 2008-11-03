@@ -7,8 +7,9 @@ field db => {}, -init => q{$self->_load};
 
 sub process {
     my $text = shift->text;
+
     my $r = $self->react_to($text);
-    $self->reply( $r );
+    $self->reply($r, defined($r) );
 }
 
 my %D2P = (
@@ -20,10 +21,10 @@ my %D2P = (
 
 sub react_to {
     my $text = shift;
-
-    while(my ($regex, $sub) = each(%D2P)) {
+    for my $regex (keys %D2P) {
         next unless $text =~ m/$regex/;
-        return $sub->($self, $1, $2);
+
+        return $D2P{$regex}->($self, $1, $2);
     }
 }
 
