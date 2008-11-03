@@ -6,9 +6,13 @@ const class_id => 'facts';
 field db => {}, -init => q{$self->_load};
 
 sub process {
-    my $text = shift->text;
+    my $msg = shift;
 
-    my $r = $self->react_to($text);
+    my $r = $self->react_to($msg);
+
+    $r =~ s{ \$who }
+           { $msg->from }xe;
+
     $self->reply($r, defined($r) );
 }
 
@@ -16,11 +20,13 @@ my %D2P = (
     qr/(.+?)\s+is\s+(.+)/i        => \&_save,
     qr/no,\s*(.+?)\s+is\s+(.+)/i  => \&_reset,
     qr/forget\s+(.+)/i            => \&_forget,
-    qr/(.{1,64})\s*\?+/           => \&_query,
+    qr/(?:what is\s+)?(.{1,64})\s*\?+/           => \&_query,
 );
 
 sub react_to {
-    my $text = shift;
+    my $msg = shift;
+    my $text = $msg->text;
+
     for my $regex (keys %D2P) {
         next unless $text =~ m/$regex/;
 
@@ -30,8 +36,20 @@ sub react_to {
 
 sub _save {
     my ($X, $Y) = @_;
+    my $orig = $self->db->{$X};
+
+    if ($Y =~ /^also\s+(.+)$/) {
+        $orig = "" unless defined $orig;
+        $orig =~ s/\.?$/, /;
+        $orig .= $Y;
+    }
+
+    if (defined $orig) {
+        return "But $X is something else...";
+    }
+
     $self->db->{$X} = $Y;
-    "ok";
+    return 'ok, $who';
 }
 
 sub _reset {
@@ -49,10 +67,11 @@ sub _forget {
 sub _query {
     my ($X) = @_;
     return "" unless defined(my $r =  $self->db->{$X});
+
     if ($r =~ s/^<reply>\s*//) {
         return $r;
     }
-    return "It is $r";
+    return "$X is $r";
 }
 
 sub _load {
