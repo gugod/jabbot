@@ -19,7 +19,6 @@ sub default_classes {
 
 sub parse_yaml {
     my $str = shift;
-    print STDERR "\n\n$str\n\n";
     YAML::Load($str);
 }
 
