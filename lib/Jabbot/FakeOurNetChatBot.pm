@@ -1,7 +1,6 @@
 package Jabbot::FakeOurNetChatBot;
 use Jabbot::Plugin -Base;
-use Encode;
-use encoding 'utf8';
+use utf8;
 
 const class_id => 'fake_ournet_chatbot';
 
@@ -14,7 +13,10 @@ my @db = map {
 
 sub process {
     my $msg = shift;
-    $self->reply($db[int(rand($#db))]);
+    my $s = $msg->text;
+    if ($msg->me) {
+        $self->reply($db[int(rand($#db))]);
+    }
 }
 
 1;
