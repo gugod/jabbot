@@ -39,15 +39,26 @@ sub process {
     $self->reply($reply,1);
 }
 
+use Regexp::Common qw/balanced/;
+my $balanced_word = $RE{balanced}{-parens => '()[]{}'};
+
 sub normalizeWord {
-	my $str = lc(shift);
-        return $str;
+    my $str = lc(shift);
+
+    if ($str =~ m/$balanced_word/) {
+        substr($str,0,1) = "";
+        substr($str,-1,1) = "";
+    }
+
+    return $str;
 }
 
-use YAML;
 sub getKeywords {
     my $str = shift;
-    my $word = qr/[^\s\p{IsPunct}]+?/;
+    my $word = qr/(?:
+                      [^\s\p{IsPunct}]+?  |
+                      $balanced_word
+                  )/x;
     my $boundary = qr/(?:\s|\p{IsPunct}|$)/;
 
     my @words = ();
