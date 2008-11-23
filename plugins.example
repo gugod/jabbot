@@ -3,16 +3,15 @@ Jabbot::FakeOurNetChatBot
 
 Jabbot::Eliza
 Jabbot::Karma
+Jabbot::TaiwanLotto
+Jabbot::Seen
 
 # Jabbot::zh_tw::DateDay
 # Jabbot::zh_tw::CurrencyConvert
-# Jabbot::TaiwanLotto
-# Jabbot::Seen
 # Jabbot::IsaDB
 # Jabbot::OldEnglish
 # Jabbot::RomanizeJapanese
 # Jabbot::UniversalLog
-
 
 # XXX: Broken
 # Jabbot::OurNetChatBot
