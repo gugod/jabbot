@@ -20,11 +20,8 @@ sub process {
         eval {$reply = $self->$_->process($msg);};
         $@ ? $self->message->new : $reply;
     } $self->all_plugin_ids;
-    if(my @musts = grep {$_->must_say} @replies) {
-        $self->messages->append($_) for @musts;
-    } else {
-        $self->messages->append((shuffle @replies)[0] || $self->message->new);
-    }
+
+    $self->messages->append($_) for @replies;
     $self->messages->next;
 }
 

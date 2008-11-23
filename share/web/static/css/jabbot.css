@@ -1,0 +1,16 @@
+#talk {
+
+}
+
+#talk .message {
+}
+
+#talk .message .from {
+    padding: 0 1em 0 0;
+    display: inline-block;
+    width: 10em;
+    text-align: right;
+}
+
+#talk .message .body {
+}

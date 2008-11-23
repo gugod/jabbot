@@ -17,3 +17,4 @@ sub next {
     shift(@{$self->must_say}) || shift(@{$self->normal}) || $self->message->new;
 }
 
+

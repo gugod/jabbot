@@ -10,3 +10,13 @@ field channel  => '';
 sub me {
     $self->to eq $self->config->{nick}
 }
+
+sub to_hash {
+    return {
+        text => $self->text,
+        must_say => $self->must_say,
+        to => $self->to,
+        from => $self->from,
+        channel => $self->channel,
+    };
+}
