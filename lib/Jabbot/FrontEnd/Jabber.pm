@@ -1,90 +1,75 @@
 package Jabbot::FrontEnd::Jabber;
 use strict;
 use warnings;
+use utf8;
 
 use Jabbot::FrontEnd -base;
 
-use Net::Jabber;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
 
-use Encode qw(encode decode from_to);
+use Net::Jabber::Bot;
 
 my $self;
+my $bot;
 
 sub process {
     $self = shift;
-    my $config = $self->hub->config;
-    my $jabber_conf = {
-                       hostname => $config->{jabber_server},
-                       port => $config->{jabber_port},
-                       username => $config->{jabber_username},
-                       password => $config->{jabber_password},
-                       tls => $config->{jabber_tls},
-                      };
-    my $client = $self->init_client($jabber_conf);
-    $client->SetCallBacks(message => \&on_message);
-    while (defined($client->Process())) {}
-    $client->Disconnect();
+    my $config = $self->hub->config->{jabber};
+
+    $bot = Net::Jabber::Bot->new({
+        server                  => $config->{server},
+        gtalk                   => $config->{gtalk},
+        conference_server       => $config->{server},
+        port                    => $config->{port},
+        username                => $config->{username},
+        password                => $config->{password},
+        alias                   => $config->{username},
+        message_callback        => \&bot_message,
+        background_activity     => \&background_checks,
+        loop_sleep_time         => 15,
+        process_timeout         => 5,
+        ignore_server_messages  => 0,
+        ignore_self_messages    => 0,
+        out_messages_per_second => 40,
+        max_message_size        => 1000,
+        max_messages_per_hour   => 100
+    }) or die "WTF\n";
+
+    $bot->SendPersonalMessage( 'gugodliu', "How are you.");
+
+    $bot->Start();
 }
 
-sub init_client {
-    my $self   = shift;
-    my $config = shift;
-    my $client = new Net::Jabber::Client();
-    $self->{client} = $client;
+use Encode;
+use YAML;
 
-    my $status = $client->Connect(
-                                  hostname => $config->{hostname},
-                                  port => $config->{port},
-                                 );
+sub bot_message {
+    my %bot_message_hash = @_;
 
-    if (!defined($status)) {
-        die"Jabber server down"
+    my $user    = $bot_message_hash{reply_to};
+    my $message = $bot_message_hash{body};
+
+    print "IN: $message\n";
+    my $reply = $self->hub->process(
+        $self->hub->message->new(
+            text => $message,
+            from => $user,
+            channel => 'jabber',
+            to => $self->hub->config->nick,
+        )
+    );
+
+    my $reply_text = $reply->text || "";
+    print "REPLY: $reply_text\n";
+
+    if(length($reply_text)) {
+        $bot->SendPersonalMessage( $user, Encode::encode('utf8', $reply_text) );
     }
-
-    my @result = $client->AuthSend(
-                                   username => $config->{username},
-                                   password => $config->{password},
-                                   tls => $config->{tls},
-                                   resource => 'Jabbot'
-                                  );
-
-    die "Auth error" if ($result[0] ne "ok");
-
-    $client->RosterGet();
-    $client->PresenceSend();
-    return $client
 }
 
-sub on_message {
-    my $sid = shift;
-    my $message = shift;
-    my $type = $message->GetType();
-    my $fromJID = $message->GetFrom("jid");
-    my $from = $fromJID->GetUserID();
-    my $resource = $fromJID->GetResource();
-    my $subject = $message->GetSubject();
-    my $body = $message->GetBody();
-
-    shift; # my $self = shift;
-    my $msg = $self->hub->message->new (
-         text => $body,
-         from => $fromJID,
-         to   => $self->hub->config->nick,
-         channel => '__jabber'
-        );
-    my $reply = $self->hub->process($msg);
-
-    binmode(STDOUT,":utf8");
-    print "<< $body\n";
-    print ">> " . $reply->text . "\n";
-
-    $self->{client}->MessageSend(
-                         Body => $reply->text,
-                         To => $fromJID,
-                         From => $message->GetTo("jid"),
-                         type => 'chat'
-                        );
-
+sub background_checks {
+    print "!!! background_checks\n";
 }
 
 1;
