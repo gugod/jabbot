@@ -38,17 +38,19 @@ sub _save {
     my ($X, $Y) = @_;
     my $orig = $self->db->{$X};
 
-    if ($Y =~ /^also\s+(.+)$/) {
+    if ($Y =~ s/^also\s+//i) {
         $orig = "" unless defined $orig;
         $orig =~ s/\.?$/, /;
         $orig .= $Y;
-    }
 
-    if (defined $orig) {
+        $self->db->{$X} = $orig;
+    }
+    elsif (defined $orig) {
         return "But $X is something else...";
     }
-
-    $self->db->{$X} = $Y;
+    else {
+        $self->db->{$X} = $Y;
+    }
     return 'ok, $who';
 }
 
