@@ -4,25 +4,27 @@ use HTTP::Request::Common qw(GET);
 use LWP::UserAgent;
 use Encode;
 use List::Util qw(shuffle);
+use utf8;
+use encoding 'utf8';
 
 # This .pm has to be in big5 otherwise http request failed.
 
 const class_id => 'zhtw_currencyconvert';
 
-# qq{¬üª÷(USD) ·s¥x¹ô(NTD) ¤é¶ê(JPY) ´ä¹ô(HKD) ¤H¥Á¹ô(MCY) ­^Âé(GRP) ¼Ú¬w³q³f(ECU) ¥[®³¤j¤¸(CAD) ¿D¤¸(AUD) ®õ»Ë(THB) ·s¥[©Y¤¸(SGD) «nÁúéG(KOW) ¦L¥§¬Ş(IDR) °¨¨Ó¦è¨È¹ô(MYR) µá«ß»«©Ü¯Á(PHP) ¦L«×¿c¤ñ(INR) ªü¹ô(SAR) ¬ì«Â¯S¹ô(KWD) ®¿«Â¹ô(NOK) ·ç¤hªk­¦(SWF) ·ç¨å§J®Ô(SEK) ¤¦³Á§J®Ô(DMK) ¤Ú¦è¹ô(BRC) ¾¥¦è­ô©Ü¯Á(MEP) ªü®Ú§Ê©Ü¯Á(ARS) ´¼§Q©Ü¯Á(CLP) ©e·ç¤º©Ô¹ô(VEB) «n«D¹ô(ZAR) «XÃ¹´µ¿c¥¬(RUR) ¯Ã¦èÄõ¤¸(NZD)  };
+# qq{ç¾é‡‘(USD) æ–°å°å¹£(NTD) æ—¥åœ“(JPY) æ¸¯å¹£(HKD) äººæ°‘å¹£(MCY) è‹±éŠ(GRP) æ­æ´²é€šè²¨(ECU) åŠ æ‹¿å¤§å…ƒ(CAD) æ¾³å…ƒ(AUD) æ³°éŠ–(THB) æ–°åŠ å¡å…ƒ(SGD) å—éŸ“åœœ(KOW) å°å°¼ç›¾(IDR) é¦¬ä¾†è¥¿äºå¹£(MYR) è²å¾‹è³“æŠ«ç´¢(PHP) å°åº¦ç›§æ¯”(INR) é˜¿å¹£(SAR) ç§‘å¨ç‰¹å¹£(KWD) æŒªå¨å¹£(NOK) ç‘å£«æ³•éƒ(SWF) ç‘å…¸å…‹æœ—(SEK) ä¸¹éº¥å…‹æœ—(DMK) å·´è¥¿å¹£(BRC) å¢¨è¥¿å“¥æŠ«ç´¢(MEP) é˜¿æ ¹å»·æŠ«ç´¢(ARS) æ™ºåˆ©æŠ«ç´¢(CLP) å§”ç‘å…§æ‹‰å¹£(VEB) å—éå¹£(ZAR) ä¿„ç¾…æ–¯ç›§å¸ƒ(RUR) ç´è¥¿è˜­å…ƒ(NZD)  };
 
-my %cname = (USD => "¬üª÷", NTD => "·s¥x¹ô", JPY => "¤é¶ê", HKD => "´ä¹ô",
-             MCY => "¤H¥Á¹ô", GRP => "­^Âé", ECU => "¼Ú¬w³q³f", CAD => "¥[®³¤j¤¸",
-             AUD => "¿D¤¸", THB => "®õ»Ë", SGD => "·s¥[©Y¤¸", KOW => "«nÁúéG",
-             IDR => "¦L¥§¬Ş", MYR => "°¨¨Ó¦è¨È¹ô", PHP => "µá«ß»«©Ü¯Á",
-             INR => "¦L«×¿c¤ñ", SAR => "ªü¹ô", KWD => "¬ì«Â¯S¹ô", NOK => "®¿«Â¹ô",
-             SWF => "·ç¤hªk­¦", SEK => "·ç¨å§J®Ô", DMK => "¤¦³Á§J®Ô", BRC => "¤Ú¦è¹ô",
-             MEP => "¾¥¦è­ô©Ü¯Á", ARS => "ªü®Ú§Ê©Ü¯Á", CLP => "´¼§Q©Ü¯Á",
-             VEB => "©e·ç¤º©Ô¹ô", ZAR => "«n«D¹ô", RUR => "«XÃ¹´µ¿c¥¬",
-             NZD => "¯Ã¦èÄõ¤¸" );
+my %cname = (USD => "ç¾é‡‘", TWD => "æ–°å°å¹£", JPY => "æ—¥åœ“", HKD => "æ¸¯å¹£",
+             MCY => "äººæ°‘å¹£", GRP => "è‹±éŠ", ECU => "æ­æ´²é€šè²¨", CAD => "åŠ æ‹¿å¤§å…ƒ",
+             AUD => "æ¾³å…ƒ", THB => "æ³°éŠ–", SGD => "æ–°åŠ å¡å…ƒ", KOW => "å—éŸ“åœœ",
+             IDR => "å°å°¼ç›¾", MYR => "é¦¬ä¾†è¥¿äºå¹£", PHP => "è²å¾‹è³“æŠ«ç´¢",
+             INR => "å°åº¦ç›§æ¯”", SAR => "é˜¿å¹£", KWD => "ç§‘å¨ç‰¹å¹£", NOK => "æŒªå¨å¹£",
+             SWF => "ç‘å£«æ³•éƒ", SEK => "ç‘å…¸å…‹æœ—", DMK => "ä¸¹éº¥å…‹æœ—", BRC => "å·´è¥¿å¹£",
+             MEP => "å¢¨è¥¿å“¥æŠ«ç´¢", ARS => "é˜¿æ ¹å»·æŠ«ç´¢", CLP => "æ™ºåˆ©æŠ«ç´¢",
+             VEB => "å§”ç‘å…§æ‹‰å¹£", ZAR => "å—éå¹£", RUR => "ä¿„ç¾…æ–¯ç›§å¸ƒ",
+             NZD => "ç´è¥¿è˜­å…ƒ" );
 
 my %coin = (
-    USD => "1", NTD => "2", JPY => "3", HKD => "4", MCY => "5",
+    USD => "1", TWD => "2", JPY => "3", HKD => "4", MCY => "5",
     GRP => "6", ECU => "7", CAD => "8", AUD => "9", THB => "10",
     SGD => "11", KOW => "12", IDR => "13", MYR => "14", PHP => "15",
     INR => "16", SAR => "17", KWD => "18", NOK => "19", SWF => "20",
@@ -30,14 +32,14 @@ my %coin = (
     CLP => "26", VEB => "27", ZAR => "28", RUR => "29", NZD => "30"
    );
 
-my %calias = ( GBP => 'GRP', EUR => "ECU", "RMB" => "MCY", "YEN" => "JPY", "CHF" =>"SWF");
+my %calias = ( GBP => 'GRP', EUR => "ECU", "RMB" => "MCY", "YEN" => "JPY", "CHF" =>"SWF", "NTD" => "TWD");
 
 
 sub process {
     my $s = shift->text;
     my $reply;
     my $allsymbol = join("|",keys %coin) . "|" . join("|",keys %calias);
-    my $qmark = '(?:[\s\?]|¡H)*';
+    my $qmark = '(?:[\s\?]|ï¼Ÿ)*';
     if ( $s =~ /^([\d\.\+\-\*\/]+)\s*($allsymbol)\s+to\s+($allsymbol)$qmark$/i ) {
         $reply = $self->get_ex_money($1,$2,$3);
     } elsif ( $s =~ /^([\d\.\+\-\*\/]+)\s*($allsymbol)$qmark$/i ) {
@@ -49,13 +51,13 @@ sub process {
         $reply =
             qq{I can do currency exchanging, Example: 10 USD to NTD?, or simply "10 USD". To list all currency, say "currency list" to me};
     }
-    $reply = Encode::decode('big5',$reply);
+
     $self->reply($reply,1);
 }
 
 sub get_ex_money {
     my ($money,$from,$to) = @_;
-    $to ||= "NTD"; # Default to NTD
+    $to ||= "TWD"; # Default to TWD
     $from = $self->expand_alias(uc($from));
     $to   = $self->expand_alias(uc($to));
     eval"\$money = $money";
@@ -66,10 +68,8 @@ sub get_ex_money {
     eval {
         $SIG{ALRM} = sub { die "alarm\n"; };
 	alarm(30);
-	$res = $ua->request(
-		GET 'http://tw.stock.yahoo.com/d/c/ex.php?money='.$money.
-		'&select1='.$coin{$from}.'&select2='.$coin{$to}
-		);
+        my $url ="http://tw.money.yahoo.com/currency_exc_result?amt=${money}&from=${from}&to=${to}";
+        $res = $ua->get($url);
 	alarm(0);
     };
     if($@) {
@@ -77,14 +77,14 @@ sub get_ex_money {
     }
 
     if ($res->is_success) {
-	my $data = $res->content;
-	if ($data =~ /¸g¹L­pºâ«á¡A([^<]+)/) {
+	my $data = Encode::decode('utf8', $res->content);
+
+	if ($data =~ /ç¶“éè¨ˆç®—å¾Œï¼Œ (.+)<div/) {
 	    my $reStr = $1;
-	    $reStr =~ s/&nbsp;/ /igs;
-	    $reStr =~ s/  / /igs;
+            $reStr =~ s{</?em>}{}g;
 	    return $reStr;
 	} else {
-	    return "§ä¤£¨ì";
+	    return "æ‰¾ä¸åˆ°";
 	};
     }
 }

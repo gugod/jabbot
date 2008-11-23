@@ -6,8 +6,8 @@ Jabbot::Karma
 Jabbot::TaiwanLotto
 Jabbot::Seen
 Jabbot::zh_tw::DateDay
+Jabbot::zh_tw::CurrencyConvert
 
-# Jabbot::zh_tw::CurrencyConvert
 # Jabbot::IsaDB
 # Jabbot::OldEnglish
 # Jabbot::RomanizeJapanese
