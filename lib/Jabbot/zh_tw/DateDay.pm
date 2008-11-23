@@ -16,9 +16,10 @@ my %ZhDay = (
     );
 
 sub process {
-    my $msg = shift->text;
+    my $msg = shift;
+    my $s = $msg->text;
     my $reply;
-    if($msg =~ /^(.*(?:號|日))(?:是)?(?:星期幾)?/) {
+    if($s =~ /^(.*(?:號|日))(?:是)?(?:星期幾)?/) {
         my $target = $1;
         my $p = '(.+)(?:號|日)';
         my $p0 = '(.+)月(.+)(?:號|日)';
@@ -33,15 +34,16 @@ sub process {
             my ($m,$n) = ($1,$2);
             $self->trim($m,$n);
             my $result = &day($m,$n,$now[5]+1900);
+            $target = "今年" . $target;
             $reply = $ZhDay{$result};
         } elsif($target =~ /$p/) {
             my $n = $1;
             $self->trim($n);
             my $result = &day($now[4]+1,$n,$now[5]+1900);
+            $target = "這個月" . $target;
             $reply = $ZhDay{$result};
         }
-        $reply = "${target}是${reply}"
-            if(defined $reply && rand(100) > 60);
+        $reply = "${target}是${reply}" if(defined $reply);
     }
     $self->reply($reply,1);
 }
