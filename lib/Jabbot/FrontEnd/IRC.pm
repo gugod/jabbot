@@ -33,6 +33,7 @@ sub process {
                 irc_error        => \&bot_reconnect,
                 irc_socketerr    => \&bot_reconnect,
                 irc_public       => \&bot_public,
+                irc_invite       => \&bot_invited,
                 irc_msg          => \&bot_msg,
                 irc_ping         => \&bot_ping,
                 autoping         => \&bot_do_autoping,
@@ -73,6 +74,14 @@ sub bot_default {
     say "default $state = $event (@$args)";
     $heap->{seen_traffic} = 1;
 };
+
+sub bot_invited {
+    my ($kernel,$channel, $heap) = @_[KERNEL,ARG1, HEAP];
+    my $network = $heap->{network};
+
+    say "Bot invited to $network $channel";
+    $kernel->post($network => join => $channel);
+}
 
 sub bot_start {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
