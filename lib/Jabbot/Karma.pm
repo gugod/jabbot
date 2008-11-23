@@ -8,14 +8,15 @@ sub process {
     my $s = $msg->text;
     my $reply;
     my $db = io->catfile($self->plugin_directory,"karma.db")->assert;
-    if($s =~ /\S(?:\+\+|\-\-)(?:\s|$)/) {
-        my $k = $self->getKeyword($s);
-        if ( $s =~ m/\+\+/ ) {
-            ($db->{$k})++;
-        } elsif ( $s =~ m/\-\-/ ) {
-            ($db->{$k})--;
+    if($s =~ /\S(?:\+\+|\-\-)(?:\s|\p{IsPunct}|$)/) {
+        for my $k ($self->getKeywords($s)) {
+            my ($word, $op) = @$k[0,1];
+            if ( $op eq '++') {
+                ($db->{$word})++;
+            } elsif ( $op eq '--' ) {
+                ($db->{$word})--;
+            }
         }
-
         $reply = "ok, " . $msg->from;
     } elsif ($s =~ /^karma\s+scoreboard\s*$/i) {
         $reply = join (", ", map {
@@ -43,15 +44,18 @@ sub normalizeWord {
         return $str;
 }
 
-sub getKeyword {
+use YAML;
+sub getKeywords {
     my $str = shift;
-    $str =~ s/(?:\+\+|--).*$//;
-    # Quoted by quote, or determined by whitespaces
-    if($str =~ /([\'\"\(\[\{])(.*)([\'\"\)\]\}])$/) {
-	$str = $2;
-    } else {
-	$str = (split(/ /,$str))[-1];
+    my $word = qr/[^\s\p{IsPunct}]+?/;
+    my $boundary = qr/(?:\s|\p{IsPunct}|$)/;
+
+    my @words = ();
+
+    while($str =~ m{($word)(\+\+|\-\-)$boundary}g) {
+        push @words, [ $self->normalizeWord($1), $2 ];
     }
-    return $self->normalizeWord($str);
+
+    return @words;
 }
 
