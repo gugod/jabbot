@@ -1,9 +1,10 @@
-#!/Users/gugod/local/bin/perl
+#!/usr/bin/env perl
 # -*- cperl -*-
 
 use strict;
 use warnings;
 use File::Path;
+use File::Spec;
 
 my $JABBOT_HOME;
 

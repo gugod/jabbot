@@ -1,15 +1,21 @@
-#talk {
+form {
+    line-height: 2em;
+}
 
+#talk {
 }
 
 #talk .message {
+    line-height: 1.5em;
+    height: 1.5em;
+}
+
+#talk .message.odd {
+    background: #faa;
 }
 
 #talk .message .from {
-    padding: 0 1em 0 0;
-    display: inline-block;
-    width: 10em;
-    text-align: right;
+    padding: 0 1em;
 }
 
 #talk .message .body {

@@ -9,6 +9,7 @@ sub process {
     my $self = shift;
     my $cgi = CGI::Minimal->new;
 
+    my $message_from = $cgi->param("f") || "CGI";
     my $message_text = $cgi->param("s");
 
     if (!$message_text) {
@@ -18,7 +19,7 @@ sub process {
     $message_text = Encode::decode_utf8($message_text);
 
     my $message = $self->hub->message->new(
-        from => "CGI",
+        from => $message_from,
         channel => "CGI",
         to => $self->hub->config->nick,
         text => $message_text

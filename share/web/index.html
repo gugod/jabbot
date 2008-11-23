@@ -1,5 +1,9 @@
 <html>
   <head>
+    <meta name="viewport" content="width=320; initial-scale=1; maximum-scale=1.0; minimum-scale=0.6666" />
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
     <title>Jabbot Web Frontend</title>
     <style type="text/css" media="screen">
       @import url("static/css/jabbot.css");
@@ -11,8 +15,15 @@
     <noscript>This Frontend Require Javascript.</noscript>
 
     <form id="m" action="">
-      <input name="s" >
-      <input type="submit" value="Send">
+      <div>
+        <label for="f">Nick:</label>
+        <input name="f" value="CGI">
+      </div>
+
+      <div>
+        <input name="s" >
+        <input type="submit" value="Send">
+      </div>
     </form>
 
     <div id="talk"></div>

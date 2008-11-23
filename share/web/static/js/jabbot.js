@@ -3,21 +3,23 @@ jQuery(function($) {
 
     $s.focus();
 
+    var i = 0;
+    var zebra = ["odd", "even"];
     function appendTalk(nick, m) {
-        $("#talk").prepend(
-            "<div class=\"message\"><span class=\"user from\">" + nick + "</span><span class=\"body\">" + m + "</span></div>"
-        );
+        $("<div class=\"message " + zebra[i] + "\"><span class=\"user from\">" + nick + "</span><span class=\"body\"></span></div>").find(".body").text(m).end().prependTo("#talk");
+        i = 1-i;
     }
 
     $("form#m").submit(function() {
         var m = $s.val();
         if (!m) return false;
 
-        appendTalk("You", m);
+        var me = $("input[name=f]").val() || "CGI";
+        appendTalk(me, m);
 
         $.getJSON(
             "cgi-bin/jabbot.cgi",
-            { "s": m },
+            { "s": m, "f": me },
             function(data) {
                 if(data.reply && data.reply.text)
                     appendTalk("jabbot", data.reply.text);
