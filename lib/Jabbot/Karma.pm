@@ -4,7 +4,8 @@ use Jabbot::Plugin -Base;
 const class_id => 'karma';
 
 sub process {
-    my $s = shift->text;
+    my $msg = shift;
+    my $s = $msg->text;
     my $reply;
     my $db = io->catfile($self->plugin_directory,"karma.db")->assert;
     if($s =~ /\S(?:\+\+|\-\-)(?:\s|$)/) {
@@ -14,6 +15,8 @@ sub process {
         } elsif ( $s =~ m/\-\-/ ) {
             ($db->{$k})--;
         }
+
+        $reply = "ok, " . $msg->from;
     } elsif ($s =~ /^karma\s+scoreboard\s*$/i) {
         $reply = join (", ", map {
             "$_(" . $db->{$_} .")"
