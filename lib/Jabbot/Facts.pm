@@ -17,10 +17,10 @@ sub process {
 }
 
 my %D2P = (
-    qr/(.+?)\s+is\s+(.+)/i        => \&_save,
-    qr/no,\s*(.+?)\s+is\s+(.+)/i  => \&_reset,
-    qr/forget\s+(.+)/i            => \&_forget,
-    qr/(?:what is\s+)?(.{1,64})\s*\?+/           => \&_query,
+    qr/^(?:what is\s)?\s*(.+?)\s*[?？]+$/i           => \&_query,
+    qr/^no,\s*(.+?)\s+is\s+(.+)$/i  => \&_reset,
+    qr/^forget\s+(.+)$/i            => \&_forget,
+    qr/^(.+?)\s+is\s+([^?]+)$/i        => \&_save,
 );
 
 sub react_to {
