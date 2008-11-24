@@ -9,10 +9,11 @@ sub process {
 	$hub->pre_process;
 	my $reply = $hub->process(
 			$self->hub->message->new(
-				text => Encode::decode_utf8( $text ),
-				from => $ENV{USER},
-				channel => 'commandline',
-				));
+                            to => $self->config->{nick},
+                            text => Encode::decode_utf8( $text ),
+                            from => $ENV{USER},
+                            channel => 'commandline',
+                        ));
 	print "=> ",$reply->text,"\n";
 	$hub->post_process;
 }

@@ -12,6 +12,7 @@ sub process {
         $hub->pre_process;
         my $reply = $hub->process(
             $self->hub->message->new(
+                to => $self->config->{nick},
                 text => Encode::decode_utf8($_),
                 from => $ENV{USER},
                 channel => 'console',

@@ -1,5 +1,6 @@
 package Jabbot::Messages;
 use Jabbot::Base -Base;
+use List::Util qw(shuffle);
 
 field must_say => [];
 field normal => [];
@@ -14,7 +15,22 @@ sub append {
 }
 
 sub next {
-    shift(@{$self->must_say}) || shift(@{$self->normal}) || $self->message->new;
+    my $ret;
+    if (@{$self->must_say}) {
+        my $text = join(" ", map { $_->text } @{$self->must_say});
+        $ret = $self->must_say->[0];
+        $ret->text($text);
+    }
+    elsif(@{$self->normal}) {
+        $ret = (shuffle @{$self->normal})[0];
+    }
+    else {
+        $ret = $self->hub->message->new;
+    }
+
+    $self->must_say([]);
+    $self->normal([]);
+    return $ret;
 }
 
 
