@@ -18,6 +18,13 @@ sub process {
             }
         }
         $reply = "ok, " . $msg->from;
+
+        eval {
+            tied(%{$db->tied_file})->sync;
+        };
+        if ($@) {
+            print "??? sync failed\n";
+        }
     } elsif ($s =~ /^karma\s+scoreboard\s*$/i) {
         $reply = join (", ", map {
             "$_(" . $db->{$_} .")"

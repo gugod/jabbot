@@ -26,6 +26,14 @@ sub process {
 	}
     }
     $db->{$nick} = time;
+
+    eval {
+        tied(%{$db->tied_file})->sync;
+    };
+    if ($@) {
+        print "??? sync failed\n";
+    }
+
     $self->reply($reply,1);
 }
 
