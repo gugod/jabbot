@@ -16,22 +16,35 @@ sub process {
     $self->reply($r, defined($r) );
 }
 
-my %D2P = (
-    qr/^(?:what is\s)?\s*(.+?)\s*[?？]+$/i           => \&_query,
-    qr/^no,\s*(.+?)\s+is\s+(.+)$/i  => \&_reset,
-    qr/^forget\s+(.+)$/i            => \&_forget,
-    qr/^(.+?)\s+is\s+([^?]+)$/i        => \&_save,
+my $question_mark = qr/(?:\?|？)/;
+
+my @D2P = (
+    qr/^(.+?)\s+=>\s+(.+)$/                           => \&_save_factpack,
+    qr/^(?:what is\s)?\s*(.+?)\s*${question_mark}+$/i => \&_query,
+    qr/^no,\s*(.+?)\s+is\s+(.+)$/i                    => \&_reset,
+    qr/^forget\s+(.+)$/i                              => \&_forget,
+    qr/^(.+?)\s+is\s+([^?]+)$/i                       => \&_save,
 );
 
 sub react_to {
     my $msg = shift;
     my $text = $msg->text;
 
-    for my $regex (keys %D2P) {
-        next unless $text =~ m/$regex/;
-
-        return $D2P{$regex}->($self, $1, $2);
+    my $i = 0;
+    for my $i (0..$#D2P) {
+        next if $i % 2;
+        my ($regex, $sub) = @D2P[$i, $i+1];
+        if ($text =~ m/$regex/) {
+            return $sub->($self, $1, $2);
+        }
     }
+
+    tied(%{$self->db->tied_file})->sync;
+}
+
+sub _save_factpack {
+    my ($X, $Y) = @_;
+    $self->_save($X, "<reply>$Y");
 }
 
 sub _save {
@@ -56,6 +69,7 @@ sub _save {
 
 sub _reset {
     my ($X, $Y) = @_;
+
     $self->db->{$X} = $Y;
     "ok!";
 }
