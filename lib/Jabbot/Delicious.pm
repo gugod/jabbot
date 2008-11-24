@@ -11,9 +11,7 @@ sub process {
     return if (!$config->{username} || !$config->{password});
 
     my $msg = shift;
-
     my $msg_from = $msg->from;
-    print $msg->text, "\n";
     if ($msg->text =~ /^spread +($RE{URI}{HTTP})(?: +tags:(.+?))?$/i) {
         my $del = Net::Delicious->new({ user => $config->{username}, pswd => $config->{password} });
 
