@@ -13,6 +13,9 @@ sub process {
     $r =~ s{ \$who }
            { $msg->from }xe;
 
+    # manually close db handle since now that we have different frontends running,
+    # db should be reloaded everytime this sub is invoked.
+    $self->db(undef);
     $self->reply($r, defined($r) );
 }
 
