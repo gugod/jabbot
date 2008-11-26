@@ -29,7 +29,7 @@ my @D2P = (
     qr/^(?:what is\s)?\s*(.+?)\s*${question_mark}+$/i => \&_query,
     qr/^no,\s*(.+?)\s+is\s+(.+)$/i                    => \&_reset,
     qr/^forget\s+(.+)$/i                              => \&_forget,
-    qr/^(.{1,64})\s+is\s+([^?]+)$/id                  => \&_save,
+    qr/^(.{1,64})\s+is\s+([^?]+)$/i                   => \&_save,
 );
 
 sub react_to {
