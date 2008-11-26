@@ -4,11 +4,14 @@ use Jabbot::Plugin -Base;
 const class_id => 'facts';
 
 field db => {}, -init => q{$self->_load};
+field 'msg';
 
 sub process {
     my $msg = shift;
 
-    my $r = $self->react_to($msg);
+    my ($r,$must_say) = $self->react_to($msg);
+
+    $must_say = 1 if $msg->me;
 
     $r =~ s{ \$who }
            { $msg->from }xe;
@@ -16,7 +19,7 @@ sub process {
     # manually close db handle since now that we have different frontends running,
     # db should be reloaded everytime this sub is invoked.
     $self->db(undef);
-    $self->reply($r, defined($r) );
+    $self->reply($r, $must_say);
 }
 
 my $question_mark = qr/(?:\?|？)/;
@@ -26,12 +29,13 @@ my @D2P = (
     qr/^(?:what is\s)?\s*(.+?)\s*${question_mark}+$/i => \&_query,
     qr/^no,\s*(.+?)\s+is\s+(.+)$/i                    => \&_reset,
     qr/^forget\s+(.+)$/i                              => \&_forget,
-    qr/^(.+?)\s+is\s+([^?]+)$/i                       => \&_save,
+    qr/^(.{1,64})\s+is\s+([^?]+)$/id                  => \&_save,
 );
 
 sub react_to {
     my $msg = shift;
     my $text = $msg->text;
+    $self->msg($msg);
 
     my $i = 0;
     for my $i (0..$#D2P) {
@@ -62,24 +66,26 @@ sub _save {
         $self->db->{$X} = $orig;
     }
     elsif (defined $orig) {
-        return "But $X is something else...";
+        return "But $X is something else..." if ($self->msg->me);
     }
     else {
         $self->db->{$X} = $Y;
     }
-    return 'ok, $who';
+    return 'ok, $who' if ($self->msg->me);
 }
 
 sub _reset {
     my ($X, $Y) = @_;
 
     $self->db->{$X} = $Y;
+
     "ok!";
 }
 
 sub _forget {
     my ($X) = @_;
     delete $self->db->{$X};
+
     "What is $X ?";
 }
 
@@ -90,7 +96,8 @@ sub _query {
     if ($r =~ s/^<reply>\s*//) {
         return $r;
     }
-    return "$X is $r";
+
+    return "$X is $r",1;
 }
 
 sub _load {
