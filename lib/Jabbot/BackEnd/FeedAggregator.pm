@@ -42,7 +42,7 @@ sub init_session {
 sub handle_feed {
     my ($kernel,$feed) = ($_[KERNEL], $_[ARG1]->[0]);
     my $remote = create_ikc_client(
-        port => $self->config->{irc_frontend_port},
+        port => $self->config->{irc}{frontend_port},
 	serialiser => 'FreezeThaw'
        ) or die POE::Component::IKC::ClientLite::error();
 
