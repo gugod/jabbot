@@ -37,7 +37,6 @@ sub react_to {
     my $text = $msg->text;
     $self->msg($msg);
 
-    my $i = 0;
     for my $i (0..$#D2P) {
         next if $i % 2;
         my ($regex, $sub) = @D2P[$i, $i+1];
