@@ -14,13 +14,14 @@ my $self;
 
 sub process {
     $self= shift;
-    $config = $self->hub->config;
+    $config = $self->hub->config->{irc};
+
     POE::Component::IKC::Server->spawn(
-        port => $config->{irc_frontend_port},
-        name => $config->{nick}
+        port => $config->{frontend_port},
+        name => $self->hub->config->{nick}
        );
 
-    for my $network (@{$config->{irc_networks}}) {
+    for my $network (@{$config->{networks}}) {
         POE::Component::IRC->new($network)
                 or die "Couldn't create IRC POE session: $!";
         POE::Session->create(
@@ -93,9 +94,9 @@ sub bot_start {
     $kernel->delay( autoping => 300 );
 
     $kernel->post( $network => connect => {
-        Nick   => $config->{nick},
-        Server => $config->{"irc_${network}_server"},
-        Port   => $config->{"irc_${network}_port"},
+        Nick   => $self->hub->config->{nick},
+        Server => $config->{$network}{server},
+        Port   => $config->{$network}{port},
     });
 }
 
@@ -103,19 +104,18 @@ sub bot_connected {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
     my $network = $heap->{network};
     say "Connected to $network";
-    foreach (map {
-        s/${network}://; $_
-    } grep { /^${network}:/ } @{$config->{"irc_channels"}}) {
-        say "Joining channel #$_";
-        $kernel->post($network=>join=>"#$_");
+    foreach(@{ $config->{$network}{channels} }) {
+        my ($channel, $key) = split;
+        say "Joining channel #channel";
+        $kernel->post($network => join => "#$channel", $key);
     }
 }
 
 sub bot_do_autoping {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
     my $network = $heap->{network};
-    $kernel->post($network=>userhost=>$config->{notify_irc_nickname})
-        unless $heap->{seen_traffic};
+#     $kernel->post($network=>userhost=>$config->{notify_irc_nickname})
+#         unless $heap->{seen_traffic};
     $heap->{seen_traffic} = 0;
     $kernel->delay(autoping=>300);
 }
