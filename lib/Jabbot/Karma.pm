@@ -17,7 +17,7 @@ sub process {
                 ($db->{$word})--;
             }
         }
-        $reply = "ok, " . $msg->from;
+        $reply = "ok, " . $msg->from if $msg->me;
 
         eval {
             tied(%{$db->tied_file})->sync;
