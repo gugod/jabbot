@@ -55,6 +55,9 @@ sub _save_factpack {
 
 sub _save {
     my ($X, $Y) = @_;
+
+    return if $X =~ / that|this|what|who|when|how /xi;
+
     my $orig = $self->db->{$X};
 
     if ($Y =~ s/^also\s+//i) {
