@@ -1,23 +1,20 @@
 message_dispatcher_port: 65000
-irc_frontend_port: 65123
-irc_networks:
-  - freenode
-# - localhost
-# - ircnet
-irc_freenode_server: chat.freenode.net
-irc_freenode_port: 6667
-# irc_ircnet_server: ircnet.choopa.net
-# irc_ircnet_port: 6666
-# irc_localhost_server: 127.0.0.1
 
 nick: jabbot
 admin:
   - gugod
 
-irc_channels:
-  - freenode:jabbot
-# - localhost:jabbot3
-
+irc:
+  frontend_port: 65123
+  networks:
+    - freenode
+  freenode:
+    nick: jabbot
+    server: chat.freenode.net
+    port: 6667
+    channels:
+      - jabbot
+ 
 feeds:
   - fortune
 feeds_fortune_url: http://gugod.org/fortune.cgi
