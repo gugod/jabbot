@@ -11,14 +11,17 @@ sub process {
 
     my ($r,$must_say) = $self->react_to($msg);
 
+    # manually close db handle since now that we have different frontends running,
+    # db should be reloaded everytime this sub is invoked.
+    $self->db(undef);
+
+    return unless defined $r;
+
     $must_say = 1 if $msg->me;
 
     $r =~ s{ \$who }
            { $msg->from }xe;
 
-    # manually close db handle since now that we have different frontends running,
-    # db should be reloaded everytime this sub is invoked.
-    $self->db(undef);
     $self->reply($r, $must_say);
 }
 
