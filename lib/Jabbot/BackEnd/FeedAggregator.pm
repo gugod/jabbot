@@ -83,10 +83,12 @@ sub handle_feed {
             $text .= " $url";
         }
 
-	my $utf8_text = Encode::encode('utf8',$text);
+        my $utf8_text = ($config->{type} eq 'rss') ? Encode::encode('utf8',$text) : $text;
+
         for(@$channels) {
             my($network,$channel) = split(/:/,$_);
             say "Posting to $network/$channel: $utf8_text";
+
             $remote->post("irc_frontend_${network}/message",
                           {channel => $channel,
                            network => $network,
