@@ -134,7 +134,7 @@ sub bot_msg {
     my $pubmsg  = decode($encoding,$msg);
     my $nick = ( split /!/, $who )[0];
 
-    say "[$network/$who encoding=\"$encoding\"] ". encode('utf8',$pubmsg);
+    say "[$network/$who encoding=\"$encoding\"] $pubmsg";
     my $reply = $self->hub->process(
         $self->hub->message->new(
             text => $pubmsg,
