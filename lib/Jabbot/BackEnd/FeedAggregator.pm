@@ -3,6 +3,8 @@ use strict;
 use Jabbot::BackEnd -base;
 use POE;
 use POE::Component::RSSAggregator;
+use POE::Component::AtomAggregator;
+
 use POE::Component::IKC::ClientLite;
 use WWW::Shorten '0rz';
 use Encode;
@@ -21,22 +23,28 @@ sub process {
 }
 
 sub init_session {
-    my @feeds = map {
-        {
-            url => $self->config->{"feeds_${_}_url"},
-            delay => $self->config->{"feeds_${_}_delay"} || 600,
-            name => $_,
-        }
-    } @{$self->config->{feeds}};
-
     my ($kernel, $heap, $session) = @_[KERNEL, HEAP, SESSION];
+
     $heap->{rssagg} = POE::Component::RSSAggregator->new(
         alias    => 'rssagg',
         debug    => 1,
         callback => $session->postback("handle_feed"),
         tmpdir   => '/tmp',     # optional caching
-       );
-    $kernel->post('rssagg','add_feed',$_) for @feeds;
+    );
+
+    $heap->{atomagg} = POE::Component::AtomAggregator->new(
+        alias    => 'atomagg',
+        debug    => 1,
+        callback => $session->postback("handle_feed"),
+        tmpdir   => '/tmp',     # optional caching
+    );
+
+
+    my %feeds = %{$self->config->{feeds}};
+    my @feeds = map { { name => $_, %{$feeds{$_}} } } keys %feeds;
+
+    $kernel->post('rssagg','add_feed',$_) for grep { $_->{type} eq 'rss' } @feeds;
+    $kernel->post('atomagg','add_feed',$_) for grep { $_->{type} eq 'atom' } @feeds;
 }
 
 sub handle_feed {
@@ -48,18 +56,34 @@ sub handle_feed {
 
     my $feed_name = $feed->name;
     for my $headline (reverse $feed->late_breaking_news) {
-        my $channels = $self->config->{"feeds_${feed_name}_channels"};
-        my $headline_text = $headline->headline;
-        my $text = "${feed_name} - " . $headline_text;
+        my $config = $self->config->{feeds}{$feed_name};
 
-        if($self->config->{"feeds_${feed_name}_appendurl"}) {
-            my $url = ($self->config->{"feeds_${feed_name}_shorturl"})?
-                eval 'makeashorterlink($headline->url)':$headline->url;
+        my $channels = $self->config->{feeds}{$feed_name}{publish_to};
+        next unless $channels;
+
+        my ( $text, $link )
+            = $headline->can("headline")
+            ? ( $headline->headline, $headline->url )
+            : $headline->can("title")
+            ? ( $headline->title, $headline->link )
+            : ();
+
+        if ($config->{showAuthor}) {
+            if ($headline->can('author')) {
+                my $author = $headline->author;
+                if ($author) {
+                    $text = "(@{[ $author->name ]}) $text";
+                }
+            }
+        }
+
+        $text = "${feed_name} - " . $text;
+        if ($config->{appendurl}) {
+            my $url = $config->{shorturl} ? eval 'makeashorterlink($link)' : $link;
             $text .= " $url";
         }
 
 	my $utf8_text = Encode::encode('utf8',$text);
-	next unless $channels;
         for(@$channels) {
             my($network,$channel) = split(/:/,$_);
             say "Posting to $network/$channel: $utf8_text";

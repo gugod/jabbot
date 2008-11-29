@@ -16,14 +16,14 @@ irc:
       - jabbot
  
 feeds:
-  - fortune
-feeds_fortune_url: http://gugod.org/fortune.cgi
-feeds_fortune_delay: 10
-feeds_fortune_appendurl: yes
-feeds_fortune_shorturl: yes
-feeds_fortune_channels:
-  - freenode:jabbot
-  - localhost:jabbot
+  jabbot-commits:
+    type: atom
+    url:  http://github.com/feeds/gugod/commits/jabbot/master
+    showAuthor: true
+    appendurl: true
+    shorturl: true
+    publish_to:
+      - "freenode:jabbot"
 
 default_encoding: utf8
 # channel_encoding_freenode_jabbot3: big5
