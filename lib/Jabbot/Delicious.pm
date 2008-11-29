@@ -24,7 +24,7 @@ sub process {
 
         my $res = $del->add_post({
             url => $url,
-            tags => "by_${msg_from} for:${msg_from} " . ($tags||""),
+            tags => "by_${msg_from} " . ($tags||""),
             description => $url,
         });
 
