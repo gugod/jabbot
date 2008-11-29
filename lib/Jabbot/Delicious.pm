@@ -12,7 +12,7 @@ sub process {
 
     my $msg = shift;
     my $msg_from = $msg->from;
-    if ($msg->text =~ /^(?:spread|+d|delicious) +($RE{URI}{HTTP})(?: +tags:(.+?))?$/i) {
+    if ($msg->text =~ /^(?:spread|\+d|delicious) +($RE{URI}{HTTP})(?: +tags:(.+?))?$/i) {
         my ($url,$tags) = ($1,$2);
         my $del = Net::Delicious->new({
             user => $config->{username},
