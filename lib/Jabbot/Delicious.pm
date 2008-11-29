@@ -12,12 +12,20 @@ sub process {
 
     my $msg = shift;
     my $msg_from = $msg->from;
-    if ($msg->text =~ /^spread +($RE{URI}{HTTP})(?: +tags:(.+?))?$/i) {
-        my $del = Net::Delicious->new({ user => $config->{username}, pswd => $config->{password} });
+    if ($msg->text =~ /^(?:spread|+d|delicious) +($RE{URI}{HTTP})(?: +tags:(.+?))?$/i) {
+        my ($url,$tags) = ($1,$2);
+        my $del = Net::Delicious->new({
+            user => $config->{username},
+            pswd => $config->{password},
+            debug => 1
+        });
+
+        print "!! Posting $url to delicious\n";
 
         my $res = $del->add_post({
-            url => $1,
-            tags => "for:$msg_from " . ($2||"")
+            url => $url,
+            tags => "by_${msg_from} for:${msg_from} " . ($tags||""),
+            description => $url,
         });
 
         if($res) {
