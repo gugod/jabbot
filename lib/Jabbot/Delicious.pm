@@ -22,9 +22,12 @@ sub process {
 
         print "!! Posting $url to delicious\n";
 
+
+        my $auto_tags = join " ", split /\W/, $url;
+
         my $res = $del->add_post({
             url => $url,
-            tags => "by_${msg_from} " . ($tags||""),
+            tags => "$auto_tags by_${msg_from} " . ($tags||""),
             description => $url,
         });
 
