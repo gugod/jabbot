@@ -13,7 +13,7 @@ sub process {
     }
 
     if ($msg->me) {
-        return $self->reply("WHAT? MAKE IT YOUSELF", 1)
+        return $self->reply("WHAT? MAKE IT YOURSELF", 1)
             if $text =~ /^make\s+me\s+./i;
         return $self->reply("OKAY", 1)
             if $text =~ /^sudo\s+make\s+me\s+./i;
