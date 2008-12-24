@@ -24,6 +24,7 @@ requires(
          Net::Jabber => 0,
          Perl6::Say => 0,
          Lingua::JA::Romanize::Japanese => 0,
+         URI::Title => 0,
         );
 
 check_nmake();

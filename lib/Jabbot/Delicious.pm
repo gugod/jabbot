@@ -5,6 +5,7 @@ const class_id => 'delicious';
 
 use Net::Delicious;
 use Regexp::Common qw/URI/;
+use URI::Title qw( title );
 
 sub process {
     my $config = $self->hub->config->{delicious};
@@ -22,12 +23,17 @@ sub process {
 
         print "!! Posting $url to delicious\n";
 
+        my $title = title($url) || "";
+        my $auto_tags = join " ", split /\W/, "$url  $title";
 
-        my $auto_tags = join " ", split /\W/, $url;
+        my $for_user = "";
+        if (defined($_ = $config->{user_mapping}{$msg_from})) {
+            $for_user = "for:$_";
+        }
 
         my $res = $del->add_post({
             url => $url,
-            tags => "$auto_tags by_${msg_from} " . ($tags||""),
+            tags => "$for_user $auto_tags by_${msg_from} " . ($tags||""),
             description => $url,
         });
 
