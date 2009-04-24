@@ -27,11 +27,11 @@ feeds:
       - "freenode:jabbot"
 
 cpanfeeds:
-  recent:
+  CPAN-Upload:
     type: rss
     url: 'http://unknownplace.org/cpanrecent/rss'
     publish_to:
-      - "freenode:bottest"
+      - "freenode:chupei.pm"
 
 default_encoding: utf8
 # channel_encoding_freenode_jabbot3: big5
