@@ -16,6 +16,7 @@ requires(
          POE::Component::IRC => 0,
          POE::Component::IKC => 0,
          POE::Component::RSSAggregator => 0,
+         POE::Component::AtomAggregator => 0,
          Perl6::Say => 0,
          WWW::Shorten::0rz => 0,
          OurNet::Chatbot => 0,
