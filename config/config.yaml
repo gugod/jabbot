@@ -1,20 +1,20 @@
 # vim:et:sw=2:
 message_dispatcher_port: 65000
 
-nick: asdfasdf
+nick: jabbot
 admin:
-  - c9s
+  - gugod
 
 irc:
   frontend_port: 65123
   networks:
     - freenode
   freenode:
-    nick: asdfasdf
+    nick: jabbot
     server: chat.freenode.net
     port: 6667
     channels:
-      - bottest
+      - jabbot
  
 feeds:
   jabbot-commits:
