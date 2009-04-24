@@ -1,19 +1,20 @@
+# vim:et:sw=2:
 message_dispatcher_port: 65000
 
-nick: jabbot
+nick: asdfasdf
 admin:
-  - gugod
+  - c9s
 
 irc:
   frontend_port: 65123
   networks:
     - freenode
   freenode:
-    nick: jabbot
+    nick: asdfasdf
     server: chat.freenode.net
     port: 6667
     channels:
-      - jabbot
+      - bottest
  
 feeds:
   jabbot-commits:
@@ -24,6 +25,13 @@ feeds:
     shorturl: true
     publish_to:
       - "freenode:jabbot"
+
+cpanfeeds:
+  recent:
+    type: rss
+    url: 'http://unknownplace.org/cpanrecent/rss'
+    publish_to:
+      - "freenode:bottest"
 
 default_encoding: utf8
 # channel_encoding_freenode_jabbot3: big5

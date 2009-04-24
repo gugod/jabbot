@@ -39,12 +39,12 @@ sub init_session {
         tmpdir   => '/tmp',     # optional caching
     );
 
-
     my %feeds = %{$self->config->{feeds}};
     my @feeds = map { { name => $_, %{$feeds{$_}} } } keys %feeds;
-
-    $kernel->post('rssagg','add_feed',$_) for grep { $_->{type} eq 'rss' } @feeds;
-    $kernel->post('atomagg','add_feed',$_) for grep { $_->{type} eq 'atom' } @feeds;
+    $kernel->post( 'rssagg', 'add_feed', $_ )
+        for grep { $_->{type} eq 'rss' } @feeds;
+    $kernel->post( 'atomagg', 'add_feed', $_ )
+        for grep { $_->{type} eq 'atom' } @feeds;
 }
 
 sub handle_feed {

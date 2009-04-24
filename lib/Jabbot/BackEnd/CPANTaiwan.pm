@@ -1,4 +1,4 @@
-package Jabbot::BackEnd::FeedAggregator;
+package Jabbot::BackEnd::CPANTaiwan;
 use strict;
 use Jabbot::BackEnd -base;
 use POE;
@@ -24,7 +24,6 @@ sub process {
 
 sub init_session {
     my ($kernel, $heap, $session) = @_[KERNEL, HEAP, SESSION];
-
     $heap->{rssagg} = POE::Component::RSSAggregator->new(
         alias    => 'rssagg',
         debug    => 1,
@@ -32,48 +31,51 @@ sub init_session {
         tmpdir   => '/tmp',     # optional caching
     );
 
-    $heap->{atomagg} = POE::Component::AtomAggregator->new(
-        alias    => 'atomagg',
-        debug    => 1,
-        callback => $session->postback("handle_feed"),
-        tmpdir   => '/tmp',     # optional caching
-    );
+    my %feeds = %{$self->config->{cpanfeeds}};
+    my @rss_feeds = map { { name => $_ , url => $feeds{ $_ }->{url} } } 
+                    grep { $feeds{ $_ }->{type} eq 'rss' }  keys %feeds;
 
+    my @atom_feeds = map { { name => $_ , url => $feeds{ $_ }->{url} } } 
+                    grep { $feeds{ $_ }->{type} eq 'rss' }  keys %feeds;
 
-    my %feeds = %{$self->config->{feeds}};
-    my @feeds = map { { name => $_, %{$feeds{$_}} } } keys %feeds;
-
-    $kernel->post('rssagg','add_feed',$_) for grep { $_->{type} eq 'rss' } @feeds;
-    $kernel->post('atomagg','add_feed',$_) for grep { $_->{type} eq 'atom' } @feeds;
+    $kernel->post('rssagg','add_feed',$_) for @rss_feeds;
+    $kernel->post('atomagg','add_feed',$_) for @atom_feeds;
 }
 
 sub handle_feed {
     my ($kernel,$feed) = ($_[KERNEL], $_[ARG1]->[0]);
+
+    warn "handle_feed";
     my $remote = create_ikc_client(
         port => $self->config->{irc}{frontend_port},
         serialiser => 'FreezeThaw'
        ) or die POE::Component::IKC::ClientLite::error();
 
+    use Acme::CPANAuthors;
+    my $authors = Acme::CPANAuthors->new('Taiwanese');
+
     my $feed_name = $feed->name;
     for my $headline (reverse $feed->late_breaking_news) {
         my $config = $self->config->{feeds}{$feed_name};
 
+        # XXX: may be any country not only taiwanese.
+        # filter modules by cpan authors here
         my $channels = $self->config->{feeds}{$feed_name}{publish_to};
         next unless $channels;
 
         my ( $text, $link )
             = $headline->can("headline")
-            ? ( $headline->headline, $headline->url )
-            : $headline->can("title")
-            ? ( $headline->title, $headline->link )
-            : ();
+                ? ( $headline->headline, $headline->url )
+                : $headline->can("title")
+                    ? ( $headline->title, $headline->link )
+                    : ();
 
-        if ($config->{showAuthor}) {
-            if ($headline->can('author')) {
-                my $author = $headline->author;
-                if ($author) {
-                    $text = "(@{[ $author->name ]}) $text";
-                }
+        my ($author_id) = $link =~ m{http://search.cpan.org/~(\w+)/}i;
+
+        if ($headline->can('author')) {
+            my $author = $headline->author;
+            if ($author) {
+                $text = "(@{[ $author->name ]}) $text";
             }
         }
 

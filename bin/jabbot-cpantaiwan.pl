@@ -7,5 +7,5 @@ my @configs = qw(config.yaml -plugins plugins);
 
 my $j = Jabbot->new;
 $j->load_hub(@configs);
-$j->hub->config->{backend_class} = 'Jabbot::BackEnd::FeedAggregator';
+$j->hub->config->{backend_class} = 'Jabbot::BackEnd::CPANTaiwan';
 $j->hub->backend->process(@ARGV);
