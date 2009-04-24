@@ -28,16 +28,14 @@ sub init_session {
         alias    => 'rssagg',
         debug    => 1,
         callback => $session->postback("handle_feed"),
-        tmpdir   => '/tmp',     # optional caching
+        # tmpdir   => '/tmp',     # optional caching
     );
 
     my %feeds = %{$self->config->{cpanfeeds}};
     my @rss_feeds = map { { name => $_ , url => $feeds{ $_ }->{url} } } 
                     grep { $feeds{ $_ }->{type} eq 'rss' }  keys %feeds;
-
     my @atom_feeds = map { { name => $_ , url => $feeds{ $_ }->{url} } } 
                     grep { $feeds{ $_ }->{type} eq 'rss' }  keys %feeds;
-
     $kernel->post('rssagg','add_feed',$_) for @rss_feeds;
     $kernel->post('atomagg','add_feed',$_) for @atom_feeds;
 }
@@ -56,11 +54,11 @@ sub handle_feed {
 
     my $feed_name = $feed->name;
     for my $headline (reverse $feed->late_breaking_news) {
-        my $config = $self->config->{feeds}{$feed_name};
+        my $config = $self->config->{cpanfeeds}{$feed_name};
 
         # XXX: may be any country not only taiwanese.
         # filter modules by cpan authors here
-        my $channels = $self->config->{feeds}{$feed_name}{publish_to};
+        my $channels = $self->config->{cpanfeeds}{$feed_name}{publish_to};
         next unless $channels;
 
         my ( $text, $link )
