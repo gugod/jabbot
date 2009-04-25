@@ -1,6 +1,5 @@
 package Jabbot::Backend::Github;
-use strict;
-use Jabbot::BackEnd -base;
+use Jabbot::BackEnd -Base;
 use POE;
 use POE::Component::IKC::ClientLite;
 
