@@ -43,7 +43,6 @@ sub init_session {
 sub handle_feed {
     my ($kernel,$feed) = ($_[KERNEL], $_[ARG1]->[0]);
 
-    warn "handle_feed";
     my $remote = create_ikc_client(
         port => $self->config->{irc}{frontend_port},
         serialiser => 'FreezeThaw'
@@ -71,7 +70,9 @@ sub handle_feed {
                     : ();
 
         my ($author_id) = $link =~ m{http://search.cpan.org/~(\w+)/}i ;
+
         next unless( defined $taiwan_authors->{ uc( $author_id ) } );
+        say "Found author @{[ uc $author_id ]}";
 
         my $text = "$mod_name by $author_id++ ( @{[  $taiwan_authors->{ uc( $author_id ) }  ]} )";
 
