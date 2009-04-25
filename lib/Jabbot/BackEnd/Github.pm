@@ -1,28 +1,50 @@
 package Jabbot::BackEnd::Github;
-use Jabbot::BackEnd -Base;
-use POE;
-use POE::Component::IKC::ClientLite;
+use strict;
 
+use Jabbot::BackEnd -base;
+
+const class_id => 'github';
+
+use POE;
 use POE::Component::Server::HTTP;
+use POE::Component::IKC::ClientLite;
+use CGI::Simple;
+
 use HTTP::Status;
 use JSON::XS;
+use WWW::Shorten '0rz';
+
+my $self;
 
 sub process {
+    $self = shift;
+    POE::Session->create(
+        inline_states => {
+            _start      => \&init_session,
+        }
+    );
+    $poe_kernel->run();
+
+}
+
+sub init_session {
+    my ($kernel) = ($_[KERNEL]);
+
     my $remote = POE::Component::IKC::ClientLite::create_ikc_client(
-        port => $self->config->irc_frontend_port,
-        name => "GithubBackend$$",
-        timeout => 5,
+        port => $self->config->{irc}{frontend_port},
+        name => "Github$$",
+        serialiser => 'FreezeThaw'
     ) or die $POE::Component::IKC::ClientLite::error;
 
     my $server = POE::Component::Server::HTTP->new(
-        Port => 8000,
+        Port => $self->config->{github}{port},
         ContentHandler => {
             '/' => sub {
                 my ($request, $response) = @_;
 
                 my $p = CGI::Simple->new( $request->content );
                 my $network = $p->param('network');
-                my $channel = '#' . $p->param('name');
+                my $channel = $p->param('channel');
                 my $payload = $p->param('payload');
                 my $info    = decode_json($payload);
 
@@ -33,7 +55,12 @@ sub process {
                     my $committer = $commit->{author}{email};
                     $committer =~ s/@.+$//;
 
-                    my $text = "$repo | ${committer}++ | $commit->{message} - $commit->{url}";
+                    my $url = $commit->{url};
+                    $url = eval('makeashorterlink($url)');
+
+                    my $text = "$repo | ${committer}++ | $commit->{message} - $url";
+
+                    warn "[$network/$channel] $text\n";
 
                     $remote->post("irc_frontend_${network}/message",
                           {channel => $channel,
@@ -50,6 +77,8 @@ sub process {
             Server => "Jabbot Github Backend Server"
         }
     );
+
+    print STDERR "Github Backend Started, available at port " . $self->config->{github}{port} . "\n";
 }
 
 
