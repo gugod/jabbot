@@ -29,7 +29,8 @@ feeds:
 cpanfeeds:
   CPAN-Upload:
     type: rss
-    url: 'http://unknownplace.org/cpanrecent/rss'
+# url: 'http://unknownplace.org/cpanrecent/rss'
+    url: 'http://search.cpan.org/uploads.rdf'
     publish_to:
       - "freenode:chupei.pm"
 
