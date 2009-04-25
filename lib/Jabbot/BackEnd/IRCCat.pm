@@ -11,7 +11,6 @@ sub process {
         timeout => 5,
     ) or die $POE::Component::IKC::ClientLite::error;
 
-    binmode(STDIN,":utf8");
     while(<STDIN>) {
         # freenode #jabbot Hello, world.
         my ($network, $channel, $text) = split(/ /, $_, 3);
