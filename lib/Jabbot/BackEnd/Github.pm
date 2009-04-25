@@ -1,4 +1,4 @@
-package Jabbot::Backend::Github;
+package Jabbot::BackEnd::Github;
 use Jabbot::BackEnd -Base;
 use POE;
 use POE::Component::IKC::ClientLite;
