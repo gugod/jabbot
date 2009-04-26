@@ -8,7 +8,24 @@ use Net::Twitter;
 
 sub process {
     my $self = shift;
-    io("var/run/twitter_state.yml")->assert->touch;
+    my $config = $self->config;
+
+    local $/ = undef;
+    my $tweet = <STDIN>;
+
+    if ($tweet) {
+        warn "Updating: $tweet\n";
+
+        my $twit = Net::Twitter->new({
+            username => $config->{twitter}{username},
+            password => $config->{twitter}{password}
+        });
+
+        my $status = $twit->update({ status => $tweet })
+            or warn Dump({ Error => $twit->get_error });
+
+        return;
+    }
 
     $self->read_public_timeline;
 }
@@ -16,17 +33,17 @@ sub process {
 
 sub read_public_timeline {
     my $self = shift;
-    my $config = $self->hub->config;
+    my $config = $self->config;
 
     my $state = YAML::Load(io("var/run/twitter_state.yml")->assert->utf8->all);
 
-    my $twit = Net::Twitter->new(
-        useranme => $config->{twitter}{username},
+    my $twit = Net::Twitter->new({
+        username => $config->{twitter}{username},
         password => $config->{twitter}{password}
-    );
+    });
 
     my $status_id = $state->{last_read_public_timeline_status_id} ||= 1;
-    for my $entry (@{ $twit->public_timeline($status_id) }) {
+    for my $entry (@{ $twit->friends_timeline({ since_id => $status_id }) ||[] }) {
 
         my $reply = $self->hub->process(
             $self->hub->message->new(
