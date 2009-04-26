@@ -8,6 +8,8 @@ sub process {
     binmode(STDIN, ":utf8");
     binmode(STDOUT, ":utf8");
 
+    $| = 1;
+
     while(<STDIN>) {
         chomp;
         print "<= $_\n";
