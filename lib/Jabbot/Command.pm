@@ -1,11 +1,15 @@
 package Jabbot::Command;
 use Spoon::Command -Base;
+use UNIVERSAL::require;
 
 sub usage {
     warn <<END;
 usage:
     jabbot -new [path]
     jabbot -update [path]
+
+    jabbot -run FrontEnd::IRC
+    jabbot -run BackEnd::FeedAggregator
 END
 }
 
@@ -35,6 +39,15 @@ sub handle_new {
     $self->hub->registry->load;
     io('plugin')->mkdir;
     $self->set_permissions;
+}
+
+sub handle_run {
+    my $name = shift;
+    my $class = "Jabbot::${name}";
+    $class->require or die "Failed to load front-end ${name}";
+    my $type = ($name =~ /Front/ ? 'frontend' : 'backend');
+    $self->hub->config->{"${type}_class"} = $class;
+    $self->hub->$type->process(@_);
 }
 
 sub add_new_default_config {
