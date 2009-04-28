@@ -31,6 +31,7 @@ sub init_session {
         callback => $session->postback("handle_feed"),
         tmpdir   => '/tmp',     # optional caching
         init_headlines_seen => 1,
+        headline_as_id => 1,
     );
 
     $heap->{atomagg} = POE::Component::AtomAggregator->new(
@@ -39,6 +40,7 @@ sub init_session {
         callback => $session->postback("handle_feed"),
         tmpdir   => '/tmp',     # optional caching
         init_headlines_seen => 1,
+        headline_as_id => 1,
     );
 
     my %feeds = %{$self->config->{feeds}};
