@@ -12,7 +12,7 @@ use encoding 'utf8';
 const class_id => 'zhtw_currencyconvert';
 
 my %cname = (USD => "美金", TWD => "新台幣", JPY => "日圓", HKD => "港幣",
-             MCY => "人民幣", GBP => "英鎊", ECU => "歐洲通貨", CAD => "加拿大元",
+             MCY => "人民幣", GBP => "英鎊", EUR => "歐元", CAD => "加拿大元",
              AUD => "澳元", THB => "泰銖", SGD => "新加坡元", KOW => "南韓圜",
              IDR => "印尼盾", MYR => "馬來西亞幣", PHP => "菲律賓披索",
              INR => "印度盧比", SAR => "阿幣", KWD => "科威特幣", NOK => "挪威幣",
@@ -23,14 +23,14 @@ my %cname = (USD => "美金", TWD => "新台幣", JPY => "日圓", HKD => "港�
 
 my %coin = (
     USD => "1", TWD => "2", JPY => "3", HKD => "4", MCY => "5",
-    GBP => "6", ECU => "7", CAD => "8", AUD => "9", THB => "10",
+    GBP => "6", EUR => "7", CAD => "8", AUD => "9", THB => "10",
     SGD => "11", KOW => "12", IDR => "13", MYR => "14", PHP => "15",
     INR => "16", SAR => "17", KWD => "18", NOK => "19", SWF => "20",
     SEK => "21", DMK => "22", BRC => "23", MEP => "24", ARS => "25",
     CLP => "26", VEB => "27", ZAR => "28", RUR => "29", NZD => "30"
    );
 
-my %calias = ( GRP => 'GBP', EUR => "ECU", "RMB" => "MCY", "YEN" => "JPY", "CHF" =>"SWF", "NTD" => "TWD");
+my %calias = ( GRP => 'GBP', "RMB" => "MCY", "YEN" => "JPY", "CHF" =>"SWF", "NTD" => "TWD");
 
 
 sub process {
