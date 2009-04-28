@@ -6,7 +6,7 @@ use POE::Component::RSSAggregator;
 use POE::Component::AtomAggregator;
 
 use POE::Component::IKC::ClientLite;
-use WWW::Shorten '0rz';
+use WWW::Shorten 'isgd';
 use Encode;
 
 my $self;
@@ -77,10 +77,10 @@ sub handle_feed {
             }
         }
 
-        $text = "${feed_name} - " . $text;
+        $text = "${feed_name} | " . $text;
         if ($config->{appendurl}) {
-            my $url = $config->{shorturl} ? eval 'makeashorterlink($link)' : $link;
-            $text .= " $url";
+            my $url = $config->{shorturl} ? makeashorterlink($link) : $link;
+            $text .= " | $url";
         }
 
         my $utf8_text = ($config->{type} eq 'rss') ? Encode::encode('utf8',$text) : $text;
