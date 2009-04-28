@@ -26,6 +26,7 @@ requires(
          Perl6::Say => 0,
          Lingua::JA::Romanize::Japanese => 0,
          URI::Title => 0,
+         Acme::CPANAuthors => 0,
         );
 
 check_nmake();
