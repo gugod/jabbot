@@ -1,10 +1,7 @@
 package Jabbot::CPANAuthors;
 use Jabbot::Plugin -Base;
-use Parse::CPAN::Authors;
-use LWP::Simple qw(get);
-use Cache::File;
 use Acme::CPANAuthors;
-use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
+use WWW::Shorten qw(TinyURL);
 
 const class_id => 'cpanauthors';
 
@@ -14,7 +11,7 @@ sub process {
 
     my $reply = '';
     # country
-    if($msg->text =~ /^authors (?<COUNTRY>\w+)/ ) {
+    if($msg->text =~ /^(?<COUNTRY>\w+)\s+authors/ ) {
         my $country = ucfirst $+{COUNTRY};
         $country =~ s/^Taiwan$/Taiwanese/;  # patch
         my $acme_authors = Acme::CPANAuthors->new($country);  # taiwanese
@@ -22,19 +19,29 @@ sub process {
             $reply= "there is no such module for $country";
         }
 
-        # XXX: implement
         $reply = qq!  There are @{[  $acme_authors->count ]} in $country. They are !;
-        $reply .= join( ',' , values %$acme_authors ) . ' ..etc';
+        $reply .= join( ', ' , map { $_ } keys %$acme_authors ) . ' ..etc';
 
     }
     # id
     elsif( $msg->text =~ /^author (?<AUTHOR_ID>\w+)$/ ) {
         my $author_id = uc( $+{AUTHOR_ID} );
-        my $acme_authors = Acme::CPANAuthors->new;
+
         my @authors = Acme::CPANAuthors->look_for($author_id);
          for my $author ( @authors) {
-            $reply .= sprintf("%s (%s) belongs to %s.\n",
+
+            $reply .= sprintf("%s (%s) belongs to %s. ",
                 $author->{id}, $author->{name}, $author->{category});
+
+            my $acme_authors = Acme::CPANAuthors->new( $author->{category} );
+            my @dists = $acme_authors->distributions( $author->{id} );
+
+            $reply .= sprintf(" %s has %d dists." , $author->{id} , scalar @dists );
+
+            my $url = makeashorterlink( $acme_authors->avatar_url( $author->{id} ) );
+            $reply .= sprintf(" %s looks like this: %s", $author->{id} , $acme_authors->avatar_url( $author->{id} ) );
+
+            warn $reply;
          }
     }
     $self->reply($reply,1);
