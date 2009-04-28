@@ -26,8 +26,10 @@ requires(
          URI::Title => 0,
 );
 
-# recommends( 'OurNet::Chatbot' => 0 );
-# recommends( 'Acme::CPANAuthors' => 0 );
+feature 'Jabber supports' =>
+        -default => 0,
+        'Net::Jabber' => 0;
+
 feature 'Feed Aggregator Backend' => 
         -default => 0,
         'POE::Component::RSSAggregator' => 0,
