@@ -28,20 +28,26 @@ requires(
 
 feature 'Jabber supports' =>
         -default => 0,
-        'Net::Jabber' => 0;
+        'Net::Jabber' => 0
+        ;
 
 feature 'Feed Aggregator Backend' => 
         -default => 0,
         'POE::Component::RSSAggregator' => 0,
-        'POE::Component::AtomAggregator' => 0;
+        'POE::Component::AtomAggregator' => 0
+        ;
 
 feature 'OurNet Chatbot' =>
         -default => 0,
-        'OurNet::Chatbot' => '0';
+        'OurNet::Chatbot' => '0'
+        ;
 
 feature 'CPANAuthor Plugin' =>
         -default    => 0,
-        'Acme::CPANAuthors'   => '0';
+        'Acme::CPANAuthors'   => 0,
+        'Cache' => 0,
+        ;
+
 
 
 check_nmake();

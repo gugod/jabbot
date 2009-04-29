@@ -2,8 +2,10 @@ package Jabbot::CPANAuthors;
 use Jabbot::Plugin -Base;
 use Acme::CPANAuthors;
 use WWW::Shorten qw(TinyURL);
+use Cache::Memory;
 
 const class_id => 'cpanauthors';
+
 
 sub process {
     my $msg = shift;
@@ -27,8 +29,16 @@ sub process {
     elsif( $msg->text =~ /^author (?<AUTHOR_ID>\w+)$/ ) {
         my $author_id = uc( $+{AUTHOR_ID} );
 
+        my $cache = Cache::Memory->new(
+            namespace => 'MyNamespace',
+            default_expires => '10 days',
+        );
+
+        my $reply = $cache->get( $author_id );
+        return $self->reply( $reply, 1 ) if ($reply);
+
         my @authors = Acme::CPANAuthors->look_for($author_id);
-         for my $author ( @authors) {
+        for my $author ( @authors) {
 
             $reply .= sprintf("%s (%s) belongs to %s. ",
                 $author->{id}, $author->{name}, $author->{category});
@@ -40,9 +50,8 @@ sub process {
 
             my $url = makeashorterlink( $acme_authors->avatar_url( $author->{id} ) );
             $reply .= sprintf(" %s looks like this: %s", $author->{id} , $acme_authors->avatar_url( $author->{id} ) );
-
-            warn $reply;
-         }
+        }
+        $cache->get( $author_id , $reply );
     }
     $self->reply($reply,1);
 }
