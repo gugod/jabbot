@@ -55,7 +55,7 @@ sub handle_feed {
     my ($kernel,$feed) = ($_[KERNEL], $_[ARG1]->[0]);
     my $remote = create_ikc_client(
         port => $self->config->{irc}{frontend_port},
-	serialiser => 'FreezeThaw'
+        serialiser => 'FreezeThaw'
        ) or die POE::Component::IKC::ClientLite::error();
 
     my $feed_name = $feed->name;
@@ -83,6 +83,9 @@ sub handle_feed {
 
         $text = "${feed_name} | " . $text;
         if ($config->{appendurl}) {
+            # for ATOM $link is an object of XML::Atom::Link
+            $link = $link->href if( ref( $link )  eq 'XML::Atom::Link' );
+
             my $url = $config->{shorturl} ? makeashorterlink($link) : $link;
             $text .= " | $url";
         }
