@@ -4,10 +4,11 @@ use warnings;
 use Jabbot::FrontEnd -base;
 use POE qw(Session
            Component::IRC
+           Component::IRC::Plugin::Connector
            Component::IKC::Server
            Component::IKC::Specifier);
+
 use Encode qw(encode decode from_to);
-use YAML;
 
 my $config;
 my $self;
@@ -19,13 +20,23 @@ sub process {
     POE::Component::IKC::Server->spawn(
         port => $config->{frontend_port},
         name => $self->hub->config->{nick}
-       );
+    );
 
     for my $network (@{$config->{networks}}) {
-        POE::Component::IRC->new($network)
-                or die "Couldn't create IRC POE session: $!";
+        # POE::Component::IRC->new($network)
+
+        my $irc = POE::Component::IRC->spawn(
+            alias => "irc_frontend_${network}",
+            Nick   => $self->hub->config->{nick},
+            Server => $config->{$network}{server},
+            Port   => $config->{$network}{port},
+       ) or die "Couldn't create IRC POE session: $!";
+
         POE::Session->create(
-            heap => { network => $network },
+            heap => {
+                irc => $irc,
+                network => $network,
+            },
             inline_states => {
                 _start           => \&bot_start,
                 _stop            => sub { say "stopping bot" },
@@ -36,11 +47,9 @@ sub process {
                 irc_public       => \&bot_public,
                 irc_invite       => \&bot_invited,
                 irc_msg          => \&bot_msg,
-                irc_ping         => \&bot_ping,
-                autoping         => \&bot_do_autoping,
 		message          => \&jabbotmsg,
 		_default         => \&bot_default,
-		}
+            }
 	);
     }
 
@@ -86,38 +95,27 @@ sub bot_invited {
 
 sub bot_start {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
-    my $network = $heap->{network};
+    my $irc = $heap->{irc};
+    my $alias = $irc->session_alias();
+    my ($network) = $alias =~ /irc_frontend_(.+)/;
     say "Starting irc session, Connecting to $network";
-    $kernel->alias_set("irc_frontend_${network}");
-    $kernel->call( IKC => publish => "irc_frontend_${network}" => ['message'] );
-    $kernel->post( $network => register => 'all' );
-    $kernel->delay( autoping => 300 );
-
-    $kernel->post( $network => connect => {
-        Nick   => $self->hub->config->{nick},
-        Server => $config->{$network}{server},
-        Port   => $config->{$network}{port},
-    });
+    $kernel->call( IKC => publish => $alias => ['message'] );
+    $irc->yield(register => 'all');
+    $irc->yield(connect => {});
 }
 
 sub bot_connected {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
-    my $network = $heap->{network};
+    my $irc = $heap->{irc};
+    my $alias = $irc->session_alias();
+    my ($network) = $alias =~ /irc_frontend_(.+)/;
+
     say "Connected to $network";
     foreach(@{ $config->{$network}{channels} }) {
         my ($channel, $key) = split;
         say "Joining channel #channel";
-        $kernel->post($network => join => "#$channel", $key);
+        $irc->yield(join => "#${channel}", $key);
     }
-}
-
-sub bot_do_autoping {
-    my ($kernel,$heap) = @_[KERNEL,HEAP];
-    my $network = $heap->{network};
-#     $kernel->post($network=>userhost=>$config->{notify_irc_nickname})
-#         unless $heap->{seen_traffic};
-    $heap->{seen_traffic} = 0;
-    $kernel->delay(autoping=>300);
 }
 
 sub bot_reconnect {
@@ -152,6 +150,7 @@ sub bot_msg {
 
 sub bot_public {
     my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
+    my $irc = $heap->{irc};
     my $network = $heap->{network};
     $heap->{seen_traffic} = 1;
 
@@ -181,14 +180,8 @@ sub bot_public {
          ($to eq $self->hub->config->nick))
     ) {
         $reply_text = encode($encoding,"$nick: $reply_text");
-        $kernel->post($network => privmsg => $channel, $reply_text);
+        $irc->yield(privmsg => $channel, $reply_text);
     }
-}
-
-sub bot_ping {
-    my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
-    my $network = $heap->{network};
-    $heap->{seen_traffic} = 1;
 }
 
 1;

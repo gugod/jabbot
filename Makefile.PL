@@ -14,7 +14,7 @@ requires(
          Chatbot::Eliza => 0,
          Date::Day => 0,
          POE => 0,
-         POE::Component::IRC => 0,
+         POE::Component::IRC => 6.06,
          POE::Component::IKC => 0,
          Perl6::Say => 0,
          WWW::Shorten::0rz => 0,
