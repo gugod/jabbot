@@ -43,7 +43,7 @@ sub process {
 		message          => \&jabbotmsg
             },
             package_states => [
-                'Jabbot::FrontEnd::IRC' => [qw(_start irc_join irc_public irc_msg irc_invite lag_o_meter)]
+                'Jabbot::FrontEnd::IRC' => [qw(_start irc_public irc_msg irc_invite lag_o_meter)]
             ]
 	);
     }
@@ -67,8 +67,8 @@ sub jabbotmsg {
 
     my $channel_text = encode($encoding,$text);
 
-    $kernel->post($network, privmsg => "#$channel", $channel_text );
-
+    my $irc = $heap->{irc};
+    $irc->yield(privmsg => "#${channel}", $channel_text);
     say "[${network}/#$channel] on $text " . localtime(time);
     return 0;
 }
