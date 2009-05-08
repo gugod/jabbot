@@ -24,8 +24,6 @@ sub process {
     );
 
     for my $network (@{$config->{networks}}) {
-        # POE::Component::IRC->new($network)
-
         my $irc = POE::Component::IRC::State->spawn(
             alias => "irc_frontend_${network}",
             Nick   => $self->hub->config->{nick},
@@ -46,7 +44,7 @@ sub process {
 		message          => \&jabbotmsg
             },
             package_states => [
-                'Jabbot::FrontEnd::IRC' => [qw(_start irc_join irc_public irc_invite lag_o_meter)]
+                'Jabbot::FrontEnd::IRC' => [qw(_start irc_public irc_invite lag_o_meter)]
             ]
 	);
     }
@@ -100,12 +98,6 @@ sub _start {
     $irc->yield(connect => {});
 
     $kernel->delay( 'lag_o_meter' => 60 );
-}
-
-sub irc_join {
-    my ($channel, $kernel, $heap) = @_[ARG1, KERNEL, HEAP];
-    my $irc = $heap->{irc};
-    $irc->yield(privmsg => $channel => "hi $channel!");
 }
 
 sub bot_reconnect {
