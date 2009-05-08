@@ -3,7 +3,8 @@ use strict;
 use warnings;
 use Jabbot::FrontEnd -base;
 use POE qw(Session
-           Component::IRC
+           Component::IRC::State
+           Component::IRC::Plugin::AutoJoin
            Component::IRC::Plugin::Connector
            Component::IKC::Server
            Component::IKC::Specifier);
@@ -25,7 +26,7 @@ sub process {
     for my $network (@{$config->{networks}}) {
         # POE::Component::IRC->new($network)
 
-        my $irc = POE::Component::IRC->spawn(
+        my $irc = POE::Component::IRC::State->spawn(
             alias => "irc_frontend_${network}",
             Nick   => $self->hub->config->{nick},
             Server => $config->{$network}{server},
@@ -38,18 +39,15 @@ sub process {
                 network => $network,
             },
             inline_states => {
-                _start           => \&bot_start,
-                _stop            => sub { say "stopping bot" },
-                irc_001          => \&bot_connected,
                 irc_disconnected => \&bot_reconnect,
                 irc_error        => \&bot_reconnect,
                 irc_socketerr    => \&bot_reconnect,
-                irc_public       => \&bot_public,
-                irc_invite       => \&bot_invited,
                 irc_msg          => \&bot_msg,
-		message          => \&jabbotmsg,
-		_default         => \&bot_default,
-            }
+		message          => \&jabbotmsg
+            },
+            package_states => [
+                'Jabbot::FrontEnd::IRC' => [qw(_start irc_join irc_public irc_invite lag_o_meter)]
+            ]
 	);
     }
 
@@ -67,55 +65,47 @@ sub jabbotmsg {
 
 # The $msg->{text} has utf8 flag off, but it's a valid utf8 sequence
     my $text = decode('utf8',$msg->{text});
-    my $utf8_text = encode('utf8',$text);
 
     my $encoding = $self->hub->config->{"channel_encoding_${network}_${channel}"} || $self->hub->config->default_encoding || 'utf8';
 
     my $channel_text = encode($encoding,$text);
 
     $kernel->post($network, privmsg => "#$channel", $channel_text );
-    say "[${network}/#$channel] on $utf8_text " . localtime(time);
+
+    say "[${network}/#$channel] on $text " . localtime(time);
     return 0;
 }
 
-sub bot_default {
-    my ($state, $event, $args, $heap) = @_[STATE, ARG0, ARG1, HEAP];
-    $args ||= [ ];
-    say "default $state = $event (@$args)";
-    $heap->{seen_traffic} = 1;
-};
-
-sub bot_invited {
+sub irc_invite {
     my ($kernel,$channel, $heap) = @_[KERNEL,ARG1, HEAP];
-    my $network = $heap->{network};
-
-    say "Bot invited to $network $channel";
-    $kernel->post($network => join => $channel);
+    my $irc = $heap->{irc};
+    $irc->yield(join => $channel);
+    say "Bot invited to $channel";
 }
 
-sub bot_start {
+sub _start {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
     my $irc = $heap->{irc};
     my $alias = $irc->session_alias();
     my ($network) = $alias =~ /irc_frontend_(.+)/;
     say "Starting irc session, Connecting to $network";
     $kernel->call( IKC => publish => $alias => ['message'] );
+
+    $heap->{connector} = POE::Component::IRC::Plugin::Connector->new();
+    $irc->plugin_add('Connector' => $heap->{connector});
+    $irc->plugin_add('AutoJoin', POE::Component::IRC::Plugin::AutoJoin->new(Channels => $self->hub->config->{irc}{$network}{channels}));
+
+    $irc->yield(register => 'join');
     $irc->yield(register => 'all');
     $irc->yield(connect => {});
+
+    $kernel->delay( 'lag_o_meter' => 60 );
 }
 
-sub bot_connected {
-    my ($kernel,$heap) = @_[KERNEL,HEAP];
+sub irc_join {
+    my ($channel, $kernel, $heap) = @_[ARG1, KERNEL, HEAP];
     my $irc = $heap->{irc};
-    my $alias = $irc->session_alias();
-    my ($network) = $alias =~ /irc_frontend_(.+)/;
-
-    say "Connected to $network";
-    foreach(@{ $config->{$network}{channels} }) {
-        my ($channel, $key) = split;
-        say "Joining channel #channel";
-        $irc->yield(join => "#${channel}", $key);
-    }
+    $irc->yield(privmsg => $channel => "hi $channel!");
 }
 
 sub bot_reconnect {
@@ -127,28 +117,31 @@ sub bot_reconnect {
 
 sub bot_msg {
     my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
+    my $irc = $heap->{irc};
     my $network = $heap->{network};
     my $encoding = "utf8";
     my $pubmsg  = decode($encoding,$msg);
     my $nick = ( split /!/, $who )[0];
 
-    say "[$network/$who encoding=\"$encoding\"] $pubmsg";
+    say "[$network/$who/$nick] $pubmsg";
+
     my $reply = $self->hub->process(
         $self->hub->message->new(
             text => $pubmsg,
             from => $nick,
             channel => '',
-            to => $self->hub->config->nick,
-           ));
+            to => $self->hub->config->nick
+        )
+    );
 
     my $reply_text = $reply->text;
     if(length($reply_text)) {
         $reply_text = encode($encoding,$reply_text);
-        $kernel->post($network => privmsg => $nick, $reply_text);
+        $irc->yield(privmsg => $nick => $reply_text);
     }
 }
 
-sub bot_public {
+sub irc_public {
     my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
     my $irc = $heap->{irc};
     my $network = $heap->{network};
@@ -160,28 +153,34 @@ sub bot_public {
     my $encoding = $self->hub->config->{"channel_encoding_${network}_${channel}"} || $self->hub->config->default_encoding || 'utf8';
     $channel = '#'.$channel;
     my $pubmsg  = decode($encoding,$msg);
-    say "[$network/$channel encoding=\"$encoding\"] ". encode('utf8',$pubmsg);
+
+    say "[$network/$channel encoding=\"$encoding\"] $pubmsg";
+
     my $to = sub {
        return '' if($_[0] =~ /^\s*http/i);
        if($_[0] =~ s/^([\d\w\|]+)\s*[:,]\s*//) { return $1; }
        return '';
     }->($pubmsg);
+
     my $reply = $self->hub->process(
         $self->hub->message->new(
             text => $pubmsg,
             from => $nick,
             channel => $channel,
-            to => $to
-           ));
-    my $reply_text = $reply->text;
+            to => $to));
 
-    if ($reply_text &&
-        (($reply->must_say) ||
-         ($to eq $self->hub->config->nick))
-    ) {
+    my $reply_text = $reply->text;
+    if ($reply_text && (($reply->must_say) ||  ($to eq $self->hub->config->nick)) ) {
         $reply_text = encode($encoding,"$nick: $reply_text");
         $irc->yield(privmsg => $channel, $reply_text);
     }
+}
+
+sub lag_o_meter {
+    my ($kernel,$heap) = @_[KERNEL,HEAP];
+    print 'Time: ' . time() . ' Lag: ' . $heap->{connector}->lag() . "\n";
+    $kernel->delay( 'lag_o_meter' => 60 );
+    return;
 }
 
 1;
