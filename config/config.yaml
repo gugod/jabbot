@@ -14,7 +14,8 @@ irc:
     server: chat.freenode.net
     port: 6667
     channels:
-      - jabbot
+      # channel: password
+      '#jabbot': ''
  
 feeds:
   jabbot-commits:
