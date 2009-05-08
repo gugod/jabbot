@@ -18,12 +18,13 @@ sub process {
 
         $channel =~ s/^#//;
 
-        for my $n (@{$self->config->{irc}{networks}}) {
-            next unless $n eq $network;
-            $remote->post("irc_frontend_${network}/message",
-                          {channel => $channel,
-                           text =>$text,
-                           network => $network });
-        }  
+        $remote->post(
+            "irc_frontend_${network}/message",
+            {
+                channel => $channel,
+                text =>$text,
+                network => $network
+            }
+        );
     }
 }

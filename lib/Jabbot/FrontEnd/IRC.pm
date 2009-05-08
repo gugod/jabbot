@@ -24,8 +24,9 @@ sub process {
     );
 
     for my $network (@{$config->{networks}}) {
+        my $alias = "irc_frontend_${network}";
+
         my $irc = POE::Component::IRC::State->spawn(
-            alias => "irc_frontend_${network}",
             Nick   => $self->hub->config->{nick},
             Server => $config->{$network}{server},
             Port   => $config->{$network}{port},
@@ -39,11 +40,10 @@ sub process {
             inline_states => {
                 irc_disconnected => \&bot_reconnect,
                 irc_error        => \&bot_reconnect,
-                irc_socketerr    => \&bot_reconnect,
-		message          => \&jabbotmsg
+                irc_socketerr    => \&bot_reconnect
             },
             package_states => [
-                'Jabbot::FrontEnd::IRC' => [qw(_start irc_public irc_msg irc_invite lag_o_meter)]
+                'Jabbot::FrontEnd::IRC' => [qw(_start irc_public irc_msg irc_invite message lag_o_meter)]
             ]
 	);
     }
@@ -51,9 +51,13 @@ sub process {
     $poe_kernel->run();
 }
 
-sub jabbotmsg {
+sub message {
+    say "Something";
+
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
     my ($network,$channel) = @$msg{qw(network channel)};
+
+    say "Received: $network, $channel";
 
 # Notice:
 # IKC-ClientLite has to use FreezeThaw as serializer instead of Storable.
@@ -82,21 +86,24 @@ sub irc_invite {
 
 sub _start {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
+    my $network = $heap->{network};
+    my $alias = "irc_frontend_${network}";
+
+    $kernel->alias_set($alias);
+
     my $irc = $heap->{irc};
-    my $alias = $irc->session_alias();
-    my ($network) = $alias =~ /irc_frontend_(.+)/;
-    say "Starting irc session, Connecting to $network";
-    $kernel->call( IKC => publish => $alias => ['message'] );
+
+    say "Starting irc session ($alias), Connecting to $network";
+    $kernel->post('IKC', 'publish', $alias, ['message']);
 
     $heap->{connector} = POE::Component::IRC::Plugin::Connector->new();
     $irc->plugin_add('Connector' => $heap->{connector});
     $irc->plugin_add('AutoJoin', POE::Component::IRC::Plugin::AutoJoin->new(Channels => $self->hub->config->{irc}{$network}{channels}));
 
-    $irc->yield(register => 'join');
     $irc->yield(register => 'all');
     $irc->yield(connect => {});
 
-    $kernel->delay( 'lag_o_meter' => 60 );
+    $kernel->delay('lag_o_meter' => 60);
 }
 
 sub bot_reconnect {
@@ -169,7 +176,6 @@ sub irc_public {
 
 sub lag_o_meter {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
-    print 'Time: ' . time() . ' Lag: ' . $heap->{connector}->lag() . "\n";
     $kernel->delay( 'lag_o_meter' => 60 );
     return;
 }
