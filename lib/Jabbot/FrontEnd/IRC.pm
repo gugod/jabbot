@@ -40,11 +40,10 @@ sub process {
                 irc_disconnected => \&bot_reconnect,
                 irc_error        => \&bot_reconnect,
                 irc_socketerr    => \&bot_reconnect,
-                irc_msg          => \&bot_msg,
 		message          => \&jabbotmsg
             },
             package_states => [
-                'Jabbot::FrontEnd::IRC' => [qw(_start irc_public irc_invite lag_o_meter)]
+                'Jabbot::FrontEnd::IRC' => [qw(_start irc_join irc_public irc_msg irc_invite lag_o_meter)]
             ]
 	);
     }
@@ -107,7 +106,7 @@ sub bot_reconnect {
     $kernel->delay(connect=>60);
 }
 
-sub bot_msg {
+sub irc_msg {
     my ($kernel,$heap,$who,$where,$msg) = @_[KERNEL,HEAP,ARG0..$#_];
     my $irc = $heap->{irc};
     my $network = $heap->{network};
