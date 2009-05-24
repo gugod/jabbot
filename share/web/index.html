@@ -1,34 +1,32 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=320; initial-scale=1; maximum-scale=1.0; minimum-scale=0.6666" />
 
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
-    <title>Jabbot Web Frontend</title>
+    <title>Jabbot</title>
     <style type="text/css" media="screen">
       @import url("static/css/jabbot.css");
     </style>
   </head>
   <body>
-    <h1>Jabbot Web Frontend</h1>
+    <div id="wrapper">
+      <h1>Jabbot</h1>
 
-    <noscript>This Frontend Require Javascript.</noscript>
+      <noscript>This Frontend Require Javascript.</noscript>
 
-    <form id="m" action="">
-      <div>
-        <label for="f">Nick:</label>
-        <input name="f" value="CGI">
-      </div>
+      <form id="m" action="">
+	<div>
+	  <input name="s">
+	  <input type="submit" value="Send">
+	</div>
+      </form>
 
-      <div>
-        <input name="s" >
-        <input type="submit" value="Send">
-      </div>
-    </form>
+      <div id="talk"></div>
+    </div>
 
-    <div id="talk"></div>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
+    <script type="text/javascript" src="static/js/jabbot.js"></script>
   </body>
 </html>
 
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js"></script>
-<script type="text/javascript" src="static/js/jabbot.js"></script>
