@@ -3,6 +3,10 @@ jQuery(function($) {
 
     $s.focus();
 
+    var me;
+    while(!( me = prompt("Jabbot: How do I call you ?", "someone") )) { 1 }
+    $("h1").append(" and " + me);
+
     var i = 0;
     var zebra = ["odd", "even"];
     function appendTalk(nick, m) {
@@ -14,7 +18,6 @@ jQuery(function($) {
         var m = $s.val();
         if (!m) return false;
 
-        var me = $("input[name=f]").val() || "CGI";
         appendTalk(me, m);
 
         $.getJSON(
