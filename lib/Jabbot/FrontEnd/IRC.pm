@@ -52,13 +52,8 @@ sub process {
 }
 
 sub message {
-    say "Something";
-
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
     my ($network,$channel) = @$msg{qw(network channel)};
-
-    say "Received: $network, $channel";
-
 # Notice:
 # IKC-ClientLite has to use FreezeThaw as serializer instead of Storable.
 # So that the scalar we get here are just bytes. Without utf8 flag turned on.
