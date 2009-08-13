@@ -3,6 +3,7 @@ use Jabbot::Plugin -Base;
 
 const class_id => 'delicious';
 
+use Quantum::Superpositions;
 use Net::Delicious;
 use Regexp::Common qw/URI/;
 use URI::Title qw( title );
@@ -29,7 +30,7 @@ sub process {
         }
     }
     elsif ($msg->text =~ /($RE{URI}{HTTP})/) {
-        $self->post_to_delicious($1);
+        $self->post_to_delicious($1) unless $msg->channel eq any(@{ $config->{except} });
     }
 }
 
