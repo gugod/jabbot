@@ -28,6 +28,17 @@ sub process {
 }
 
 
+
+sub build_digest_commit_message {
+    my $repo = shift;
+    my $commits = shift;
+
+
+
+
+
+}
+
 =head2 build_commit_message
 
 =cut
@@ -85,20 +96,24 @@ sub init_session {
                 my $channel = $p->param('channel');
                 my $payload = $p->param('payload');
                 my $info    = decode_json($payload);
-
                 my $repo    = $info->{repository}{name};
 
+                if ( scalar( @{ $info->{commits} } ) > 8  ) {
+                    my $text = build_digest_commit_message( $repo, $info->{commits} );
 
-                for my $commit (@{ $info->{commits} || [] }) {
+                }
+                else {
+                    for my $commit (@{ $info->{commits} || [] }) {
 
-                    my $text = build_commit_message( $repo, $commit );
+                        my $text = build_commit_message( $repo, $commit );
 
-                    # warn "[$network/$channel] $text\n";
+                        # warn "[$network/$channel] $text\n";
 
-                    $remote->post("irc_frontend_${network}/message",
-                          {channel => $channel,
-                           text =>$text,
-                           network => $network });
+                        $remote->post("irc_frontend_${network}/message",
+                            { channel => $channel,
+                                text =>$text,
+                                network => $network });
+                    }
                 }
                 
                 $response->code(RC_OK);
