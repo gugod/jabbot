@@ -16,8 +16,8 @@ requires(
          Time::Interval => 0,
          Perl6::Say => 0,
          URI::Title => 0,
+         Regexp::Common => 0,
          'WWW::Shorten' => 0,
-         'WWW::Shorten::0rz' => 0,
 #         Net::OSCAR => 0,
 );
 
@@ -45,6 +45,7 @@ feature 'Feed Aggregator Backend' =>
         -default => 0,
         'POE::Component::RSSAggregator' => 0,
         'POE::Component::AtomAggregator' => 0
+         'WWW::Shorten::isgd' => 0,
         ;
 
 feature 'OurNet Chatbot' =>
@@ -65,6 +66,7 @@ feature 'Github' =>
         'CGI::Simple' => 0,
         'HTTP::Status' => 0,
         'JSON::XS' => 0,
+        'WWW::Shorten::0rz' => 0,
         ;
 
 
