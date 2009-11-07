@@ -39,6 +39,12 @@ sub committer_name {
     return $name;
 }
 
+=head2 short_url
+
+make shorter url
+
+=cut
+
 sub short_url {
     my $url = shift;
     eval {
@@ -51,6 +57,10 @@ sub short_url {
     return $url;
 }
 
+=head2 build_digest_commit_message hashref:payload
+
+=cut
+
 sub build_digest_commit_message {
     my $payload = shift;
     my $repo = $payload->{repository};
@@ -60,7 +70,7 @@ sub build_digest_commit_message {
     my $num = scalar @$commits;
     my $committer = committer_name $first ;
     my $url = short_url $repo{url};
-    return sprintf( "%s push to %s , %d commits. ( %s ) ",
+    return sprintf( "%s pushed to %s , %d commits. ( %s ) ",
         $committer, $repo{name}, $num, $url );
 }
 
@@ -81,11 +91,6 @@ sub build_commit_message {
             $commit->{message},
             $url );
 }
-
-
-
-
-
 
 =head2 init_session
 
@@ -117,8 +122,8 @@ sub init_session {
                 my $info    = decode_json($payload);
                 my $repo    = $info->{repository}{name};
 
-                if ( scalar( @{ $info->{commits} } ) > 8  ) {
-                    my $text = build_digest_commit_message( $repo, $info->{commits} );
+                if ( scalar( @{ $info->{commits} } ) > 5  ) {
+                    my $text = build_digest_commit_message( $payload );
                     $remote->post("irc_frontend_${network}/message", { 
                             channel => $channel,
                             text => $text,

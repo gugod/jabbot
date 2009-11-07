@@ -16,7 +16,6 @@ requires(
          POE => 0,
          POE::Component::IRC => 6.06,
          POE::Component::IKC => 0,
-         Perl6::Say => 0,
          Time::Interval => 0,
          Net::OSCAR => 0,
          Net::Jabber => 0,
