@@ -27,6 +27,14 @@ sub process {
 
 }
 
+=head2 init_session
+
+github payload document:
+
+L<http://help.github.com/post-receive-hooks/>
+
+=cut
+
 sub init_session {
     my ($kernel) = ($_[KERNEL]);
 
