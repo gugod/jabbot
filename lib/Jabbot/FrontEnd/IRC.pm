@@ -115,7 +115,7 @@ sub _start {
         Channels => $self->hub->config->{irc}{$network}{channels})
     );
 
-    say "Channels:";
+    say "$network Channels:";
     say "  " . $_ for @{ $self->hub->config->{irc}{$network}{channels} };
 
     say "Registering...";
