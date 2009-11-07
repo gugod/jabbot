@@ -119,16 +119,16 @@ sub init_session {
 
                 if ( scalar( @{ $info->{commits} } ) > 8  ) {
                     my $text = build_digest_commit_message( $repo, $info->{commits} );
-                    $remote->post("irc_frontend_${network}/message",
-                        { channel => $channel,
+                    $remote->post("irc_frontend_${network}/message", { 
+                            channel => $channel,
                             text => $text,
                             network => $network });
                 }
                 else {
                     for my $commit (@{ $info->{commits} || [] }) {
                         my $text = build_commit_message( $repo, $commit );
-                        $remote->post("irc_frontend_${network}/message",
-                            { channel => $channel,
+                        $remote->post("irc_frontend_${network}/message", { 
+                                channel => $channel,
                                 text =>$text,
                                 network => $network });
                     }
