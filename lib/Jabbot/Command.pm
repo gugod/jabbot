@@ -44,7 +44,7 @@ sub handle_new {
 sub handle_run {
     my $name = shift;
     my $class = "Jabbot::${name}";
-    $class->require or die "Failed to load front-end ${name}";
+    $class->require or die "Failed to load front-end ${name}\nError: $@";
     my $type = ($name =~ /Front/ ? 'frontend' : 'backend');
     $self->hub->config->{"${type}_class"} = $class;
     $self->hub->$type->process(@_);
