@@ -98,6 +98,12 @@ github payload document:
 
 L<http://help.github.com/post-receive-hooks/>
 
+
+add config to your F<config.yaml>:
+
+    github:
+        port: 1234
+
 =cut
 
 sub init_session {
