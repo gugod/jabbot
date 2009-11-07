@@ -8,23 +8,30 @@ license('perl');
 
 include     'Module::AutoInstall';
 requires(
-         Kwiki => '0.37',
          Spoon => '0,23',
          Net::IRC => 0,
-         Chatbot::Eliza => 0,
          Date::Day => 0,
          POE => 0,
          POE::Component::IRC => 6.06,
          POE::Component::IKC => 0,
          Time::Interval => 0,
          Net::OSCAR => 0,
-         Net::Jabber => 0,
          Perl6::Say => 0,
          Lingua::JA::Romanize::Japanese => 0,
          URI::Title => 0,
          'WWW::Shorten' => 0,
          'WWW::Shorten::0rz' => 0,
 );
+
+feature 'Kwiki' =>
+        -default => 0,
+        Kwiki => '0.37'
+        ;
+
+feature 'Eliza Chatbot' =>
+        -default => 0,
+        Chatbot::Eliza => 0,
+        ;
 
 feature 'Jabber supports' =>
         -default => 0,
