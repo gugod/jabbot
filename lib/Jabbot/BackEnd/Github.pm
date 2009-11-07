@@ -29,12 +29,29 @@ sub process {
 
 
 
+sub committer_name {
+    my $commit = shift;
+    my $name = $commit->{author}{name};
+    unless ( $name ) {
+        $name = $commit->{author}{email};
+        $name =~ s/@.+$//;
+    }
+    return $name;
+}
+
+sub short_url {
+    my $url = shift;
+
+}
+
 sub build_digest_commit_message {
     my $repo = shift;
     my $commits = shift;
 
+    my $first = $commits->[0];
+    my $num = scalar @$commits;
 
-
+    my $committer = committer_name( $first );
 
 
 }
@@ -46,8 +63,8 @@ sub build_digest_commit_message {
 sub build_commit_message {
     my $repo = shift;
     my $commit = shift;
-    my $committer = $commit->{author}{email};
-    $committer =~ s/@.+$//;
+
+    my $committer = committer_name( $commit );
 
     my $url = $commit->{url};
     eval {
