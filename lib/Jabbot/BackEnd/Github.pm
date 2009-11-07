@@ -69,9 +69,9 @@ sub build_digest_commit_message {
     my $first = $commits->[0];
     my $num = scalar @$commits;
     my $committer = committer_name $first ;
-    my $url = short_url $repo{url};
+    my $url = short_url $repo->{url};
     return sprintf( "%s pushed to %s , %d commits. ( %s ) ",
-        $committer, $repo{name}, $num, $url );
+        $committer, $repo->{name}, $num, $url );
 }
 
 =head2 build_commit_message

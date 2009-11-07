@@ -30,7 +30,7 @@ sub process {
             Nick   => $self->hub->config->{nick},
             Server => $config->{$network}{server},
             Port   => $config->{$network}{port},
-       ) or die "Couldn't create IRC POE session: $!";
+        ) or die "Couldn't create IRC POE session: $!";
 
         POE::Session->create(
             heap => {
@@ -43,13 +43,25 @@ sub process {
                 irc_socketerr    => \&bot_reconnect
             },
             package_states => [
-                'Jabbot::FrontEnd::IRC' => [qw(_start irc_public irc_msg irc_invite message lag_o_meter)]
+                'Jabbot::FrontEnd::IRC' => [qw(_start irc_public irc_msg irc_001 irc_invite message lag_o_meter)]
             ]
 	);
     }
 
     $poe_kernel->run();
 }
+
+
+sub irc_001 {
+    my ( $kernel, $sender ) = @_[ KERNEL, SENDER ];
+    my $poco_object = $sender->get_heap();
+    say "Connected to ", $poco_object->server_name();
+    # In any irc_* events SENDER will be the PoCo-IRC session
+    # $kernel->post( $sender => join => $_ ) for @channels;
+    return;
+}
+
+
 
 sub message {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
