@@ -18,6 +18,9 @@ sub process {
     $self= shift;
     $config = $self->hub->config->{irc};
 
+    say "IKC::Server Spawning...";
+    say "Nick: " . $self->hub->config->{nick};
+
     POE::Component::IKC::Server->spawn(
         port => $config->{frontend_port},
         name => $self->hub->config->{nick}
@@ -25,6 +28,7 @@ sub process {
 
     for my $network (@{$config->{networks}}) {
         my $alias = "irc_frontend_${network}";
+        say 'Initializing ' . $alias;
 
         my $irc = POE::Component::IRC::State->spawn(
             Nick   => $self->hub->config->{nick},
@@ -57,11 +61,9 @@ sub irc_001 {
     my $poco_object = $sender->get_heap();
     say "Connected to ", $poco_object->server_name();
     # In any irc_* events SENDER will be the PoCo-IRC session
-    # $kernel->post( $sender => join => $_ ) for @channels;
+    #$kernel->post( $sender => join => "#bottest" );
     return;
 }
-
-
 
 sub message {
     my ($kernel,$heap,$msg) = @_[KERNEL,HEAP,ARG0];
@@ -103,11 +105,22 @@ sub _start {
     say "Starting irc session ($alias), Connecting to $network";
     $kernel->post('IKC', 'publish', $alias, ['message']);
 
+
+    say "Initializing Connector";
     $heap->{connector} = POE::Component::IRC::Plugin::Connector->new();
     $irc->plugin_add('Connector' => $heap->{connector});
-    $irc->plugin_add('AutoJoin', POE::Component::IRC::Plugin::AutoJoin->new(Channels => $self->hub->config->{irc}{$network}{channels}));
 
+    say "Adding AutoJoin Plugin";
+    $irc->plugin_add('AutoJoin', POE::Component::IRC::Plugin::AutoJoin->new(
+        Channels => $self->hub->config->{irc}{$network}{channels})
+    );
+
+    say "Channels:";
+    say "  " . $_ for @{ $self->hub->config->{irc}{$network}{channels} };
+
+    say "Registering...";
     $irc->yield(register => 'all');
+    # $irc->yield(register => 'join');
     $irc->yield(connect => {});
 
     $kernel->delay('lag_o_meter' => 60);
