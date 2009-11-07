@@ -33,6 +33,7 @@ sub process {
 =cut
 
 sub build_commit_message {
+    my $repo = shift;
     my $commit = shift;
     my $committer = $commit->{author}{email};
     $committer =~ s/@.+$//;
@@ -87,9 +88,10 @@ sub init_session {
 
                 my $repo    = $info->{repository}{name};
 
+
                 for my $commit (@{ $info->{commits} || [] }) {
 
-                    my $text = build_commit_message( $commit );
+                    my $text = build_commit_message( $repo, $commit );
 
                     # warn "[$network/$channel] $text\n";
 
