@@ -27,6 +27,35 @@ sub process {
 
 }
 
+
+=head2 build_commit_message
+
+=cut
+
+sub build_commit_message {
+    my $commit = shift;
+    my $committer = $commit->{author}{email};
+    $committer =~ s/@.+$//;
+
+    my $url = $commit->{url};
+    eval {
+        $url = makeashorterlink($url) if $url;
+    };
+    if( $@ ) {
+        warn 'shortenlink fail:' . $@;
+    }
+    return sprintf("%s | %s++ | %s - %s " , 
+            $repo , 
+            $committer, 
+            $commit->{message},
+            $url );
+}
+
+
+
+
+
+
 =head2 init_session
 
 github payload document:
@@ -60,23 +89,7 @@ sub init_session {
 
                 for my $commit (@{ $info->{commits} || [] }) {
 
-                    my $committer = $commit->{author}{email};
-                    $committer =~ s/@.+$//;
-
-                    my $url = $commit->{url};
-
-                    eval {
-                        $url = makeashorterlink($url) if $url;
-                    };
-
-                    if( $@ ) {
-                        warn 'shortenlink fail:' . $@;
-                    }
-
-                    my $text = sprintf("%s | %s | %s - %s " , $repo , 
-                            ${committer}++ , 
-                            $commit->{message},
-                            $url );
+                    my $text = build_commit_message( $commit );
 
                     # warn "[$network/$channel] $text\n";
 
