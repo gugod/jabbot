@@ -41,19 +41,27 @@ sub committer_name {
 
 sub short_url {
     my $url = shift;
-
+    eval {
+        $url = makeashorterlink($url) if $url;
+    };
+    if( $@ ) {
+        warn 'shortenlink fail:' . $@;
+        return "";
+    }
+    return $url;
 }
 
 sub build_digest_commit_message {
-    my $repo = shift;
-    my $commits = shift;
+    my $payload = shift;
+    my $repo = $payload->{repository};
+    my $commits = $payload->{commits};
 
     my $first = $commits->[0];
     my $num = scalar @$commits;
-
-    my $committer = committer_name( $first );
-
-
+    my $committer = committer_name $first ;
+    my $url = short_url $repo{url};
+    return sprintf( "%s push to %s , %d commits. ( %s ) ",
+        $committer, $repo{name}, $num, $url );
 }
 
 =head2 build_commit_message
@@ -64,15 +72,9 @@ sub build_commit_message {
     my $repo = shift;
     my $commit = shift;
 
-    my $committer = committer_name( $commit );
+    my $committer = committer_name $commit ;
+    my $url = short_url $commit->{url};
 
-    my $url = $commit->{url};
-    eval {
-        $url = makeashorterlink($url) if $url;
-    };
-    if( $@ ) {
-        warn 'shortenlink fail:' . $@;
-    }
     return sprintf("%s | %s++ | %s - %s " , 
             $repo , 
             $committer, 
