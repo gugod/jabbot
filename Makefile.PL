@@ -17,13 +17,14 @@ requires(
          POE::Component::IRC => 6.06,
          POE::Component::IKC => 0,
          Perl6::Say => 0,
-         WWW::Shorten::0rz => 0,
          Time::Interval => 0,
          Net::OSCAR => 0,
          Net::Jabber => 0,
          Perl6::Say => 0,
          Lingua::JA::Romanize::Japanese => 0,
          URI::Title => 0,
+         'WWW::Shorten' => 0,
+         'WWW::Shorten::0rz' => 0,
 );
 
 feature 'Jabber supports' =>
@@ -48,6 +49,14 @@ feature 'CPANAuthor Plugin' =>
         'Cache' => 0,
         ;
 
+feature 'Github' =>
+        -default => 0,
+        'POE::Component::Server::HTTP' => 0,
+        'POE::Component::IKC::ClientLite' => 0,
+        'CGI::Simple' => 0,
+        'HTTP::Status' => 0,
+        'JSON::XS' => 0,
+        ;
 
 
 check_nmake();
