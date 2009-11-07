@@ -56,11 +56,21 @@ sub init_session {
                     $committer =~ s/@.+$//;
 
                     my $url = $commit->{url};
-                    $url = eval('makeashorterlink($url)');
 
-                    my $text = "$repo | ${committer}++ | $commit->{message} - $url";
+                    eval {
+                        $url = makeashorterlink($url) if $url;
+                    };
 
-                    warn "[$network/$channel] $text\n";
+                    if( $@ ) {
+                        warn 'shortenlink fail:' . $@;
+                    }
+
+                    my $text = sprintf("%s | %s | %s - %s " , $repo , 
+                            ${committer}++ , 
+                            $commit->{message},
+                            $url );
+
+                    # warn "[$network/$channel] $text\n";
 
                     $remote->post("irc_frontend_${network}/message",
                           {channel => $channel,
