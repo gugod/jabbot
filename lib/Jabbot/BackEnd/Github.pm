@@ -104,6 +104,7 @@ http://[host]:[post]/?network=[network]&channel=[channel]
 add config to your F<config.yaml>:
 
     github:
+        digest: 1
         port: 1234
 
 =cut
@@ -130,7 +131,7 @@ sub init_session {
                 my $info    = decode_json($payload);
                 my $repo    = $info->{repository}{name};
 
-                if ( scalar( @{ $info->{commits} } ) > 5  ) {
+                if ( $self->config->{github}{digest} or scalar( @{ $info->{commits} } ) > 5  ) {
                     my $text = build_digest_commit_message( $payload );
                     $remote->post("irc_frontend_${network}/message", { 
                             channel => $channel,
