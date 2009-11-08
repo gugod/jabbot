@@ -99,6 +99,8 @@ github payload document:
 L<http://help.github.com/post-receive-hooks/>
 
 
+http://[host]:[post]/?network=[network]&channel=[channel]
+
 add config to your F<config.yaml>:
 
     github:
