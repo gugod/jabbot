@@ -12,7 +12,7 @@ use CGI::Simple;
 
 use HTTP::Status;
 use JSON::XS;
-use WWW::Shorten '0rz';
+use WWW::Shorten 'isgd';
 
 my $self;
 
