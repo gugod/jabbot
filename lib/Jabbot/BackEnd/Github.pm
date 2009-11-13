@@ -82,6 +82,9 @@ sub build_commit_message {
     my $repo = shift;
     my $commit = shift;
 
+    # trim message
+    my $msg = substr($commit->{message} , 0 , 20) . ' ... ';
+
     my $committer = committer_name $commit ;
     my $url = short_url $commit->{url};
 
