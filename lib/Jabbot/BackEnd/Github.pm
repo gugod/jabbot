@@ -133,7 +133,7 @@ sub init_session {
 
                 if ( $self->config->{github}{digest} or scalar( @{ $info->{commits} } ) > 5  ) {
                     my $text = build_digest_commit_message( $payload );
-                    $remote->post("irc_frontend_${network}/message", { 
+                    $remote->post("irc_frontend_${network}/wall", { 
                             channel => $channel,
                             text => $text,
                             network => $network });
@@ -141,7 +141,7 @@ sub init_session {
                 else {
                     for my $commit (@{ $info->{commits} || [] }) {
                         my $text = build_commit_message( $repo, $commit );
-                        $remote->post("irc_frontend_${network}/message", { 
+                        $remote->post("irc_frontend_${network}/wall", { 
                                 channel => $channel,
                                 text =>$text,
                                 network => $network });
