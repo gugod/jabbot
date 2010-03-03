@@ -18,15 +18,16 @@ sub process {
         my ($from, $to);
         $from = $station_id{$1};
         $to   = $station_id{$2};
-        my @result = $self->thsrc_query($from, $to);
 
-        my $r = "";
-        for(@result) {
+        my $message = join " | ", map {
             my ($car, $sale, $from_time, $to_time) = @$_;
-            $sale = $sale ? ((100 - $sale) . "折") : "沒打折";
-            $r .= "$car 車次, $sale, $from_time - $to_time. ";
-        }
-        $self->reply($r, 1);
+
+            $sale = $sale ? ((100 - $sale) . "折") : "原價";
+
+            $_ = "$car 車次 ($sale) $from_time ~ $to_time";
+        } $self->thsrc_query($from, $to);
+
+        $self->reply($message, 1);
     }
 }
 
