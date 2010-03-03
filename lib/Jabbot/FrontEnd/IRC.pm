@@ -112,11 +112,11 @@ sub _start {
 
     say "Adding AutoJoin Plugin";
     $irc->plugin_add('AutoJoin', POE::Component::IRC::Plugin::AutoJoin->new(
-        Channels => $self->hub->config->{irc}{$network}{channels})
-    );
+        Channels => $self->hub->config->{irc}{$network}{channels}
+    ));
 
     say "$network Channels:";
-    say "  " . $_ for @{ $self->hub->config->{irc}{$network}{channels} };
+    say "  " . $_ for keys %{ $self->hub->config->{irc}{$network}{channels} };
 
     say "Registering...";
     $irc->yield(register => 'all');
