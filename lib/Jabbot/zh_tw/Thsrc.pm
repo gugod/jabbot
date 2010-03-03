@@ -1,6 +1,8 @@
 package Jabbot::zh_tw::Thsrc;
 use Jabbot::Plugin -Base;
 use utf8;
+use HTML::TreeBuilder::Select;
+use WWW::Mechanize;
 
 const class_id => 'zhtw_thsrc';
 
@@ -8,8 +10,6 @@ my @stations = qw{台北 板橋 桃園 新竹 台中 嘉義 台南 左營};
 my $i = 1;
 my %station_id = map { $_, $i++ } @stations;
 
-use YAML;
-# 高鐵, 台北 到 新竹
 sub process {
     my $msg = shift;
     my $s = $msg->text;
@@ -19,8 +19,6 @@ sub process {
         $from = $station_id{$1};
         $to   = $station_id{$2};
         my @result = $self->thsrc_query($from, $to);
-
-        print STDERR YAML::Dump(\@result);
 
         my $r = "";
         for(@result) {
@@ -39,7 +37,6 @@ sub thsrc_query {
     return $self->parse_thsrc_query_result($html);
 }
 
-use WWW::Mechanize;
 sub fetch_thsrc_query_result {
     my ($from, $to, $time) = @_;
     die 'from should be 1..7'  unless $from =~ /^[01234567]$/;
@@ -59,8 +56,6 @@ sub fetch_thsrc_query_result {
     );
     return $ua->content;
 }
-
-use HTML::TreeBuilder::Select;
 
 sub parse_thsrc_query_result {
     my $html = shift;
