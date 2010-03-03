@@ -24,7 +24,7 @@ sub process {
         for(@result) {
             my ($car, $sale, $from_time, $to_time) = @$_;
             $sale = $sale ? ((100 - $sale) . "折") : "沒打折";
-            $r .= "$car 車次, $sale, $from_time - $to_time. \n";
+            $r .= "$car 車次, $sale, $from_time - $to_time. ";
         }
         $self->reply($r, 1);
     }
