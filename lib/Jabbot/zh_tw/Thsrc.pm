@@ -2,12 +2,13 @@ package Jabbot::zh_tw::Thsrc;
 use Jabbot::Plugin -Base;
 use utf8;
 
-const class_id => 'thsrc';
+const class_id => 'zhtw_thsrc';
 
 my @stations = qw{台北 板橋 桃園 新竹 台中 嘉義 台南 左營};
 my $i = 1;
 my %station_id = map { $_, $i++ } @stations;
 
+use YAML;
 # 高鐵, 台北 到 新竹
 sub process {
     my $msg = shift;
@@ -15,10 +16,11 @@ sub process {
 
     if ($s =~ /高鐵\s*[,:]?\s*(..)\s*到\s*(..)\s*/) {
         my ($from, $to);
-
         $from = $station_id{$1};
         $to   = $station_id{$2};
         my @result = $self->thsrc_query($from, $to);
+
+        print STDERR YAML::Dump(\@result);
 
         my $r = "";
         for(@result) {
@@ -58,41 +60,44 @@ sub fetch_thsrc_query_result {
     return $ua->content;
 }
 
-use pQuery;
+use HTML::TreeBuilder::Select;
+
 sub parse_thsrc_query_result {
     my $html = shift;
     my @result = ();
     my @row = ();
-    pQuery($html)->find(".tic_normal_title2 td")->each(
-        sub {
-            my $index = shift;
 
-            if ($index % 4 == 1) {
-                my $html  = pQuery($_)->html;
-                if ($html =~ /orange/) {
-                    # 35% off
-                    push @row, 35;
-                }
-                elsif ($html =~ /blue/) {
-                    # 15% off
-                    push @row, 15;
-                }
-                else {
-                    # 0% off
-                    push @row, 0;
-                }
+    my $tree = HTML::TreeBuilder::Select->new_from_content($html);
+    my @cells = $tree->select("table.tic_normal_title2 td");
+
+    for my $index (0..$#cells) {
+        if ($index % 4 == 1) {
+            my $html = $cells[$index]->as_HTML;
+
+            if ($html =~ /orange/) {
+                # 35% off
+                push @row, 35;
+            }
+            elsif ($html =~ /blue/) {
+                # 15% off
+                push @row, 15;
             }
             else {
-                my $text  = pQuery($_)->text;
-                push @row, $text;
-            }
-
-            if ($index % 4 == 3) {
-                push @result, [@row];
-                @row = ();
+                # 0% off
+                push @row, 0;
             }
         }
-    );
+        else {
+            my $text = $cells[$index]->as_trimmed_text;
+            push @row, $text;
+        }
+
+        if ($index % 4 == 3) {
+            push @result, [@row];
+            @row = ();
+        }
+    }
+
     return @result;
 }
 
