@@ -33,24 +33,30 @@ sub process {
 
 sub thsrc_query {
     my ($from, $to) = @_;
-    my $h = (localtime(time))[2];
-    my $html = $self->fetch_thsrc_query_result($from, $to, "$h:00");
+    my ($h,$mday,$mon,$year) = (localtime(time))[2,3,4,5];
+    $mon += 1;
+    $year += 1900;
+
+    my $html = $self->fetch_thsrc_query_result($from, $to, "$year/$mon/$mday","$h:00");
     return $self->parse_thsrc_query_result($html);
 }
 
 sub fetch_thsrc_query_result {
-    my ($from, $to, $time) = @_;
-    die 'from should be 1..7'  unless $from =~ /^[01234567]$/;
-    die 'to   should be 1..7'  unless $to   =~ /^[01234567]$/;
+    my ($from, $to, $date,$time) = @_;
+    die 'from should be 1..7'  unless $from =~ /^[1234567]$/;
+    die 'to   should be 1..7'  unless $to   =~ /^[1234567]$/;
     die 'time should be hh:mm' unless $time =~ /^\d\d:\d\d$/;
+    die 'date should be yyyy/mm/dd'  unless $date   =~ /^\d\d\d\d\/\d\d?\/\d\d?$/;
 
     my $ua = WWW::Mechanize->new;
     $ua->get('http://www.thsrc.com.tw/tc/ticket/tic_time_search.asp');
+
     $ua->submit_form(
-        form_name => "frmticket1",
+        form_name => "frm1",
         fields => {
             from       => $from,
             to         => $to,
+            sDate      => $date,
             TimeTable  => $time,
             FromOrDest => "From"
         }
