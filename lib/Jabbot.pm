@@ -3,6 +3,10 @@ use Spoon 0.21 -Base;
 
 const config_class => 'Jabbot::Config';
 
+sub root {
+    $ENV{'JABBOT_ROOT'}
+}
+
 __END__
 
 =head1 NAME
