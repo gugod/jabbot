@@ -29,7 +29,7 @@ sub init_session {
         alias    => 'rssagg',
         debug    => 1,
         callback => $session->postback("handle_feed"),
-        tmpdir   => '/tmp',     # optional caching
+        tmpdir   => Jabbot->root . '/var/run',
         init_headlines_seen => 1,
         headline_as_id => 1,
     );
@@ -38,7 +38,7 @@ sub init_session {
         alias    => 'atomagg',
         debug    => 1,
         callback => $session->postback("handle_feed"),
-        tmpdir   => '/tmp',     # optional caching
+        tmpdir   => Jabbot->root . '/var/run',
         init_headlines_seen => 1,
         headline_as_id => 1,
     );

@@ -2,7 +2,11 @@
 
 use strict;
 use warnings;
-use lib 'lib';
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+$ENV{JABBOT_ROOT} = "$FindBin::Bin/..";
+
 use Jabbot;
 my @configs = qw(config.yaml -plugins plugins);
 Jabbot->new->load_hub(@configs)->command->process(@ARGV);
