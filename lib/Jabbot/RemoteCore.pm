@@ -1,6 +1,7 @@
 package Jabbot::RemoteCore;
 use common::sense;
 use HTTP::Lite;
+use JSON qw(from_json);
 
 sub new {
     my $class = shift;
@@ -17,7 +18,11 @@ sub AUTOLOAD {
     my $core_server = "http://localhost:15000";
     my $http = HTTP::Lite->new;
     $http->prepare_post(\%args);
-    $http->request("${core_server}/${name}");
+    my $status = $http->request("${core_server}/${name}");
+    if ($status == 200) {
+        my $response = from_json($http->body);
+        return $response->{$name};
+    }
     return $self;
 }
 

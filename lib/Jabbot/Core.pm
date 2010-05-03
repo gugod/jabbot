@@ -2,6 +2,7 @@ package Jabbot::Core;
 use common::sense;
 use HTTP::Lite;
 use Plack::Request;
+use JSON qw(to_json);
 
 sub new {
     my $class = shift;
@@ -23,7 +24,7 @@ sub post {
     return $self;
 }
 
-sub ask {
+sub answer {
     my ($self, %args) = @_;
     my $answer = $args{question};
     return $answer;
@@ -39,9 +40,14 @@ sub app {
     my $core = Jabbot::Core->new;
     return [404, [], ["ACTION NOT FOUND"]] unless $core->can($action);
 
-    $core->$action(%{ $req->parameters });
+    my $value = $core->$action(%{ $req->parameters });
 
-    return [200, [], ["OK"]];
+    my $response_body =
+        ($value == $core)
+            ? "OK"
+            : to_json({ $action => $value });
+
+    return [200, [], [ $response_body ]];
 }
 
 1;
