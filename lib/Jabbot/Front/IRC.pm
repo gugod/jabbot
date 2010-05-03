@@ -2,29 +2,46 @@ package Jabbot::Front::IRC;
 use common::sense;
 use JSON qw(decode_json encode_json);
 use Plack::Request;
+use Jabbot;
 use Jabbot::RemoteCore;
 use AnyEvent;
 use AnyEvent::IRC::Client;
 
 sub init_irc_client {
-    my ($server) = @_;
+    my ($network) = @_;
 
     my $client = AnyEvent::IRC::Client->new;
-    $client->reg_cb(registered => sub { say STDERR "I'm in!"; });
+    $client->reg_cb(
+        registered => sub {
+            my ($client) = @_;
+            say STDERR "I'm in !";
+            for (@{$network->{channels}}) {
+                my ($channel, $key) = ref($_) ? @$_ : ($_);
+                $channel = "#${channel}" unless index($channel, "#") == 0;
+                $client->send_srv('JOIN', $channel, $key);
+            }
+        },
+        join => sub {
+            my ($client, $nick, $channel, $is_myself) = @_;
+            if ($is_myself) {
+                say STDERR "Joind $channel";
+            }
+        }
+    );
 
-    $client->connect($server, 6667, { nick => 'jabbot' });
+    $client->connect($network->{server},
+                     $network->{port} || 6667,
+                     { nick => $network->{nick} });
     return $client;
 }
 
 my $IRC_CLIENTS = {};
 
 {
-    my $servers = {
-        freenode => "chat.freenode.net"
-    };
-
-    for (qw(freenode)) {
-        $IRC_CLIENTS->{$_} = init_irc_client($servers->{$_})
+    my $networks = Jabbot->config->{irc}{networks};
+    for (keys %$networks) {
+        $networks->{$_}{nick} ||= (Jabbot->config->{nick} || "jabbot_$$");
+        $IRC_CLIENTS->{$_} = init_irc_client($networks->{$_})
     }
 }
 

@@ -1,11 +1,22 @@
 package Jabbot;
-use Spoon 0.21 -Base;
+use common::sense;
 
-const config_class => 'Jabbot::Config';
+sub new { bless {}, shift }
 
 sub root {
     $ENV{'JABBOT_ROOT'}
 }
+
+use YAML;
+
+{
+    my $config;
+    sub config {
+        $config ||= YAML::LoadFile(root . "/config/config.yaml");
+    }
+}
+
+1;
 
 __END__
 

@@ -6,16 +6,14 @@ admin:
   - gugod
 
 irc:
-  frontend_port: 65123
+  frontend_port: 15101
   networks:
-    - freenode
-  freenode:
-    nick: jabbot
-    server: chat.freenode.net
-    port: 6667
-    channels:
-      # channel: password
-      '#jabbot': ''
+    freenode:
+      nick: jabbot
+      server: chat.freenode.net
+      port: 6667
+      channels:
+        - jabbot
  
 feeds:
   jabbot-commits:
