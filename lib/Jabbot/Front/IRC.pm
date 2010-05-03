@@ -12,7 +12,7 @@ sub init_irc_client {
     my $client = AnyEvent::IRC::Client->new;
     $client->reg_cb(registered => sub { say STDERR "I'm in!"; });
 
-    $client->connect($server, 6667, { nick => 'jabbot_' });
+    $client->connect($server, 6667, { nick => 'jabbot' });
     return $client;
 }
 
