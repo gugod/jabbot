@@ -37,7 +37,7 @@ sub app {
 
     my $rc = Jabbot::RemoteCore->new;
     for my $commit (@{ $payload->{commits} || [] }) {
-        $rc->post($req->path, build_commit_message($repo, $commit));
+        $rc->post(channel => $req->path, text => build_commit_message($repo, $commit));
     }
 
     return [200, [], ["OK"]]

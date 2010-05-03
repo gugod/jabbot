@@ -9,9 +9,9 @@ sub new {
 }
 
 sub post {
-    my ($self, $args) = @_;
-     my $channel = $args->{channel};
-    my $text    = $args->{text};
+    my ($self, %args) = @_;
+     my $channel = $args{channel};
+    my $text     = $args{text};
 
     if ($channel =~ m{^/irc/}) {
         my $server = "http://localhost:15001";
@@ -24,8 +24,8 @@ sub post {
 }
 
 sub ask {
-    my ($self, $args) = @_;
-    my $answer = $args->{question};
+    my ($self, %args) = @_;
+    my $answer = $args{question};
     return $answer;
 }
 
@@ -39,7 +39,7 @@ sub app {
     my $core = Jabbot::Core->new;
     return [404, [], ["ACTION NOT FOUND"]] unless $core->can($action);
 
-    $core->$action( $req->parameters );
+    $core->$action(%{ $req->parameters });
 
     return [200, [], ["OK"]];
 }
