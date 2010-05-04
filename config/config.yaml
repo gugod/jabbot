@@ -17,6 +17,7 @@ irc:
 
 plugins:
   - zh_tw::RandomChatbot
+  - zh_tw::Thsrc
  
 feeds:
   jabbot-commits:
