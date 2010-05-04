@@ -18,6 +18,7 @@ plugins:
   - zh_tw::Polite
   - en_us::Eliza
   - Math
+  - zh_tw::TaiwanLotto
  
 feeds:
   jabbot-commits:
