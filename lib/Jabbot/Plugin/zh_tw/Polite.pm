@@ -4,8 +4,6 @@ use Object::Tiny;
 
 sub can_answer {
     my ($self, $text) = @_;
-    utf8::decode($text) unless utf8::is_utf8($text);
-
     if ($text =~ m/謝謝/) {
         return 1;
     }

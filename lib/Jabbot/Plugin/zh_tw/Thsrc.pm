@@ -8,7 +8,6 @@ sub new { bless {}, shift }
 
 sub can_answer {
     my ($self, $text) = @_;
-    utf8::decode($text) unless utf8::is_utf8($text);
 
     if ($text =~ m/高鐵\s*[,:]?\s*(..)\s*到\s*(..)\s*/) {
         $self->{matched} = [$1, $2];
