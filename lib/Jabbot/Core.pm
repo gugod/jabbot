@@ -67,7 +67,7 @@ sub app {
 
     my $response_body =
         ($value == $core)
-            ? "OK"
+            ? to_json({ $action => "OK"   }, { utf8 => 1 })
             : to_json({ $action => $value }, { utf8 => 1 });
 
     return [200, [], [ $response_body ]];
