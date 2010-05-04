@@ -1,48 +1,59 @@
-package Jabbot::zh_tw::Thsrc;
-use Jabbot::Plugin -Base;
+package Jabbot::Plugin::zh_tw::Thsrc;
+use common::sense;
 use utf8;
 use HTML::TreeBuilder::Select;
 use WWW::Mechanize;
 
-const class_id => 'zhtw_thsrc';
+sub new { bless {}, shift }
+
+sub can_answer {
+    my ($self, $text) = @_;
+    utf8::decode($text) unless utf8::is_utf8($text);
+
+    if ($text =~ m/高鐵\s*[,:]?\s*(..)\s*到\s*(..)\s*/) {
+        $self->{matched} = [$1, $2];
+        return 1;
+    }
+    return 0;
+}
+
+sub answer {
+    my ($self, undef) = @_;
+    my $content = $self->thsrc_query(@{ $self->{matched} });
+    return {
+        content    => $content,
+        confidence => 1
+    }
+}
 
 my @stations = qw{台北 板橋 桃園 新竹 台中 嘉義 台南 左營};
 my $i = 1;
 my %station_id = map { $_, $i++ } @stations;
 
-sub process {
-    my $msg = shift;
-    my $s = $msg->text;
-
-    if ($s =~ /高鐵\s*[,:]?\s*(..)\s*到\s*(..)\s*/) {
-        my ($from, $to);
-        $from = $station_id{$1};
-        $to   = $station_id{$2};
-
-        my $message = join " | ", map {
-            my ($car, $sale, $from_time, $to_time) = @$_;
-
-            $sale = $sale ? ((100 - $sale) . "折") : "原價";
-
-            $_ = "$car 車次 ($sale) $from_time ~ $to_time";
-        } $self->thsrc_query($from, $to);
-
-        $self->reply($message, 1);
-    }
-}
-
 sub thsrc_query {
-    my ($from, $to) = @_;
+    my $self = shift;
+    my ($from, $to) = map { $station_id{$_} } @_;
     my ($h,$mday,$mon,$year) = (localtime(time))[2,3,4,5];
     $mon += 1;
     $year += 1900;
+    $h = "0$h" if $h < 10;
 
     my $html = $self->fetch_thsrc_query_result($from, $to, "$year/$mon/$mday","$h:00");
-    return $self->parse_thsrc_query_result($html);
+    my @schedule = $self->parse_thsrc_query_result($html);
+
+    return "查無高鐵車次" unless @schedule;
+
+    return join " | ", map {
+        my ($car, $sale, $from_time, $to_time) = @$_;
+
+        $sale = $sale ? ((100 - $sale) . "折") : "原價";
+
+        $_ = "$car 車次 ($sale) $from_time ~ $to_time";
+    } @schedule;
 }
 
 sub fetch_thsrc_query_result {
-    my ($from, $to, $date,$time) = @_;
+    my ($self, $from, $to, $date, $time) = @_;
     die 'from should be 1..7'  unless $from =~ /^[1234567]$/;
     die 'to   should be 1..7'  unless $to   =~ /^[1234567]$/;
     die 'time should be hh:mm' unless $time =~ /^\d\d:\d\d$/;
@@ -65,6 +76,7 @@ sub fetch_thsrc_query_result {
 }
 
 sub parse_thsrc_query_result {
+    my $self = shift;
     my $html = shift;
     my @result = ();
     my @row = ();
