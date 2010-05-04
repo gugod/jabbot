@@ -46,7 +46,12 @@ sub answer {
             push @answers, $a;
         }
     }
-    return \@answers;
+
+    return "" if @answers == 0;
+    return $answers[0]->{content} if @answers == 1;
+
+    my @x = sort { $b->{confidence} <=> $a->{confidence} } @answers;
+    return $x[0]->{content};
 }
 
 my $core = lazy { Jabbot::Core->new };
