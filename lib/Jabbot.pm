@@ -1,5 +1,7 @@
 package Jabbot;
 use common::sense;
+use Object::Tiny;
+use Hash::Merge qw(merge);
 
 sub new { bless {}, shift }
 
@@ -14,8 +16,12 @@ use YAML;
     sub config {
         return $config if $config;
 
+        my $config1 = YAML::LoadFile(root . "/config/config.yaml");
+        my $config2 = {};
         my $x = root . "/config/site_config.yaml";
-        $config = YAML::LoadFile(-f $x ? $x : root . "/config/config.yaml");
+        $config2 = YAML::LoadFile($x) if -f $x;
+
+        $config = merge($config1, $config2);
         return $config;
     }
 }
