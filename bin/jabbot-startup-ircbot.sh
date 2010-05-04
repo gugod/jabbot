@@ -1,14 +1,7 @@
 #!/bin/sh
 
-perl bin/jabbot -run FrontEnd::IRC &
-
-sleep 2
-perl bin/jabbot -run BackEnd::Github &
-
-sleep 2
-perl bin/jabbot -run BackEnd::FeedAggregator &
-
-sleep 2
-perl bin/jabbot -run BackEnd::CPANTaiwan &
+twiggy -l :15000 -Ilib -MJabbot::Core         -e '\&Jabbot::Core::app' &
+twiggy -l :15101 -Ilib -MJabbot::Front::IRC   -e '\&Jabbot::Front::IRC::app' &
+twiggy -l :15201 -Ilib -MJabbot::Back::Github -e '\&Jabbot::Back::Github::app' &
 
 
