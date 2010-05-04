@@ -21,7 +21,7 @@ sub AUTOLOAD {
     my $status = $http->request("${core_server}/${name}");
     if ($status == 200) {
         my $body = $http->body;
-        if ($body != "OK") {
+        if ($body ne "OK") {
             my $response = from_json($http->body);
             return $response->{$name};
         }
