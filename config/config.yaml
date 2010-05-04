@@ -1,9 +1,6 @@
 # vim:et:sw=2:
-message_dispatcher_port: 65000
 
 nick: jabbot
-admin:
-  - gugod
 
 irc:
   listen: 127.0.0.1:15101
@@ -32,10 +29,6 @@ feeds:
 cpanfeeds:
   CPAN-Upload:
     type: rss
-# url: 'http://unknownplace.org/cpanrecent/rss'
     url: 'http://search.cpan.org/uploads.rdf'
     publish_to:
       - "freenode:chupei.pm"
-
-default_encoding: utf8
-# channel_encoding_freenode_jabbot3: big5
