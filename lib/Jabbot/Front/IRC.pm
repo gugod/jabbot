@@ -7,6 +7,8 @@ use Jabbot::RemoteCore;
 use AnyEvent;
 use AnyEvent::IRC::Client;
 
+use YAML;
+
 sub init_irc_client {
     my ($network) = @_;
 
@@ -21,10 +23,29 @@ sub init_irc_client {
                 $client->send_srv('JOIN', $channel, $key);
             }
         },
+
         join => sub {
             my ($client, $nick, $channel, $is_myself) = @_;
             if ($is_myself) {
                 say STDERR "Joind $channel";
+            }
+        },
+
+        publicmsg => sub {
+            my ($client, $channel, $ircmsg) = @_;
+            my $text = $ircmsg->{params}[1];
+            my $to_me = $text =~ s/^jabbot_*:\s+//;
+
+            return unless $to_me;
+
+            my $rc = Jabbot::RemoteCore->new;
+            my $answer = $rc->answer(question => $text);
+
+            if ($answer) {
+                return if $answer->{confidence} == 0 && rand(10) > 8;
+
+                my $from_nick = AnyEvent::IRC::Util::prefix_nick($ircmsg->{prefix}) || "";
+                $client->send_chan($channel, 'PRIVMSG', $channel, "${from_nick}: $answer->{content}");
             }
         }
     );

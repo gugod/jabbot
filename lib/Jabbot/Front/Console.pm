@@ -13,7 +13,7 @@ sub run {
     while ( defined ($_ = $term->readline($prompt)) ) {
         my $ans = $j->answer(question => $_);
         warn $@ if $@;
-        say $OUT $ans unless $@;
+        say $OUT $ans->{content} unless $@;
 
         $term->addhistory($_) if /\S/;
     }
