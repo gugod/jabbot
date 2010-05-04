@@ -3,15 +3,27 @@ use common::sense;
 use HTTP::Lite;
 use Plack::Request;
 use JSON qw(to_json);
+use UNIVERSAL::require;
+use Jabbot;
+use Scalar::Defer;
 
 sub new {
     my $class = shift;
-    return bless {}, $class;
+    my $self = bless {}, $class;
+    $self->{plugins} = [];
+
+    for my $plugin (map { "Jabbot::Plugin::$_"} @{Jabbot->config->{plugins}}) {
+        $plugin->require;
+        say STDERR "- Initiating $plugin";
+        push @{ $self->{plugins} }, $plugin->new;
+    }
+
+    return $self;
 }
 
 sub post {
     my ($self, %args) = @_;
-     my $channel = $args{channel};
+    my $channel = $args{channel};
     my $text     = $args{text};
 
     if ($channel =~ m{^/irc/}) {
@@ -26,26 +38,32 @@ sub post {
 
 sub answer {
     my ($self, %args) = @_;
-    my $answer = $args{question};
-    return $answer;
+    my @answers;
+    for my $plugin (@{$self->{plugins}}) {
+        if ($plugin->can_answer($args{question})) {
+            my $a = $plugin->answer($args{question});
+            $a->{plugin} = ref $plugin;
+            push @answers, $a;
+        }
+    }
+    return \@answers;
 }
+
+my $core = lazy { Jabbot::Core->new };
 
 sub app {
     my ($env) = @_;
     my $req = Plack::Request->new($env);
 
     my ($action) = $req->path =~ m[^/(\w+)$];
-    return [404, [], ["ACTION NOT FOUND"]] unless $action;
-
-    my $core = Jabbot::Core->new;
-    return [404, [], ["ACTION NOT FOUND"]] unless $core->can($action);
+    return [404, [], ["ACTION NOT FOUND"]] unless $action && $core->can($action);
 
     my $value = $core->$action(%{ $req->parameters });
 
     my $response_body =
         ($value == $core)
             ? "OK"
-            : to_json({ $action => $value });
+            : to_json({ $action => $value }, { utf8 => 1 });
 
     return [200, [], [ $response_body ]];
 }
