@@ -18,12 +18,8 @@ sub build_commit_message {
     # trim message
     my $msg = substr($commit->{message} , 0 , 20) . ' ... ';
 
-    my $committer = committer_name $commit ;
-    my $m = sprintf("%s | %s++ | %s" ,
-                   $repo ,
-                   $committer,
-                   $commit->{message});
-    return $m;
+    my $committer = committer_name $commit;
+    return sprintf("%s | %s++ | %s" , $repo , $committer, $commit->{message});
 }
 
 sub app {

@@ -70,7 +70,7 @@ sub app {
     my $env = shift;
     my $req = Plack::Request->new($env);
 
-    my ($network, $channel) = $req->path =~ m{/networks/(\w+)/channels/(\w+)$};
+    my ($network, $channel) = $req->path =~ m{/networks/([^/]+)/channels/([^/]+)$};
 
     unless ($IRC_CLIENTS->{$network}) {
         return [404, [], ["NETWORK NOT FOUND"]]
