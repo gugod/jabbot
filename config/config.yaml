@@ -16,6 +16,7 @@ plugins:
   - zh_tw::RandomChatbot
   - zh_tw::Thsrc
   - zh_tw::Polite
+  - en_us::Eliza
  
 feeds:
   jabbot-commits:
