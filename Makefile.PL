@@ -26,11 +26,6 @@ feature 'JA Romanize' =>
         Lingua::JA::Romanize::Japanese => 0
         ;
 
-feature 'Kwiki' =>
-        -default => 0,
-        Kwiki => '0.37'
-        ;
-
 feature 'Eliza Chatbot' =>
         -default => 0,
         Chatbot::Eliza => 0,
@@ -46,11 +41,6 @@ feature 'Feed Aggregator Backend' =>
         'POE::Component::RSSAggregator' => 0,
         'POE::Component::AtomAggregator' => 0
          'WWW::Shorten::isgd' => 0,
-        ;
-
-feature 'OurNet Chatbot' =>
-        -default => 0,
-        'OurNet::Chatbot' => '0'
         ;
 
 feature 'CPANAuthor Plugin' =>
