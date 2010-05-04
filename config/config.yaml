@@ -17,6 +17,7 @@ plugins:
   - zh_tw::Thsrc
   - zh_tw::Polite
   - en_us::Eliza
+  - Math
  
 feeds:
   jabbot-commits:
