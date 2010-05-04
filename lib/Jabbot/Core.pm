@@ -1,5 +1,6 @@
 package Jabbot::Core;
 use common::sense;
+use utf8;
 use HTTP::Lite;
 use Plack::Request;
 use JSON qw(to_json);
@@ -38,20 +39,23 @@ sub post {
 
 sub answer {
     my ($self, %args) = @_;
+    return $self->answers(%args)->[0];
+}
+
+sub answers {
+    my ($self, %args) = @_;
     my @answers;
+    my $q = $args{question};
+    utf8::decode($q) unless utf8::is_utf8($q);
+
     for my $plugin (@{$self->{plugins}}) {
-        if ($plugin->can_answer($args{question})) {
-            my $a = $plugin->answer($args{question});
+        if ($plugin->can_answer($q)) {
+            my $a = $plugin->answer($q);
             $a->{plugin} = ref $plugin;
             push @answers, $a;
         }
     }
-
-    return "" if @answers == 0;
-    return $answers[0] if @answers == 1;
-
-    my @x = sort { $b->{confidence} <=> $a->{confidence} } @answers;
-    return $x[0];
+    return [sort { $b->{confidence} <=> $a->{confidence} } @answers];
 }
 
 my $core = lazy { Jabbot::Core->new };
