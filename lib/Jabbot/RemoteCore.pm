@@ -20,8 +20,11 @@ sub AUTOLOAD {
     $http->prepare_post(\%args);
     my $status = $http->request("${core_server}/${name}");
     if ($status == 200) {
-        my $response = from_json($http->body);
-        return $response->{$name};
+        my $body = $http->body;
+        if ($body != "OK") {
+            my $response = from_json($http->body);
+            return $response->{$name};
+        }
     }
     return $self;
 }
