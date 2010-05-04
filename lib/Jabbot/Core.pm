@@ -38,6 +38,11 @@ sub post {
 
 sub answer {
     my ($self, %args) = @_;
+    return $self->answers(%args)->[0];
+}
+
+sub answers {
+    my ($self, %args) = @_;
     my @answers;
     for my $plugin (@{$self->{plugins}}) {
         if ($plugin->can_answer($args{question})) {
@@ -46,12 +51,7 @@ sub answer {
             push @answers, $a;
         }
     }
-
-    return "" if @answers == 0;
-    return $answers[0] if @answers == 1;
-
-    my @x = sort { $b->{confidence} <=> $a->{confidence} } @answers;
-    return $x[0];
+    return [sort { $b->{confidence} <=> $a->{confidence} } @answers];
 }
 
 my $core = lazy { Jabbot::Core->new };
