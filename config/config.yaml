@@ -6,7 +6,7 @@ admin:
   - gugod
 
 irc:
-  frontend_port: 15101
+  listen: 127.0.0.1:15101
   networks:
     freenode:
       nick: jabbot

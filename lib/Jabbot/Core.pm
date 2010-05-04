@@ -27,11 +27,11 @@ sub post {
     my $text     = $args{text};
 
     if ($channel =~ m{^/irc/}) {
-        my $server = "http://localhost:15001";
+        my $server = Jabbot->config->{irc}{listen};
 
         my $http = HTTP::Lite->new;
         $http->prepare_post({ 'message[body]' => $text });
-        $http->request("${server}${channel}");
+        $http->request("http://${server}${channel}");
     }
     return $self;
 }
