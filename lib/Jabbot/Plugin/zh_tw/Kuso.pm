@@ -1,15 +1,11 @@
 package Jabbot::Plugin::zh_tw::Kuso;
 use common::sense;
 use Object::Tiny;
-use self;
 
-sub can_answer {
-    rand(10) > 2
-}
+sub can_answer { 1 }
 
 sub answer {
-    my ($text) = @args;
-
+    my ($self, $text) = @_;
     my $reply;
 
     given($text) {
