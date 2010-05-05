@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use common::sense;
-use lib 'lib';
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
 use Jabbot::RemoteCore;
 
 my $j = Jabbot::RemoteCore->new;
