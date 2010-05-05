@@ -19,6 +19,8 @@ plugins:
   - en_us::Eliza
   - Math
   - zh_tw::TaiwanLotto
+  - zh_tw::DateDay
+  - zh_tw::Kuso
  
 feeds:
   jabbot-commits:
