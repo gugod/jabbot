@@ -15,7 +15,6 @@ sub new {
 
     for my $plugin (map { "Jabbot::Plugin::$_"} @{Jabbot->config->{plugins}}) {
         $plugin->require;
-        say STDERR "- Initiating $plugin";
         push @{ $self->{plugins} }, $plugin->new;
     }
 
