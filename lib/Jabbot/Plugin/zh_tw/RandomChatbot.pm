@@ -6,13 +6,13 @@ use self;
 
 sub can_answer {
     my ($text) = @args;
-    return (length($text) > 3);
+    return (length($text) > 2);
 }
 
 sub answer {
-    my $remix = Acme::Lingua::ZH::Remix->new;
+    $self->{remix} ||= Acme::Lingua::ZH::Remix->new;
     return {
-        content    => $remix->random_sentence,
+        content    => $self->{remix}->random_sentence,
         confidence => 0
     }
 }
