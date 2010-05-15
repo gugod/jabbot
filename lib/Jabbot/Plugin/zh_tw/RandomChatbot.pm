@@ -6,7 +6,7 @@ use self;
 
 sub can_answer {
     my ($text) = @args;
-    return (lenght($text) > 3);
+    return (length($text) > 3);
 }
 
 sub answer {
