@@ -7,6 +7,7 @@ use JSON qw(to_json);
 use UNIVERSAL::require;
 use Jabbot;
 use Scalar::Defer;
+use Try::Tiny;
 
 sub new {
     my $class = shift;
@@ -49,11 +50,13 @@ sub answers {
 
     for my $plugin (@{$self->{plugins}}) {
         if ($plugin->can_answer($q)) {
-            my $a = $plugin->answer($q);
-            if (ref $a eq 'HASH') {
-                $a->{plugin} = ref $plugin;
-                $a->{plugin} =~ s/^Jabbot::Plugin:://;
-                push @answers, $a
+            try {
+                my $a = $plugin->answer($q);
+                if (ref $a eq 'HASH') {
+                    $a->{plugin} = ref $plugin;
+                    $a->{plugin} =~ s/^Jabbot::Plugin:://;
+                    push @answers, $a
+                }
             }
         }
     }

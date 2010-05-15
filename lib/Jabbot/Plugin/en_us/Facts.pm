@@ -34,7 +34,6 @@ sub answer {
     my $sub = $self->{dispatch_to};
     my $ans = $self->$sub(@{ $self->{matched} });
 
-    tied($self->db)->sync;
     return {
         content    => $ans,
         confidence => length($ans) > 0 ? 1 : 0
