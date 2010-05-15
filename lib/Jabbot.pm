@@ -3,10 +3,15 @@ use common::sense;
 use Object::Tiny;
 use Hash::Merge qw(merge);
 
-sub new { bless {}, shift }
+use Cwd ();
 
-sub root {
-    $ENV{'JABBOT_ROOT'}
+{
+    my $root;
+    sub root {
+        return $root if $root;
+        $root = $ENV{'JABBOT_ROOT'} || Cwd::getcwd();
+        return $root;
+    }
 }
 
 use YAML;
