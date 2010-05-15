@@ -8,6 +8,8 @@ sub new {
     return bless {}, $class;
 }
 
+sub DESTROY {}
+
 our $AUTOLOAD;
 sub AUTOLOAD {
     my ($self, %args) = @_;
