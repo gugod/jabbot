@@ -1,29 +1,10 @@
-package Jabbot::Facts;
-use Jabbot::Plugin -Base;
-
-const class_id => 'facts';
-
-field db => {}, -init => q{$self->_load};
-field 'msg';
-
-sub process {
-    my $msg = shift;
-
-    my ($r,$must_say) = $self->react_to($msg);
-
-    # manually close db handle since now that we have different frontends running,
-    # db should be reloaded everytime this sub is invoked.
-    $self->db(undef);
-
-    return unless defined $r;
-
-    $must_say = 1 if $msg->me;
-
-    $r =~ s{ \$who }
-           { $msg->from }xe;
-
-    $self->reply($r, $must_say);
-}
+package Jabbot::Plugin::en_us::Facts;
+use common::sense;
+use Object::Tiny;
+use Chatbot::Eliza;
+use Scalar::Defer;
+use utf8;
+use self;
 
 my $question_mark = qr/(?:\?|？)/;
 
@@ -35,29 +16,38 @@ my @D2P = (
     qr/^(.{1,64})\s+is\s+([^?]+)$/i                   => \&_save,
 );
 
-sub react_to {
-    my $msg = shift;
-    my $text = $msg->text;
-    $self->msg($msg);
+sub can_answer {
+    my ($text) = @args;
 
     for my $i (0..$#D2P) {
         next if $i % 2;
         my ($regex, $sub) = @D2P[$i, $i+1];
         if ($text =~ m/$regex/) {
-            return $sub->($self, $1, $2);
+            $self->{matched} = [$1, $2];
+            $self->{dispatch_to} = $sub;
+            return 1;
         }
     }
+}
 
-    tied(%{$self->db->tied_file})->sync;
+sub answer {
+    my $sub = $self->{dispatch_to};
+    my $ans = $self->$sub(@{ $self->{matched} });
+
+    tied($self->db)->sync;
+    return {
+        content    => $ans,
+        confidence => length($ans) > 0 ? 1 : 0
+    }
 }
 
 sub _save_factpack {
-    my ($X, $Y) = @_;
+    my ($X, $Y) = @args;
     $self->_save($X, "<reply>$Y");
 }
 
 sub _save {
-    my ($X, $Y) = @_;
+    my ($X, $Y) = @args;
 
     return if $X =~ / that|this|what|who|when|how /xi;
 
@@ -71,16 +61,16 @@ sub _save {
         $self->db->{$X} = $orig;
     }
     elsif (defined $orig) {
-        return "But $X is something else..." if ($self->msg->me);
+        return "But $X is $orig";
     }
     else {
         $self->db->{$X} = $Y;
     }
-    return 'ok, $who' if ($self->msg->me);
+    return 'ok';
 }
 
 sub _reset {
-    my ($X, $Y) = @_;
+    my ($X, $Y) = @args;
 
     $self->db->{$X} = $Y;
 
@@ -88,26 +78,37 @@ sub _reset {
 }
 
 sub _forget {
-    my ($X) = @_;
+    my ($X) = @args;
     delete $self->db->{$X};
 
-    "What is $X ?";
+    return "What is $X ?";
 }
 
 sub _query {
-    my ($X) = @_;
+    my ($X) = @args;
     return "" unless defined(my $r =  $self->db->{$X});
+
+    utf8::decode($r);
 
     if ($r =~ s/^<reply>\s*//) {
         return $r;
     }
 
-    return "$X is $r",1;
+    return "$X is $r";
 }
 
-sub _load {
-    io($self->plugin_directory)->mkpath;
-    my $db = io->catfile($self->plugin_directory,'main.db')->utf8->assert;
-    $self->db($db);
-    return $db;
+{
+    use IO::All;
+    io->catdir(Jabbot->root, "var", "plugins")->mkpath;
+
+    my $db;
+    sub db {
+        return $db if $db;
+
+        $db = io->catfile(Jabbot->root, "var", "plugins", "facts.db")->utf8->assert;
+        $db->{__inited__} = time;
+        return $db;
+    }
 }
+
+1;
