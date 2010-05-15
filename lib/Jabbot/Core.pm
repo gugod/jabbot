@@ -1,5 +1,6 @@
 package Jabbot::Core;
 use common::sense;
+use utf8;
 use HTTP::Lite;
 use Plack::Request;
 use JSON qw(to_json);
@@ -14,7 +15,6 @@ sub new {
 
     for my $plugin (map { "Jabbot::Plugin::$_"} @{Jabbot->config->{plugins}}) {
         $plugin->require;
-        say STDERR "- Initiating $plugin";
         push @{ $self->{plugins} }, $plugin->new;
     }
 
@@ -44,11 +44,17 @@ sub answer {
 sub answers {
     my ($self, %args) = @_;
     my @answers;
+    my $q = $args{question};
+    utf8::decode($q) unless utf8::is_utf8($q);
+
     for my $plugin (@{$self->{plugins}}) {
-        if ($plugin->can_answer($args{question})) {
-            my $a = $plugin->answer($args{question});
-            $a->{plugin} = ref $plugin;
-            push @answers, $a;
+        if ($plugin->can_answer($q)) {
+            my $a = $plugin->answer($q);
+            if (ref $a eq 'HASH') {
+                $a->{plugin} = ref $plugin;
+                $a->{plugin} =~ s/^Jabbot::Plugin:://;
+                push @answers, $a
+            }
         }
     }
     return [sort { $b->{confidence} <=> $a->{confidence} } @answers];

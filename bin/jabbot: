@@ -1,10 +1,16 @@
 #!/usr/bin/env perl
 use common::sense;
-use lib 'lib';
-use Jabbot::RemoteCore;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
-my $j = Jabbot::RemoteCore->new;
+$ENV{JABBOT_ROOT} = "$FindBin::Bin/..";
+
+use UNIVERSAL::require;
+
+my $class = 'Jabbot::Core';
+$class->require;
+
+my $j = $class->new;
 my $q = join(" ", @ARGV);
-my $ans = $j->answer(question => $q);
-
-say $ans->{content};
+my $ans = $j->answers(question => $q);
+say "- [$_->{plugin}] $_->{content}" for @$ans;

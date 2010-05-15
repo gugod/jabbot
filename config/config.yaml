@@ -17,6 +17,10 @@ plugins:
   - zh_tw::Thsrc
   - zh_tw::Polite
   - en_us::Eliza
+  - Math
+  - zh_tw::TaiwanLotto
+  - zh_tw::DateDay
+  - zh_tw::Kuso
  
 feeds:
   jabbot-commits:

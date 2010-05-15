@@ -1,12 +1,25 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use common::sense;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 $ENV{JABBOT_ROOT} = "$FindBin::Bin/..";
 
+my %runnables = (
+    irc     => 'Jabbot::Front::IRC',
+    console => 'Jabbot::Front::Console',
+    github  => 'Jabbot::Back::Github',
+    core    => 'Jabbot::Core'
+);
+
 use Jabbot;
-my @configs = qw(config.yaml -plugins plugins);
-Jabbot->new->load_hub(@configs)->command->process(@ARGV);
+
+my $cmd = shift @ARGV;
+
+given($cmd) {
+    when('start') {
+        my $runner = Plack::Runner->new(server => 'Twiggy', env => 'production');
+        $runner->parse_options(@ARGV);
+        $runner->run;
+    }
+}
