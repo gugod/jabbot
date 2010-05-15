@@ -36,8 +36,8 @@ sub answer {
 
     return {
         content    => $ans,
-        confidence => length($ans) > 0 ? 1 : 0
-    }
+        confidence => 1
+    } if $ans
 }
 
 sub _save_factpack {
