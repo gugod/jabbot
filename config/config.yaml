@@ -13,6 +13,7 @@ irc:
         - jabbot
 
 plugins:
+  - en_us::Facts
   - zh_tw::RandomChatbot
   - zh_tw::Thsrc
   - zh_tw::Polite

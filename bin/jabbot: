@@ -3,9 +3,14 @@ use common::sense;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Jabbot::RemoteCore;
+$ENV{JABBOT_ROOT} = "$FindBin::Bin/..";
 
-my $j = Jabbot::RemoteCore->new;
+use UNIVERSAL::require;
+
+my $class = 'Jabbot::Core';
+$class->require;
+
+my $j = $class->new;
 my $q = join(" ", @ARGV);
 my $ans = $j->answers(question => $q);
-say "- $_->{content}" for @$ans;
+say "- [$_->{plugin}] $_->{content}" for @$ans;

@@ -7,8 +7,6 @@ use Jabbot::RemoteCore;
 use AnyEvent;
 use AnyEvent::IRC::Client;
 
-use YAML;
-
 sub init_irc_client {
     my ($network) = @_;
 
@@ -16,7 +14,7 @@ sub init_irc_client {
     $client->reg_cb(
         registered => sub {
             my ($client) = @_;
-            say STDERR "I'm in !";
+            say STDERR "[IRC] Connected to $network->{server}.";
             for (@{$network->{channels}}) {
                 my ($channel, $key) = ref($_) ? @$_ : ($_);
                 $channel = "#${channel}" unless index($channel, "#") == 0;
@@ -27,7 +25,7 @@ sub init_irc_client {
         join => sub {
             my ($client, $nick, $channel, $is_myself) = @_;
             if ($is_myself) {
-                say STDERR "Joind $channel";
+                say STDERR "[IRC] Joind $channel";
             }
         },
 

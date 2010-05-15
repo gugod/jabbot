@@ -15,7 +15,6 @@ sub new {
 
     for my $plugin (map { "Jabbot::Plugin::$_"} @{Jabbot->config->{plugins}}) {
         $plugin->require;
-        say STDERR "- Initiating $plugin";
         push @{ $self->{plugins} }, $plugin->new;
     }
 
@@ -51,8 +50,11 @@ sub answers {
     for my $plugin (@{$self->{plugins}}) {
         if ($plugin->can_answer($q)) {
             my $a = $plugin->answer($q);
-            $a->{plugin} = ref $plugin;
-            push @answers, $a;
+            if (ref $a eq 'HASH') {
+                $a->{plugin} = ref $plugin;
+                $a->{plugin} =~ s/^Jabbot::Plugin:://;
+                push @answers, $a
+            }
         }
     }
     return [sort { $b->{confidence} <=> $a->{confidence} } @answers];
