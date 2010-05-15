@@ -2,16 +2,18 @@ package Jabbot::Plugin::en_us::Eliza;
 use common::sense;
 use Object::Tiny;
 use Chatbot::Eliza;
-use Scalar::Defer;
+use self;
 
-sub can_answer { 1 }
-
-my $chatbot = lazy { Chatbot::Eliza->new() };
+sub can_answer {
+    my ($text) = @args;
+    return length($text) > 2;
+}
 
 sub answer {
-    my $self = shift;
-    my $text = shift;
-    my $ans  = $chatbot->transform($text);
+    my ($text) = @args;
+
+    $self->{chatbot} ||= Chatbot::Eliza->new();
+    my $ans  = $self->{chatbot}->transform($text);
 
     if ($text =~ /thou|thy|thee|thine/) {
         $ans =~ s/have you/hast thou/gi;
