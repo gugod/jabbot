@@ -1,6 +1,5 @@
 package Jabbot::Core;
 use common::sense;
-use utf8;
 use HTTP::Lite;
 use Plack::Request;
 use JSON qw(to_json);
