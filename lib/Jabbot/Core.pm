@@ -15,8 +15,10 @@ sub new {
     $self->{plugins} = [];
 
     for my $plugin (map { "Jabbot::Plugin::$_"} @{Jabbot->config->{plugins}}) {
-        $plugin->require;
-        push @{ $self->{plugins} }, lazy { $plugin->new };
+        push @{ $self->{plugins} }, lazy {
+            $plugin->require;
+            $plugin->new;
+        };
     }
 
     return $self;
