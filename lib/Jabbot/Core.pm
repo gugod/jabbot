@@ -6,7 +6,7 @@ use Plack::Request;
 use JSON qw(to_json);
 use UNIVERSAL::require;
 use Jabbot;
-use Scalar::Defer;
+use Data::Thunk qw(lazy);
 use Try::Tiny;
 
 sub new {
@@ -16,7 +16,7 @@ sub new {
 
     for my $plugin (map { "Jabbot::Plugin::$_"} @{Jabbot->config->{plugins}}) {
         $plugin->require;
-        push @{ $self->{plugins} }, $plugin->new;
+        push @{ $self->{plugins} }, lazy { $plugin->new };
     }
 
     return $self;
@@ -49,15 +49,20 @@ sub answers {
     utf8::decode($q) unless utf8::is_utf8($q);
 
     for my $plugin (@{$self->{plugins}}) {
-        if ($plugin->can_answer($q)) {
-            try {
-                my $a = $plugin->answer($q);
-                if (ref $a eq 'HASH') {
-                    $a->{plugin} = ref $plugin;
-                    $a->{plugin} =~ s/^Jabbot::Plugin:://;
-                    push @answers, $a
+        if ($plugin->can("can_answer")) {
+            if ($plugin->can_answer($q)) {
+                try {
+                    my $a = $plugin->answer($q);
+                    if (ref $a eq 'HASH') {
+                        $a->{plugin} = ref $plugin;
+                        $a->{plugin} =~ s/^Jabbot::Plugin:://;
+                        push @answers, $a
+                    }
                 }
             }
+        }
+        else {
+            warn ">>> $plugin need to respond 'can_answer' method, but it does not.\n";
         }
     }
     return [sort { $b->{confidence} <=> $a->{confidence} } @answers];
