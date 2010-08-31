@@ -42,7 +42,10 @@ sub post {
         my $server = Jabbot->config->{irc}{listen};
 
         my $http = HTTP::Lite->new;
-        $http->prepare_post({ 'message[body]' => $text });
+        $http->prepare_post({
+            'message[body]'    => $text,
+            'message[channel]' => $channel
+        });
         $http->request("http://${server}${channel}");
     }
     return $self;
@@ -66,7 +69,7 @@ sub answers {
                 if (ref $a eq 'HASH') {
                     $a->{plugin} = ref $plugin;
                     $a->{plugin} =~ s/^Jabbot::Plugin:://;
-                    push @answers, $a
+                    push @answers, $a;
                 }
             }
         }
