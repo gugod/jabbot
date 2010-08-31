@@ -1,12 +1,11 @@
 package Jabbot::Core;
 use common::sense;
-use utf8;
 use HTTP::Lite;
 use Plack::Request;
 use JSON qw(to_json);
 use UNIVERSAL::require;
 use Jabbot;
-use Scalar::Defer;
+use Data::Thunk qw(lazy);
 use Try::Tiny;
 
 sub new {
@@ -15,8 +14,20 @@ sub new {
     $self->{plugins} = [];
 
     for my $plugin (map { "Jabbot::Plugin::$_"} @{Jabbot->config->{plugins}}) {
-        $plugin->require;
+        unless ($plugin->require) {
+            warn "* $plugin failed to be loaded.\n";
+            next;
+        }
+
+        unless ($plugin->can('can_answer') && $plugin->can('answer') &&
+            $plugin->can('can_answer') != \&Jabbot::Plugin::can_answer &&
+            $plugin->can('answer')     != \&Jabbot::Plugin::answer) {
+            warn "* $plugin not loaded due to the lack of 'can_answer' or 'answer' method\n";
+            next;
+        }
+
         push @{ $self->{plugins} }, $plugin->new;
+        warn "* LOAD $plugin\n";
     }
 
     return $self;
@@ -31,7 +42,10 @@ sub post {
         my $server = Jabbot->config->{irc}{listen};
 
         my $http = HTTP::Lite->new;
-        $http->prepare_post({ 'message[body]' => $text });
+        $http->prepare_post({
+            'message[body]'    => $text,
+            'message[channel]' => $channel
+        });
         $http->request("http://${server}${channel}");
     }
     return $self;
@@ -49,13 +63,13 @@ sub answers {
     utf8::decode($q) unless utf8::is_utf8($q);
 
     for my $plugin (@{$self->{plugins}}) {
-        if ($plugin->can_answer($q)) {
+        if ($plugin->can_answer($q, \%args)) {
             try {
-                my $a = $plugin->answer($q);
+                my $a = $plugin->answer($q, \%args);
                 if (ref $a eq 'HASH') {
                     $a->{plugin} = ref $plugin;
                     $a->{plugin} =~ s/^Jabbot::Plugin:://;
-                    push @answers, $a
+                    push @answers, $a;
                 }
             }
         }
@@ -63,23 +77,25 @@ sub answers {
     return [sort { $b->{confidence} <=> $a->{confidence} } @answers];
 }
 
-my $core = lazy { Jabbot::Core->new };
+{
+    my $core = lazy { Jabbot::Core->new };
 
-sub app {
-    my ($env) = @_;
-    my $req = Plack::Request->new($env);
+    sub app {
+        my ($env) = @_;
+        my $req = Plack::Request->new($env);
 
-    my ($action) = $req->path =~ m[^/(\w+)$];
-    return [404, [], ["ACTION NOT FOUND"]] unless $action && $core->can($action);
+        my ($action) = $req->path =~ m[^/(\w+)$];
+        return [404, [], ["ACTION NOT FOUND"]] unless $action && $core->can($action);
 
-    my $value = $core->$action(%{ $req->parameters });
+        my $value = $core->$action(%{ $req->parameters });
 
-    my $response_body =
-        ($value == $core)
-            ? to_json({ $action => "OK"   }, { utf8 => 1 })
-            : to_json({ $action => $value }, { utf8 => 1 });
+        my $response_body =
+            ($value == $core)
+                ? to_json({ $action => "OK"   }, { utf8 => 1 })
+                    : to_json({ $action => $value }, { utf8 => 1 });
 
-    return [200, [], [ $response_body ]];
+        return [200, [], [ $response_body ]];
+    }
 }
 
 1;

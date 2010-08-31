@@ -1,8 +1,6 @@
 package Jabbot::Plugin::en_us::Facts;
 use common::sense;
 use Object::Tiny;
-use Chatbot::Eliza;
-use Scalar::Defer;
 use utf8;
 use self;
 

@@ -13,11 +13,12 @@ irc:
         - jabbot
 
 plugins:
+  - HandlinoRedmine
   - en_us::Facts
+  - en_us::Eliza
   - zh_tw::RandomChatbot
   - zh_tw::Thsrc
   - zh_tw::Polite
-  - en_us::Eliza
   - Math
   - zh_tw::TaiwanLotto
   - zh_tw::DateDay

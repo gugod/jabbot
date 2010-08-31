@@ -1,6 +1,5 @@
 package Jabbot::Plugin::en_us::Eliza;
-use common::sense;
-use Object::Tiny;
+use parent 'Jabbot::Plugin';
 use Chatbot::Eliza;
 use self;
 

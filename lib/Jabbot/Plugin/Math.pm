@@ -1,6 +1,6 @@
 package Jabbot::Plugin::Math;
-use common::sense;
-use Object::Tiny;
+use parent 'Jabbot::Plugin';
+
 use Try::Tiny;
 use Math::Expression::Evaluator;
 
