@@ -1,12 +1,13 @@
 package Jabbot::Plugin::zh_tw::Kuso;
-use common::sense;
-use Object::Tiny;
-
+use Jabbot::Plugin;
 sub can_answer { 1 }
 
 sub answer {
-    my ($self, $text) = @_;
+    my ($text) = @args;
+
     my $reply;
+
+    my $confidence = 0.5;
 
     given($text) {
         when("!") {
@@ -25,7 +26,7 @@ sub answer {
 
     return {
         content => $reply,
-        confidence => 0.5
+        confidence => $confidence
     } if $reply;
 }
 
