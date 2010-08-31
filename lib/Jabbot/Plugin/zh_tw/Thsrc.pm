@@ -1,10 +1,7 @@
 package Jabbot::Plugin::zh_tw::Thsrc;
-use common::sense;
-use utf8;
+use parent 'Jabbot::Plugin';
 use HTML::TreeBuilder::Select;
 use WWW::Mechanize;
-
-sub new { bless {}, shift }
 
 sub can_answer {
     my ($self, $text) = @_;
