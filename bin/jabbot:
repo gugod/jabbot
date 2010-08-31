@@ -12,7 +12,7 @@ $class->require;
 
 my $j = $class->new;
 my $q = join(" ", @ARGV);
-my $ans = $j->answers(question => $q);
+my $ans = $j->answers(question => $q, channel => ($ENV{CHANNEL} || '/console/jabbot:'));
 
 say "\nanswers:";
 say "  $_->{plugin}: $_->{content}" for @$ans;
