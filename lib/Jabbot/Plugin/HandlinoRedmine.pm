@@ -4,7 +4,11 @@ use common::sense;
 use self;
 
 sub can_answer {
-    my ($text) = @args;
+    my ($text, $message) = @args;
+    warn "The channel is.. $message->{channel}\n";
+
+    return unless $message->{channel} eq '/irc/handlino';
+
     if ($text =~ m/#([1-9][0-9]*)\b/) {
         $self->{issue_number} = $1;
         return 1;
@@ -13,12 +17,15 @@ sub can_answer {
 }
 
 sub answer {
-    my ($text) = @args;
+    my ($text, $message) = @args;
 
-    return {
-        content => "http://redmine.handlino.com/issues/" . $self->{issue_number},
-        confidence => 1
-    };
+    if ($message->{channel} eq '/irc/handlino') {
+        return {
+            content => "http://redmine.handlino.com/issues/" . $self->{issue_number},
+            confidence => 1
+        };
+    }
+    return undef;
 }
 
 1;
