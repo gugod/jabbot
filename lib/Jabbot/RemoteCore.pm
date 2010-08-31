@@ -1,12 +1,8 @@
 package Jabbot::RemoteCore;
 use common::sense;
+use Object::Tiny;
 use HTTP::Lite;
 use JSON qw(from_json);
-
-sub new {
-    my $class = shift;
-    return bless {}, $class;
-}
 
 sub DESTROY {}
 
