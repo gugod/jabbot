@@ -23,6 +23,6 @@ sub answer {
 
     return {
         content => $reply,
-        confidence => 1
+        confidence => 0.9
     }
 }
