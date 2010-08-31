@@ -3,7 +3,7 @@ use parent 'Jabbot::Plugin';
 
 use Try::Tiny;
 use Math::Expression::Evaluator;
-use Trash;
+
 sub can_answer {
     my ($self, $text) = @_;
 
