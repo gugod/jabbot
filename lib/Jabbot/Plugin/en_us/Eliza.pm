@@ -1,7 +1,6 @@
 package Jabbot::Plugin::en_us::Eliza;
-use parent 'Jabbot::Plugin';
+use Jabbot::Plugin;
 use Chatbot::Eliza;
-use self;
 
 sub can_answer {
     my ($text) = @args;

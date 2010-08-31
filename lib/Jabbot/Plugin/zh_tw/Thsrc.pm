@@ -1,10 +1,10 @@
 package Jabbot::Plugin::zh_tw::Thsrc;
-use parent 'Jabbot::Plugin';
+use Jabbot::Plugin;
 use HTML::TreeBuilder::Select;
 use WWW::Mechanize;
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($text) = @args;
 
     if ($text =~ m/高鐵\s*[,:]?\s*(..)\s*到\s*(..)\s*/) {
         $self->{matched} = [$1, $2];
@@ -14,7 +14,8 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, undef) = @_;
+    return unless $self->{matched};
+
     my $content = $self->thsrc_query(@{ $self->{matched} });
     return {
         content    => $content,

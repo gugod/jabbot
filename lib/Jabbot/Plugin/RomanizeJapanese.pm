@@ -1,8 +1,6 @@
 package Jabbot::Plugin::RomanizeJapanese;
-use common::sense;
-use Object::Tiny;
+use Jabbot::Plugin;
 use Lingua::JA::Romanize::Japanese;
-use self;
 
 sub can_answer {
     my ($text) = @args;
@@ -20,7 +18,7 @@ sub can_answer {
 }
 
 sub answer {
-    return join " ", map { defined($_->[1]) ? "$_->[0]($_->[1])" : "$_->[0]" } $self->romanizer->string($self->{matched});}
+    return join " ", map { defined($_->[1]) ? "$_->[0]($_->[1])" : "$_->[0]" } $self->romanizer->string($self->{matched});
 }
 
 1;

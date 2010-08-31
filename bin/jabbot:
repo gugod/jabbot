@@ -11,8 +11,23 @@ my $class = 'Jabbot::Core';
 $class->require;
 
 my $j = $class->new;
-my $q = join(" ", @ARGV);
-my $ans = $j->answers(question => $q, channel => ($ENV{CHANNEL} || '/console/jabbot:'));
+my $ans = [];
 
-say "\nanswers:";
-say "  $_->{plugin}: $_->{content}" for @$ans;
+if (@ARGV > 0) {
+    my $q = join(" ", @ARGV);
+    $ans = $j->answers(question => $q, channel => ($ENV{CHANNEL} || '/console/jabbot:'));
+    say "\nanswers:";
+    say "  $_->{plugin}: $_->{content}" for @$ans;
+}
+else {
+    while(<>) {
+        chomp;
+        my $q = $_;
+
+        $ans = $j->answers(question => $q, channel => ($ENV{CHANNEL} || '/console/jabbot:'));
+
+        say "\nQ: $q";
+        say "A: $_->{plugin}: $_->{content}" for @$ans;
+    }
+}
+

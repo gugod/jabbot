@@ -1,18 +1,13 @@
 package Jabbot::Plugin::zh_tw::Polite;
-use common::sense;
-use Object::Tiny;
+use Jabbot::Plugin;
 
 sub can_answer {
-    my ($self, $text) = @_;
-    if ($text =~ m/謝謝/) {
-        return 1;
-    }
-    return 0;
+    my ($text) = @args;
+
+    return $text =~ /謝謝/;
 }
 
 sub answer {
-    my ($self, undef) = @_;
-
     return {
         content    => "不客氣",
         confidence => 0.5

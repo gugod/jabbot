@@ -1,7 +1,5 @@
 package Jabbot::Plugin::HandlinoRedmine;
-use parent 'Jabbot::Plugin';
-use common::sense;
-use self;
+use Jabbot::Plugin;
 
 sub can_answer {
     my ($text, $message) = @args;
