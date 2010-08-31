@@ -1,5 +1,6 @@
 package Jabbot::Plugin::zh_tw::Kuso;
 use Jabbot::Plugin;
+
 sub can_answer { 1 }
 
 sub answer {
@@ -13,8 +14,15 @@ sub answer {
         when("!") {
             $reply = "驚嘆號是棒槌";
         }
-        when(/還不賴(!?)/) {
-            $reply = ($1?"驚嘆號是棒槌，":"") . "真的還不賴"
+        when(/還不賴/) {
+            $self->{habiulai_count} ||= 0;
+            $self->{habiulai_count} +=  1;
+
+            if ($self->{habiulai_count} > 1 + 4 * rand) {
+                $reply = "還不賴！";
+                $confidence = 1;
+                $self->{habiulai_count} = 0;
+            }
         }
         when(/^make\s+me\s?./i) {
             $reply = "WHAT? MAKE IT YOURSELF"
