@@ -37,7 +37,7 @@ sub init_irc_client {
             return unless $to_me;
 
             my $rc = Jabbot::RemoteCore->new;
-            my $answer = $rc->answer(question => $text);
+            my $answer = $rc->answer(question => $text, channel => $channel);
 
             if ($answer) {
                 return if $answer->{confidence} == 0 && rand(10) > 8;

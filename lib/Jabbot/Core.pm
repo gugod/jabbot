@@ -63,9 +63,9 @@ sub answers {
     utf8::decode($q) unless utf8::is_utf8($q);
 
     for my $plugin (@{$self->{plugins}}) {
-        if ($plugin->can_answer($q)) {
+        if ($plugin->can_answer($q, \%args)) {
             try {
-                my $a = $plugin->answer($q);
+                my $a = $plugin->answer($q, \%args);
                 if (ref $a eq 'HASH') {
                     $a->{plugin} = ref $plugin;
                     $a->{plugin} =~ s/^Jabbot::Plugin:://;
