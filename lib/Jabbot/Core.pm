@@ -14,10 +14,20 @@ sub new {
     $self->{plugins} = [];
 
     for my $plugin (map { "Jabbot::Plugin::$_"} @{Jabbot->config->{plugins}}) {
-        push @{ $self->{plugins} }, lazy {
-            $plugin->require;
-            $plugin->new;
-        };
+        unless ($plugin->require) {
+            warn "* $plugin failed to be loaded.\n";
+            next;
+        }
+
+        unless ($plugin->can('can_answer') && $plugin->can('answer') &&
+            $plugin->can('can_answer') != \&Jabbot::Plugin::can_answer &&
+            $plugin->can('answer')     != \&Jabbot::Plugin::answer) {
+            warn "* $plugin not loaded due to the lack of 'can_answer' or 'answer' method\n";
+            next;
+        }
+
+        push @{ $self->{plugins} }, $plugin->new;
+        warn "* LOAD $plugin\n";
     }
 
     return $self;
