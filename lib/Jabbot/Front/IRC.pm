@@ -33,17 +33,24 @@ sub init_irc_client {
             my ($client, $channel, $ircmsg) = @_;
             my $text = $ircmsg->{params}[1];
             my $to_me = $text =~ s/^jabbot_*:\s+//;
-
-            return unless $to_me;
+            my $from_nick = AnyEvent::IRC::Util::prefix_nick($ircmsg->{prefix}) || "";
 
             my $rc = Jabbot::RemoteCore->new;
-            my $answer = $rc->answer(question => $text, channel => "/networks/$network->{name}/channels/" . substr($channel, 1));
+            my $answers = $rc->answers(question => $text, channel => "/networks/$network->{name}/channels/" . substr($channel, 1));
 
-            if ($answer) {
-                return if $answer->{confidence} == 0 && rand(10) > 8;
+            my @to_send = ();
+            for my $answer (@$answers) {
+                if ($answer->{confidence} == 1) {
+                    push @to_send, ($to_me ? "${from_nick}: " : "") . $answer->{content};
+                    next;
+                }
 
-                my $from_nick = AnyEvent::IRC::Util::prefix_nick($ircmsg->{prefix}) || "";
-                $client->send_chan($channel, 'PRIVMSG', $channel, "${from_nick}: $answer->{content}");
+                last if @to_send > 0 || !$to_me;
+                push @to_send, "${from_nick}: " . $answer->{content};
+            }
+
+            for my $text (@to_send) {
+                $client->send_chan($channel, 'PRIVMSG', $channel, $text);
             }
         }
     );
