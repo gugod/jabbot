@@ -5,9 +5,7 @@ use self;
 
 sub can_answer {
     my ($text, $message) = @args;
-    warn "The channel is.. $message->{channel}\n";
-
-    return unless $message->{channel} eq '/irc/handlino';
+    return unless $message->{channel} eq '/networks/freenode/channels/handlino';
 
     if ($text =~ m/#([1-9][0-9]*)\b/) {
         $self->{issue_number} = $1;
@@ -18,14 +16,11 @@ sub can_answer {
 
 sub answer {
     my ($text, $message) = @args;
-
-    if ($message->{channel} eq '/irc/handlino') {
-        return {
-            content => "http://redmine.handlino.com/issues/" . $self->{issue_number},
-            confidence => 1
-        };
-    }
-    return undef;
+    return unless $self->{issue_number};
+    return {
+        content => "http://redmine.handlino.com/issues/" . $self->{issue_number},
+        confidence => 1
+    };
 }
 
 1;

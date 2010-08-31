@@ -37,7 +37,7 @@ sub init_irc_client {
             return unless $to_me;
 
             my $rc = Jabbot::RemoteCore->new;
-            my $answer = $rc->answer(question => $text, channel => $channel);
+            my $answer = $rc->answer(question => $text, channel => "/networks/$network->{name}/channels/" . substr($channel, 1));
 
             if ($answer) {
                 return if $answer->{confidence} == 0 && rand(10) > 8;
@@ -59,6 +59,7 @@ my $IRC_CLIENTS = {};
 {
     my $networks = Jabbot->config->{irc}{networks};
     for (keys %$networks) {
+        $networks->{$_}{name} = $_;
         $networks->{$_}{nick} ||= (Jabbot->config->{nick} || "jabbot_$$");
         $IRC_CLIENTS->{$_} = init_irc_client($networks->{$_})
     }
