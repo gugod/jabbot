@@ -31,7 +31,7 @@ sub answer {
 
     return {
         content => $val,
-        confidence => 1
+        confidence => 0.9
     };
 }
 

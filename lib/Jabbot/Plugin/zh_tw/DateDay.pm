@@ -86,7 +86,7 @@ sub answer {
         $reply = "${target}是${reply}";
         return {
             content => $reply,
-            confidence => 1
+            confidence => 0.9
         }
     }
 }

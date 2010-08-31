@@ -18,7 +18,7 @@ sub answer {
     my $content = $self->thsrc_query(@{ $self->{matched} });
     return {
         content    => $content,
-        confidence => 1
+        confidence => 0.9
     }
 }
 
