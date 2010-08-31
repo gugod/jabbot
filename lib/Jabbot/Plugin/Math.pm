@@ -1,5 +1,5 @@
 package Jabbot::Plugin::Math;
-use parent 'Jabbot::Plugin';
+use Jabbot::Plugin;
 
 use Try::Tiny;
 use Math::Expression::Evaluator;
