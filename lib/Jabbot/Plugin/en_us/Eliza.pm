@@ -22,7 +22,7 @@ sub answer {
 
     return {
         content    => $ans,
-        confidence => 0
+        confidence => 0 - rand
     }
 }
 

@@ -13,7 +13,7 @@ sub answer {
     $self->{remix} ||= Acme::Lingua::ZH::Remix->new;
     return {
         content    => $self->{remix}->random_sentence,
-        confidence => 0
+        confidence => 0 - rand
     }
 }
 
