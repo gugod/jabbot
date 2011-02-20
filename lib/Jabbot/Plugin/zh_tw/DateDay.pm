@@ -1,6 +1,5 @@
 package Jabbot::Plugin::zh_tw::DateDay;
-use common::sense;
-use Object::Tiny;
+use Jabbot::Plugin;
 
 my %ZhDay = (
     MON => "星期一",

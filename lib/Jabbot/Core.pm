@@ -5,7 +5,6 @@ use Plack::Request;
 use JSON qw(to_json);
 use UNIVERSAL::require;
 use Jabbot;
-use Data::Thunk qw(lazy);
 use Try::Tiny;
 
 sub new {
@@ -78,8 +77,7 @@ sub answers {
 }
 
 {
-    my $core = lazy { Jabbot::Core->new };
-
+    my $core = Jabbot::Core->new;
     sub app {
         my ($env) = @_;
         my $req = Plack::Request->new($env);
