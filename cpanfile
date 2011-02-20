@@ -21,6 +21,7 @@ LWP::UserAgent
 Lingua::JA::Romanize::Japanese
 Log::Log4perl
 Math::Expression::Evaluator
+Mojo::DOM
 Net::Delicious
 Net::Jabber::Bot
 Net::Msmgr
