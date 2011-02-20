@@ -1,15 +1,13 @@
-package Jabbot::zh_tw::CurrencyConvert;
-use Jabbot::Plugin -Base;
+package Jabbot::Plugin::zh_tw::CurrencyConvert;
+use Jabbot::Plugin;
 use HTTP::Request::Common qw(GET);
 use LWP::UserAgent;
 use Encode;
 use List::Util qw(shuffle);
 use utf8;
 use encoding 'utf8';
-
-# This .pm has to be in big5 otherwise http request failed.
-
-const class_id => 'zhtw_currencyconvert';
+use Mojo::DOM;
+use Try::Tiny;
 
 my %cname = (USD => "美金", TWD => "新台幣", JPY => "日圓", HKD => "港幣",
              MCY => "人民幣", GBP => "英鎊", EUR => "歐元", CAD => "加拿大元",
@@ -32,12 +30,15 @@ my %coin = (
 
 my %calias = ( GRP => 'GBP', "RMB" => "MCY", "YEN" => "JPY", "CHF" =>"SWF", "NTD" => "TWD");
 
+sub can_answer { 1 }
 
-sub process {
-    my $s = shift->text;
+sub answer {
+    my ($s) = @args;
     my $reply;
     my $allsymbol = join("|",keys %coin) . "|" . join("|",keys %calias);
     my $qmark = '(?:[\s\?]|？)*';
+
+    my $confidence = 1;
     if ( $s =~ /^([\d\.\+\-\*\/]+)\s*($allsymbol)\s+to\s+($allsymbol)$qmark$/i ) {
         $reply = $self->get_ex_money($1,$2,$3);
     } elsif ( $s =~ /^([\d\.\+\-\*\/]+)\s*($allsymbol)$qmark$/i ) {
@@ -49,48 +50,59 @@ sub process {
         $reply =
             qq{I can do currency exchanging, Example: 10 USD to NTD?, or simply "10 USD". To list all currency, say "currency list" to me};
     }
+    else {
+        return { content => "",  confidence => 0 };
+    }
 
-    $self->reply($reply,1);
+    return {
+        content    => $reply,
+        confidence => $confidence
+    };
 }
 
 sub get_ex_money {
-    my ($money,$from,$to) = @_;
+    my ($money,$from,$to) = @args;
     $to ||= "TWD"; # Default to TWD
     $from = $self->expand_alias(uc($from));
     $to   = $self->expand_alias(uc($to));
-    eval"\$money = $money";
-    # Random answer :-/
+
     while($from eq $to) {$to = (shuffle(keys %coin))[0];}
     my $ua = LWP::UserAgent->new(timeout => 300) or die $!;;
     my $res;
-    eval {
+
+    my $reply;
+    try {
         $SIG{ALRM} = sub { die "alarm\n"; };
 	alarm(30);
         my $url ="http://tw.money.yahoo.com/currency_exc_result?amt=${money}&from=${from}&to=${to}";
         $res = $ua->get($url);
 	alarm(0);
+
+        if ($res->is_success) {
+            my $dom = Mojo::DOM->new;
+            $dom->parse(Encode::decode_utf8($res->content));
+
+            my $data = $dom->find('.exponent')->[0]->all_text;
+
+            if ($data =~ /經過計算後，\s*([\d\.]+\s*\w+ = [\d\.]+\s*\w+)\s/) {
+                $reply = $1;
+            }
+
+            # $reply = $data;
+        }
+    } catch {
+        say "ERROR: $_";
     };
-    if($@) {
-	return "Yahoo Connection Timeout";
-    }
 
-    if ($res->is_success) {
-	my $data = Encode::decode('utf8', $res->content);
-
-	if ($data =~ /經過計算後， (.+)<div/) {
-	    my $reStr = $1;
-            $reStr =~ s{</?em>}{}g;
-	    return $reStr;
-	} else {
-	    return "找不到";
-	};
-    }
+    return $reply;
 }
 
 sub expand_alias {
-    my $from = shift;
+    my ($from) = @args;
     if(defined $calias{$from}) {
 	$from = $calias{$from};
     }
     return $from;
 }
+
+1;
