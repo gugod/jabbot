@@ -51,13 +51,13 @@ sub answer {
             qq{I can do currency exchanging, Example: 10 USD to NTD?, or simply "10 USD". To list all currency, say "currency list" to me};
     }
     else {
-        return { content => "",  confidence => 0 };
+        return;
     }
 
     return {
         content    => $reply,
         confidence => $confidence
-    };
+    } if $reply;
 }
 
 sub get_ex_money {
@@ -87,8 +87,6 @@ sub get_ex_money {
             if ($data =~ /經過計算後，\s*([\d\.]+\s*\w+ = [\d\.]+\s*\w+)\s/) {
                 $reply = $1;
             }
-
-            # $reply = $data;
         }
     } catch {
         say "ERROR: $_";
