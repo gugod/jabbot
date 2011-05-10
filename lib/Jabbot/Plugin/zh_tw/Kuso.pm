@@ -66,7 +66,7 @@ sub answer {
         when(/^sudo\s+make/) {
             $reply = "OKAY"
         }
-        when(/^(吃|喫)(啥|什麼)/) {
+        when(/(?:早上|中午|晚上|早餐|午餐|晚餐|宵夜|現在|要|\A)(吃|喫)(啥|什麼)?/) {
             $reply = "";
             $reply .= $foods[ int(rand( @foods )) ];
         }
