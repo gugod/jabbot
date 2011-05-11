@@ -7,8 +7,13 @@ use UNIVERSAL::require;
 use Jabbot;
 use Try::Tiny;
 
+my $core;
+
 sub new {
+    return $core if $core;
+
     my $class = shift;
+
     my $self = bless {}, $class;
     $self->{plugins} = [];
 
@@ -29,6 +34,7 @@ sub new {
         warn "* LOAD $plugin\n";
     }
 
+    $core = $self;
     return $self;
 }
 
@@ -76,24 +82,23 @@ sub answers {
     return [sort { $b->{confidence} <=> $a->{confidence} } @answers];
 }
 
-{
+sub app {
+    my ($env) = @_;
     my $core = Jabbot::Core->new;
-    sub app {
-        my ($env) = @_;
-        my $req = Plack::Request->new($env);
+    my $req = Plack::Request->new($env);
 
-        my ($action) = $req->path =~ m[^/(\w+)$];
-        return [404, [], ["ACTION NOT FOUND"]] unless $action && $core->can($action);
+    my ($action) = $req->path =~ m[^/(\w+)$];
+    return [404, [], ["ACTION NOT FOUND"]] unless $action && $core->can($action);
 
-        my $value = $core->$action(%{ $req->parameters });
+    my $value = $core->$action(%{ $req->parameters });
 
-        my $response_body =
-            ($value == $core)
-                ? to_json({ $action => "OK"   }, { utf8 => 1 })
-                    : to_json({ $action => $value }, { utf8 => 1 });
+    my $response_body =
+        ($value == $core)
+            ? to_json({ $action => "OK"   }, { utf8 => 1 })
+                : to_json({ $action => $value }, { utf8 => 1 });
 
-        return [200, [], [ $response_body ]];
-    }
+    return [200, [], [ $response_body ]];
 }
+
 
 1;
