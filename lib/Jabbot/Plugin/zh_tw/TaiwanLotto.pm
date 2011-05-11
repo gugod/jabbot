@@ -1,15 +1,13 @@
 package Jabbot::Plugin::zh_tw::TaiwanLotto;
-use common::sense;
+use Jabbot::Plugin;
 use Object::Tiny;
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($text) = @args;
     ($self->{matched}) = $text =~ /^(樂透|四星彩)$/;
 }
 
 sub answer {
-    my $self = shift;
-
     my $reply;
     given($self->{matched}) {
         when("樂透") {
@@ -26,3 +24,5 @@ sub answer {
         confidence => 0.9
     }
 }
+
+1;
