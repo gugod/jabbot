@@ -63,7 +63,6 @@ sub _save {
     else {
         $self->db->{$X} = $Y;
     }
-    return 'ok';
 }
 
 sub _reset {
