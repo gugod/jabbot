@@ -10,7 +10,7 @@ use AnyEvent::IRC::Client;
 sub init_irc_client {
     my ($network) = @_;
 
-    my %connection_args = (
+    my @connection_args = (
         $network->{server},
         $network->{port} || 6667,
         { nick => $network->{nick} }
@@ -21,6 +21,7 @@ sub init_irc_client {
         registered => sub {
             my ($client) = @_;
             say STDERR "[IRC] Connected to $network->{server}.";
+
             for (@{$network->{channels}}) {
                 my ($channel, $key) = ref($_) ? @$_ : ($_);
                 $channel = "#${channel}" unless index($channel, "#") == 0;
@@ -33,7 +34,7 @@ sub init_irc_client {
                     my ($conn) = @_;
                     say STDERR "Connection Timeout\n";
                     $conn->disconnect("Connection Timeout.");
-                    $client->connect(%connection_args);
+                    $client->connect(@connection_args);
                 }
             );
         },
@@ -71,7 +72,11 @@ sub init_irc_client {
         }
     );
 
-    $client->connect(%connection_args);
+    say "OHAI\n";
+    require YAML;
+    say YAML::Dump(\@connection_args);
+
+    $client->connect(@connection_args);
     return $client;
 }
 
