@@ -10,6 +10,12 @@ use AnyEvent::IRC::Client;
 sub init_irc_client {
     my ($network) = @_;
 
+    my %connection_args = (
+        $network->{server},
+        $network->{port} || 6667,
+        { nick => $network->{nick} }
+    );
+
     my $client = AnyEvent::IRC::Client->new;
     $client->reg_cb(
         registered => sub {
@@ -20,6 +26,16 @@ sub init_irc_client {
                 $channel = "#${channel}" unless index($channel, "#") == 0;
                 $client->send_srv('JOIN', $channel, $key);
             }
+
+            $client->enable_ping(
+                300,
+                sub {
+                    my ($conn) = @_;
+                    say STDERR "Connection Timeout\n";
+                    $conn->disconnect("Connection Timeout.");
+                    $client->connect(%connection_args);
+                }
+            );
         },
 
         join => sub {
@@ -55,9 +71,7 @@ sub init_irc_client {
         }
     );
 
-    $client->connect($network->{server},
-                     $network->{port} || 6667,
-                     { nick => $network->{nick} });
+    $client->connect(%connection_args);
     return $client;
 }
 
