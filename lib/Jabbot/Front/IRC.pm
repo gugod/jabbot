@@ -72,10 +72,6 @@ sub init_irc_client {
         }
     );
 
-    say "OHAI\n";
-    require YAML;
-    say YAML::Dump(\@connection_args);
-
     $client->connect(@connection_args);
     return $client;
 }
