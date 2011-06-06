@@ -40,6 +40,10 @@ sub app {
     my $payload = decode_json($req->param('payload'));
     my $repo    = $payload->{repository}{name};
 
+    unless ($channel =~ /^[#&+!]/) {
+        $channel = "#" . $channel;
+    }
+
     for my $commit (@{ $payload->{commits} || [] }) {
         snd $_, post => {
             network => $network,
