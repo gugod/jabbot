@@ -1,25 +1,13 @@
 package Jabbot::Front::IRC;
 use 5.012;
 use common::sense;
-use JSON qw(decode_json encode_json to_json);
-use Encode ();
-use Plack::Request;
+use JSON qw(decode_json encode_json);
+use Encode qw(encode_utf8);
 use Jabbot;
-use Jabbot::RemoteCore;
 use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
 use AnyEvent::IRC::Client;
-
-configure;
-
-my $IRC_CLIENTS = {};
-my $networks = Jabbot->config->{irc}{networks};
-for (keys %$networks) {
-    $networks->{$_}{name} = $_;
-    $networks->{$_}{nick} ||= (Jabbot->config->{nick} || "jabbot_$$");
-    $IRC_CLIENTS->{$_} = init_irc_client($networks->{$_})
-}
 
 sub init_irc_client {
     my ($network) = @_;
@@ -56,7 +44,7 @@ sub init_irc_client {
         join => sub {
             my ($client, $nick, $channel, $is_myself) = @_;
             if ($is_myself) {
-                say STDERR "[IRC] Joind $channel";
+                say STDERR "[IRC] Joined $channel";
             }
         },
 
@@ -80,24 +68,6 @@ sub init_irc_client {
                     }
                 };
             }
-
-            # my $rc = Jabbot::RemoteCore->new;
-            # my $answers = $rc->answers(
-            #     question => $text,
-            #     channel  => "/networks/$network->{name}/channels/" . substr($channel, 1)
-            # );
-            # my @to_send = ();
-            # for my $answer (@$answers) {
-            #     if ($answer->{confidence} == 1) {
-            #         push @to_send, ($to_me ? "${from_nick}: " : "") . $answer->{content};
-            #         next;
-            #     }
-            #     last if @to_send > 0 || !$to_me;
-            #     push @to_send, "${from_nick}: " . $answer->{content};
-            # }
-            # for my $text (@to_send) {
-            #     $client->send_chan($channel, 'PRIVMSG', $channel, $text);
-            # }
         }
     );
 
@@ -105,43 +75,25 @@ sub init_irc_client {
     return $client;
 }
 
-sub app {
-    my $env = shift;
-    my $req = Plack::Request->new($env);
-
-    my ($network, $channel) = $req->path =~ m{/networks/([^/]+)/channels/([^/]+)$};
-
-    unless ($IRC_CLIENTS->{$network}) {
-        return [404, [], ["NETWORK NOT FOUND"]]
-    }
-
-    if ($network && $channel) {
-        $channel = "#" . $channel;
-
-        my $message_body = $req->param("message[body]");
-        if ($message_body) {
-            my $c = $IRC_CLIENTS->{$network};
-
-            unless ($c->channel_list($channel)) {
-                $c->send_srv("JOIN", $channel);
-            }
-
-            $c->send_chan($channel, "PRIVMSG", $channel, $message_body);
-        }
-    }
-
-    return [200, [], ["OK"]]
-}
-
 sub run {
+    configure;
+
+    my $IRC_CLIENTS = {};
+    my $networks = Jabbot->config->{irc}{networks};
+    for (keys %$networks) {
+        $networks->{$_}{name} = $_;
+        $networks->{$_}{nick} ||= (Jabbot->config->{nick} || "jabbot_$$");
+        $IRC_CLIENTS->{$_} = init_irc_client($networks->{$_})
+    }
+
     my $port = rcv(
         port,
 
-        message => sub {
+        post => sub {
             my ($data, $reply_port) = @_;
 
             if (my $client = $IRC_CLIENTS->{$data->{network}}) {
-                my $channel = "#". $data->{channel};
+                my $channel = $data->{channel};
                 my $body    = $data->{body};
 
                 unless ($client->channel_list($channel)) {
@@ -153,8 +105,6 @@ sub run {
 
         reply => sub {
             my ($data, $reply_port) = @_;
-            say "GOT REPLY: " . to_json($data);
-
             return unless $data->{to_me};
 
             my $client  = $IRC_CLIENTS->{$data->{network}} or return;
@@ -165,7 +115,7 @@ sub run {
                 $client->send_srv("JOIN", $channel);
             }
 
-            $client->send_chan($channel, "PRIVMSG", $channel, Encode::encode('utf8', $body));
+            $client->send_chan($channel, "PRIVMSG", $channel, encode_utf8($body));
         }
     );
 
@@ -174,16 +124,41 @@ sub run {
     AnyEvent->condvar->recv;
 }
 
+sub cat {
+    configure;
+
+    my ($class, $network, $channel, $body) = @_;
+
+    my $cv = AnyEvent->condvar;
+
+    my $w = AnyEvent->timer(
+        after => 1,
+        cb => sub {
+            my $irc = grp_get "jabbot_irc" or die "Unable to send messages to irc clients.\n";
+
+            snd $_, post => {
+                network => $network,
+                channel => $channel,
+                body    => $body
+            } for @$irc;
+
+            $cv->send;
+        }
+    );
+
+    $cv->recv;
+}
+
 1;
 
 =head1 SYNOPSIS
 
-Launch the frontend server
+Launch the irc clients
 
-    plackup -s Twiggy -l 127.0.0.1:5000 -Ilib -MJabbot::Front::IRC -e "\&Jabbot::Front::IRC::app"
+    perl -MJabbot::Front::IRC -e "Jabbot::Front::IRC->run";
 
 Post to the givent channel (auto-joined if not alreay joined):
 
-    echo "message[body]=你好" | POST http://127.0.0.1:5000/networks/freenode/channels/jabbot
+    perl -MJabbot::Front::IRC -e 'Jabbot::Front::IRC->cat(@ARGV)' freenode '#jabbot' "Ni Hao";
 
 =cut
