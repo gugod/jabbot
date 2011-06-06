@@ -2,7 +2,11 @@ package Jabbot::Back::Github;
 use common::sense;
 use JSON qw(decode_json encode_json);
 use Plack::Request;
-use Jabbot::RemoteCore;
+use AnyEvent;
+use AnyEvent::MP;
+use AnyEvent::MP::Global;
+
+configure;
 
 sub committer_name {
     my $commit = shift;
@@ -28,12 +32,20 @@ sub app {
 
     return [404, [], ["NOT FOUND"]] if $req->path eq '/';
 
+    my ($network, $channel) = $req->path =~ m{/networks/([^/]+)/channels/([^/]+)};
+    my $irc = grp_get "jabbot_irc";
+
+    return [404, [], ["NOT FOUND"]] unless $network && $channel && $irc;
+
     my $payload = decode_json($req->param('payload'));
     my $repo    = $payload->{repository}{name};
 
-    my $rc = Jabbot::RemoteCore->new;
     for my $commit (@{ $payload->{commits} || [] }) {
-        $rc->post(channel => $req->path, text => build_commit_message($repo, $commit));
+        snd $_, post => {
+            network => $network,
+            channel => $channel,
+            body    => build_commit_message($repo, $commit)
+        } for @$irc;
     }
 
     return [200, [], ["OK"]]
