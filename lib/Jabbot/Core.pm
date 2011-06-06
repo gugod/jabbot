@@ -1,14 +1,19 @@
 package Jabbot::Core;
+use 5.012;
 use common::sense;
-use HTTP::Lite;
 use Plack::Request;
 use JSON qw(to_json);
 use UNIVERSAL::require;
 use Jabbot;
 use Try::Tiny;
 
-my $core;
+use AnyEvent;
+use AnyEvent::MP;
+use AnyEvent::MP::Global;
 
+configure;
+
+my $core;
 sub new {
     return $core if $core;
 
@@ -41,17 +46,21 @@ sub new {
 sub post {
     my ($self, %args) = @_;
     my $channel = $args{channel};
-    my $text     = $args{text};
+    my $text    = $args{text};
 
-    if ($channel =~ m{^/irc/}) {
-        my $server = Jabbot->config->{irc}{listen};
+    my $ports = grp_get "jabbot_irc"
+        or return;
 
-        my $http = HTTP::Lite->new;
-        $http->prepare_post({
-            'message[body]'    => $text,
-            'message[channel]' => $channel
-        });
-        $http->request("http://${server}${channel}");
+    if ($channel =~ m{^/irc/networks/([^/]+)/channels/([^/]+)}) {
+        my ($irc_network, $irc_channel) = ($1, $2);
+
+        for (@$ports) {
+            snd $_, message => {
+                network => $irc_network,
+                channel => $irc_channel,
+                body    => $text
+            };
+        }
     }
     return $self;
 }
@@ -65,6 +74,7 @@ sub answers {
     my ($self, %args) = @_;
     my @answers;
     my $q = $args{question};
+
     utf8::decode($q) unless utf8::is_utf8($q);
 
     for my $plugin (@{$self->{plugins}}) {
@@ -100,5 +110,38 @@ sub app {
     return [200, [], [ $response_body ]];
 }
 
+sub run {
+    my $self = Jabbot::Core->new;
+    my $port = rcv(
+        port,
+        action => sub {
+            my ($data, $reply_port) = @_;
+            my $name = $data->{name};
+
+            $reply_port ||= (grp_get("jabbot_irc") || [])->[0];
+
+            return unless $self->can($name);
+
+            my $reply;
+
+            try {
+                $reply = $self->$name(%{$data->{args}});
+
+                snd $reply_port, reply => {
+                    $name => $reply,
+                    network => $data->{args}{network},
+                    channel => $data->{args}{channel},
+                    from    => $data->{args}{from},
+                    to_me   => $data->{args}{to_me},
+                }
+            } catch {
+                say "ERROR:  $_";
+            };
+        }
+    );
+
+    my $guard = grp_reg "jabbot_core", $port;
+    AnyEvent->condvar->recv
+}
 
 1;

@@ -1,11 +1,25 @@
 package Jabbot::Front::IRC;
+use 5.012;
 use common::sense;
-use JSON qw(decode_json encode_json);
+use JSON qw(decode_json encode_json to_json);
+use Encode ();
 use Plack::Request;
 use Jabbot;
 use Jabbot::RemoteCore;
 use AnyEvent;
+use AnyEvent::MP;
+use AnyEvent::MP::Global;
 use AnyEvent::IRC::Client;
+
+configure;
+
+my $IRC_CLIENTS = {};
+my $networks = Jabbot->config->{irc}{networks};
+for (keys %$networks) {
+    $networks->{$_}{name} = $_;
+    $networks->{$_}{nick} ||= (Jabbot->config->{nick} || "jabbot_$$");
+    $IRC_CLIENTS->{$_} = init_irc_client($networks->{$_})
+}
 
 sub init_irc_client {
     my ($network) = @_;
@@ -52,39 +66,43 @@ sub init_irc_client {
             my $to_me = $text =~ s/^jabbot_*:\s+//;
             my $from_nick = AnyEvent::IRC::Util::prefix_nick($ircmsg->{prefix}) || "";
 
-            my $rc = Jabbot::RemoteCore->new;
-            my $answers = $rc->answers(question => $text, channel => "/networks/$network->{name}/channels/" . substr($channel, 1));
+            my $ports = grp_get "jabbot_core" or return;
 
-            my @to_send = ();
-            for my $answer (@$answers) {
-                if ($answer->{confidence} == 1) {
-                    push @to_send, ($to_me ? "${from_nick}: " : "") . $answer->{content};
-                    next;
-                }
-
-                last if @to_send > 0 || !$to_me;
-                push @to_send, "${from_nick}: " . $answer->{content};
+            for (@$ports) {
+                snd $_, action => {
+                    name => 'answers',
+                    args => {
+                        question => $text,
+                        network  => $network->{name},
+                        channel  => $channel,
+                        from     => $from_nick,
+                        to_me    => $to_me
+                    }
+                };
             }
 
-            for my $text (@to_send) {
-                $client->send_chan($channel, 'PRIVMSG', $channel, $text);
-            }
+            # my $rc = Jabbot::RemoteCore->new;
+            # my $answers = $rc->answers(
+            #     question => $text,
+            #     channel  => "/networks/$network->{name}/channels/" . substr($channel, 1)
+            # );
+            # my @to_send = ();
+            # for my $answer (@$answers) {
+            #     if ($answer->{confidence} == 1) {
+            #         push @to_send, ($to_me ? "${from_nick}: " : "") . $answer->{content};
+            #         next;
+            #     }
+            #     last if @to_send > 0 || !$to_me;
+            #     push @to_send, "${from_nick}: " . $answer->{content};
+            # }
+            # for my $text (@to_send) {
+            #     $client->send_chan($channel, 'PRIVMSG', $channel, $text);
+            # }
         }
     );
 
     $client->connect(@connection_args);
     return $client;
-}
-
-my $IRC_CLIENTS = {};
-
-{
-    my $networks = Jabbot->config->{irc}{networks};
-    for (keys %$networks) {
-        $networks->{$_}{name} = $_;
-        $networks->{$_}{nick} ||= (Jabbot->config->{nick} || "jabbot_$$");
-        $IRC_CLIENTS->{$_} = init_irc_client($networks->{$_})
-    }
 }
 
 sub app {
@@ -113,6 +131,47 @@ sub app {
     }
 
     return [200, [], ["OK"]]
+}
+
+sub run {
+    my $port = rcv(
+        port,
+
+        message => sub {
+            my ($data, $reply_port) = @_;
+
+            if (my $client = $IRC_CLIENTS->{$data->{network}}) {
+                my $channel = "#". $data->{channel};
+                my $body    = $data->{body};
+
+                unless ($client->channel_list($channel)) {
+                    $client->send_srv("JOIN", $channel);
+                }
+                $client->send_chan($channel, "PRIVMSG", $channel, $body);
+            }
+        },
+
+        reply => sub {
+            my ($data, $reply_port) = @_;
+            say "GOT REPLY: " . to_json($data);
+
+            return unless $data->{to_me};
+
+            my $client  = $IRC_CLIENTS->{$data->{network}} or return;
+            my $channel = $data->{channel};
+            my $body    = $data->{from} . ": " . $data->{answers}[0]{content};
+
+            unless ($client->channel_list($channel)) {
+                $client->send_srv("JOIN", $channel);
+            }
+
+            $client->send_chan($channel, "PRIVMSG", $channel, Encode::encode('utf8', $body));
+        }
+    );
+
+    my $guard = grp_reg "jabbot_irc", $port;
+
+    AnyEvent->condvar->recv;
 }
 
 1;
