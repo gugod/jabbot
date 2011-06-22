@@ -3,6 +3,8 @@ use common::sense;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
+use UNIVERSAL::require;
+
 $ENV{JABBOT_ROOT} = "$FindBin::Bin/..";
 
 my %runnables = (
@@ -17,6 +19,13 @@ use Jabbot;
 my $cmd = shift @ARGV;
 
 given($cmd) {
+    when('run') {
+        my $runnable = shift @ARGV or die "Need a name.";
+        my $module = $runnables{$runnable};
+        die "Do not know how to run $runnable\n" unless $module;
+        $module->require or die "Fail to load $module\n";
+        $module->run;
+    }
     when('start') {
         my $runner = Plack::Runner->new(server => 'Twiggy', env => 'production');
         $runner->parse_options(@ARGV);

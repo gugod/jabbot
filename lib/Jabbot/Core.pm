@@ -93,7 +93,8 @@ sub answers {
 
 sub run {
     my $self = Jabbot::Core->new;
-    my $port = rcv(
+
+    grp_reg jabbot_core => rcv(
         port,
         action => sub {
             my ($data, $reply_port) = @_;
@@ -121,7 +122,6 @@ sub run {
         }
     );
 
-    my $guard = grp_reg "jabbot_core", $port;
     AnyEvent->condvar->recv
 }
 

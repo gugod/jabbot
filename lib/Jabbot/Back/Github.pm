@@ -55,4 +55,12 @@ sub app {
     return [200, [], ["OK"]]
 }
 
+sub run {
+    require Plack::Runner;
+
+    my $runner = Plack::Runner->new(server => "Twiggy", env => "production");
+    $runner->parse_options("--port" => "15201");
+    $runner->run(\&app);
+}
+
 1;
