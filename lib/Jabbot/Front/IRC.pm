@@ -1,6 +1,6 @@
 package Jabbot::Front::IRC;
 use 5.012;
-use common::sense;
+use utf8;
 use JSON qw(decode_json encode_json);
 use Encode qw(encode_utf8);
 use Jabbot;
@@ -52,7 +52,7 @@ sub init_irc_client {
 
         publicmsg => sub {
             my ($client, $channel, $ircmsg) = @_;
-            my $text = $ircmsg->{params}[1];
+            my $text = Encode::decode("utf8", $ircmsg->{params}[1]);
             my $to_me = $text =~ s/^jabbot_*:\s+//;
             my $from_nick = AnyEvent::IRC::Util::prefix_nick($ircmsg->{prefix}) || "";
 
@@ -60,13 +60,14 @@ sub init_irc_client {
 
             for (@$ports) {
                 snd $_, action => {
-                    name => 'answers',
+                    name => 'answer',
+                    node     => "jabbot_irc",
                     args => {
-                        question => $text,
                         network  => $network->{name},
                         channel  => $channel,
                         from     => $from_nick,
-                        to_me    => $to_me
+                        to_me    => $to_me,
+                        question => $text
                     }
                 };
             }
@@ -104,12 +105,13 @@ sub run {
         },
 
         reply => sub {
-            my ($data, $reply_port) = @_;
+            my ($data) = @_;
+
             return unless $data->{to_me};
 
             my $client  = $IRC_CLIENTS->{$data->{network}} or return;
             my $channel = $data->{channel};
-            my $body    = $data->{from} . ": " . $data->{answers}[0]{content};
+            my $body    = $data->{from} . ": " . $data->{answer}{content};
 
             unless ($client->channel_list($channel)) {
                 $client->send_srv("JOIN", $channel);

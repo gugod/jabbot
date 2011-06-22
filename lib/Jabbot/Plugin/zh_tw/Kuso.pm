@@ -1,4 +1,7 @@
 package Jabbot::Plugin::zh_tw::Kuso;
+use 5.012;
+use utf8;
+use encoding 'utf8';
 use Jabbot::Plugin;
 
 my @foods = (
@@ -67,8 +70,8 @@ sub answer {
             $reply = "OKAY"
         }
         when(/(?:早上|中午|晚上|早餐|午餐|晚餐|宵夜|現在|\A)要?(吃|喫)(啥|什麼)?/) {
-            $reply = "";
-            $reply .= $foods[ int(rand( @foods )) ];
+            $reply = $foods[ int(rand( @foods )) ];
+            $confidence = 0.9;
         }
     }
 

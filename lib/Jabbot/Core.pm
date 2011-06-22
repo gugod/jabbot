@@ -1,6 +1,7 @@
 package Jabbot::Core;
 use 5.012;
-use common::sense;
+use utf8;
+use encoding 'utf8';
 use JSON qw(to_json);
 use UNIVERSAL::require;
 use Jabbot;
@@ -74,8 +75,6 @@ sub answers {
     my @answers;
     my $q = $args{question};
 
-    utf8::decode($q) unless utf8::is_utf8($q);
-
     for my $plugin (@{$self->{plugins}}) {
         if ($plugin->can_answer($q, \%args)) {
             try {
@@ -97,25 +96,23 @@ sub run {
     grp_reg jabbot_core => rcv(
         port,
         action => sub {
-            my ($data, $reply_port) = @_;
+            my ($data) = @_;
             my $name = $data->{name};
-
-            $reply_port ||= (grp_get("jabbot_irc") || [])->[0];
-
             return unless $self->can($name);
 
             my $reply;
 
             try {
                 $reply = $self->$name(%{$data->{args}});
+                my $reply_port = grp_get($data->{node});
 
-                snd $reply_port, reply => {
-                    $name => $reply,
+                snd $_, reply => {
+                    $name   => $reply,
                     network => $data->{args}{network},
                     channel => $data->{args}{channel},
                     from    => $data->{args}{from},
                     to_me   => $data->{args}{to_me},
-                }
+                } for @$reply_port;
             } catch {
                 say "ERROR:  $_";
             };
