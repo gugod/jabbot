@@ -132,13 +132,15 @@ sub cat {
     my $w = AnyEvent->timer(
         after => 1,
         cb => sub {
-            my $irc = grp_get "jabbot_irc" or die "Unable to send messages to irc clients.\n";
+            my $irc = grp_get "jabbot_irc";
 
-            snd $_, post => {
-                network => $network,
-                channel => $channel,
-                body    => $body
-            } for @$irc;
+            if ($irc) {
+		snd $_, post => {
+		    network => $network,
+		    channel => $channel,
+		    body    => $body
+		} for @$irc;
+            }
 
             $cv->send;
         }
