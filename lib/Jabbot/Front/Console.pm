@@ -1,22 +1,53 @@
 package Jabbot::Front::Console;
 use common::sense;
-use Jabbot::RemoteCore;
-use Term::ReadLine;
+use AnyEvent;
+use AnyEvent::MP;
+use AnyEvent::MP::Global;
+use AnyEvent::IRC::Client;
 
 sub run {
+    configure nodeid => "jabbot_console";
+
     say "Jabbot Console. Hit Ctrl-C to quit.";
 
-    my $j = Jabbot::RemoteCore->new;
-    my $term = Term::ReadLine->new('jabbot');
-    my $prompt = "\njabbot> ";
-    my $OUT = $term->OUT || \*STDOUT;
-    while ( defined ($_ = $term->readline($prompt)) ) {
-        my $ans = $j->answer(question => $_);
-        warn $@ if $@;
-        say $OUT $ans->{content} unless $@;
+    my $answered = AE::cv;
 
-        $term->addhistory($_) if /\S/;
-    }
+    grp_reg jabbot_console => rcv
+        port,
+        reply => sub {
+            my $data = shift;
+
+            say "\njabbot: " . $data->{answer}{content} . "\n";
+        };
+
+    my $ask = sub {
+        my $question = shift;
+
+        my $ports = grp_get "jabbot_core" or return;
+
+        for (@$ports) {
+            snd $_, action => {
+                name => 'answer',
+                node => "jabbot_console",
+                args => {
+                    network  => "jabbot_console",
+                    channel  => "jabbot_console",
+                    from     => $ENV{USER} || "user",
+                    to_me    => 1,
+                    question => $question
+                }
+            };
+        }
+    };
+
+    $| = 1;
+    my $question_ready = AE::io *STDIN, 0, sub {
+        local $_= <STDIN>;
+        chomp;
+        $ask->($_);
+    };
+
+    AE::cv->recv;
 }
 
-&run;
+1;
