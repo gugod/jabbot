@@ -8,6 +8,7 @@ CGI::Simple
 Cache::Memory
 Chatbot::Eliza
 Data::Thunk
+Feersum
 HTML::Strip
 HTML::TreeBuilder::Select
 HTTP::Lite
