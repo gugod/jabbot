@@ -3,21 +3,26 @@ use common::sense;
 use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
-
-my $self = bless {}, __PACKAGE__;
-
-sub new {
-    return $self;
-}
+use Scalar::Util qw(refaddr);
 
 configure;
 
-grp_reg jabbot_remotecore => rcv
-    port,
-    reply => sub {
-        my $data = shift;
-        $self->{answers}->send(@{ $data->{answers} });
-    };
+sub new {
+    my $self = bless {}, __PACKAGE__;
+
+    $self->{_aemp_port} = port;
+    $self->{_aemp_node} = "jabbot_remotecore_" . refaddr($self);
+
+    grp_reg $self->{_aemp_node} =>
+        rcv $self->{_aemp_port},
+            reply => sub {
+                my $data = shift;
+                $self->{answers}->send(@{ $data->{answers} });
+            };
+
+    return $self;
+}
+
 
 sub answers {
     my ($self, %args) = @_;
@@ -34,7 +39,7 @@ sub answers {
             undef $ready;
 
             for (@$ports) {
-                snd $_, action => { node => "jabbot_remotecore", name => "answers", args => \%args };
+                snd $_, action => { node => $self->{_aemp_node}, name => "answers", args => \%args };
             }
         }
     };
