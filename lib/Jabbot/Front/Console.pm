@@ -1,51 +1,33 @@
 package Jabbot::Front::Console;
+use v5.12;
 use common::sense;
 use AnyEvent;
-use AnyEvent::MP;
-use AnyEvent::MP::Global;
-use AnyEvent::IRC::Client;
+use Jabbot::RemoteCore;
 
 sub run {
-    configure nodeid => "jabbot_console";
-
     say "Jabbot Console. Hit Ctrl-C to quit.";
+    binmode STDIN, ":utf8";
+    binmode STDOUT, ":utf8";
 
-    my $answered = AE::cv;
+    my $jabbot = Jabbot::RemoteCore->new;
 
-    grp_reg jabbot_console => rcv
-        port,
-        reply => sub {
-            my $data = shift;
+    local $| = 1;
 
-            say "\njabbot: " . $data->{answer}{content} . "\n";
-        };
+    print "jabbot> ";
 
-    my $ask = sub {
-        my $question = shift;
-
-        my $ports = grp_get "jabbot_core" or return;
-
-        for (@$ports) {
-            snd $_, action => {
-                name => 'answer',
-                node => "jabbot_console",
-                args => {
-                    network  => "jabbot_console",
-                    channel  => "jabbot_console",
-                    from     => $ENV{USER} || "user",
-                    to_me    => 1,
-                    question => $question
-                }
-            };
-        }
-    };
-
-    $| = 1;
-    my $question_ready = AE::io *STDIN, 0, sub {
-        local $_= <STDIN>;
+    while( $_ = <>) {
         chomp;
-        $ask->($_);
-    };
+        my $answer = $jabbot->answer(question => $_);
+
+        if ($answer) {
+            say $answer->{content}
+        }
+        else {
+            say "NO ANSWER";
+        }
+
+        print "jabbot> ";
+    }
 
     AE::cv->recv;
 }
