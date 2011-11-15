@@ -26,9 +26,4 @@ given($cmd) {
         $module->require or die "Fail to load $module\n";
         $module->run;
     }
-    when('start') {
-        my $runner = Plack::Runner->new(server => 'Twiggy', env => 'production');
-        $runner->parse_options(@ARGV);
-        $runner->run;
-    }
 }
