@@ -1,6 +1,6 @@
 #!/bin/sh
 
-aemp run profile seed &
 bin/jabbot run core &
+bin/jabbot run memory &
 bin/jabbot run irc &
 bin/jabbot run github &
