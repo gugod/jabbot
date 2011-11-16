@@ -9,8 +9,6 @@ use AnyEvent::MP;
 use AnyEvent::MP::Global;
 use AnyEvent::IRC::Client;
 
-configure;
-
 sub init_irc_client {
     my ($network) = @_;
 
@@ -79,6 +77,9 @@ sub init_irc_client {
 }
 
 sub run {
+
+    configure profile => "jabbot-irc";
+
     my $IRC_CLIENTS = {};
     my $networks = Jabbot->config->{irc}{networks};
     for (keys %$networks) {

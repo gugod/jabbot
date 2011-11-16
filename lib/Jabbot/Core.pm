@@ -11,8 +11,6 @@ use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
 
-configure;
-
 my $core;
 sub new {
     return $core if $core;
@@ -92,6 +90,8 @@ sub answers {
 
 sub run {
     my $self = Jabbot::Core->new;
+
+    configure profile => "jabbot-core";
 
     grp_reg jabbot_core => rcv(
         port,

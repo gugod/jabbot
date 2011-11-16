@@ -6,8 +6,6 @@ use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
 
-configure;
-
 sub committer_name {
     my $commit = shift;
     my $name = $commit->{author}{email};
@@ -56,6 +54,8 @@ sub app {
 }
 
 sub run {
+    configure profile => "jabbot-github";
+
     require Plack::Runner;
 
     my $runner = Plack::Runner->new(server => "Twiggy", env => "production");

@@ -5,9 +5,8 @@ use AnyEvent;
 use AnyEvent::MP;
 use ANyEvent::MP::Global;
 
-configure profile => "jabbot-memory";
-
 sub run {
+    configure profile => "jabbot-memory";
     AE::cv->recv;
 }
 
