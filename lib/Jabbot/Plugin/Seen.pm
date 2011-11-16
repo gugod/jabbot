@@ -19,8 +19,8 @@ sub answer {
     my ($text) = @args;
     my $nick = $self->{nick};
 
-    # my $ans = AE::cv;
-    # Jabbot->memory->get("seen", $nick, $ans);
+    my $ans = AE::cv;
+    Jabbot->memory->get("seen", $nick, $ans);
 
     return $ans->recv;
 }
