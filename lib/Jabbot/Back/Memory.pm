@@ -23,25 +23,29 @@ use YAML;
     }
 }
 
-
-
 sub run {
     configure profile => "jabbot-memory";
     grp_reg "jabbot-memory", rcv port,
         get => sub {
-            my ($collection, $key) = @_;
-            return unless $collection && $key;
+            my ($collection, $key, $reply_port) = @_;
+            return unless $collection && $key && $reply_port;
 
             my $co = db->get_collection($collection);
-            return $co->find_one({ _name => $key });
+            my $doc = $co->find_one($key);
+
+            snd $reply_port, $doc;
         },
+
         set => sub {
             my ($collection, $key, $value) = @_;
-            say YAML::Dump(\@_);
             return unless $collection && $key && defined($value);
 
             my $co = db->get_collection($collection);
-            $co->insert($key, $value);
+
+            $co->update($key, $value, { upsert => 1 });
+
+            db->commit("memorize: ${collection}.${key}");
+
             return 1;
         };
 

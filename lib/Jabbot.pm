@@ -33,6 +33,9 @@ use YAML;
     }
 }
 
+use Jabbot::Memory;
+sub memory { "Jabbot::Memory" }
+
 1;
 
 __END__
