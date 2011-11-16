@@ -59,7 +59,6 @@ sub answer {
 
             if ($self->{habiulai_count} > 1 + 4 * rand) {
                 $reply = "還不賴！";
-                $confidence = 1;
                 $self->{habiulai_count} = 0;
             }
         }

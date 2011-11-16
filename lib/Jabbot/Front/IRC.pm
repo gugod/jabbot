@@ -108,7 +108,7 @@ sub run {
         reply => sub {
             my ($data) = @_;
 
-            return unless $data->{to_me};
+            return unless $data->{to_me} || $data->{answer}{confidence} == 1;
 
             my $client  = $IRC_CLIENTS->{$data->{network}} or return;
             my $channel = $data->{channel};
