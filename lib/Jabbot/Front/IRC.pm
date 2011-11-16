@@ -114,7 +114,7 @@ sub run {
 
             my $client  = $IRC_CLIENTS->{$data->{network}} or return;
             my $channel = $data->{channel};
-            my $body    = $data->{from} . ": " . $data->{answer}{content};
+            my $body    = ($data->{to_me} ? ($data->{from} . ": ") : "") . $data->{answer}{content};
 
             unless ($client->channel_list($channel)) {
                 $client->send_srv("JOIN", $channel);
