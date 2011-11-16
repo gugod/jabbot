@@ -42,11 +42,14 @@ sub run {
 
             my $co = db->get_collection($collection);
 
-            $co->update($key, $value, { upsert => 1 });
+            if ($co->find_one($key)) {
+                $co->update($key, $value);
+            }
+            else {
+                $co->insert($key, $value);
+            }
 
             db->commit("memorize: ${collection}.${key}");
-
-            return 1;
         };
 
     AE::cv->recv;
