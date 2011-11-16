@@ -47,7 +47,7 @@ sub answer {
 
     my $reply;
 
-    my $confidence = 0.5;
+    my $confidence = 0.9;
 
     given($text) {
         when("!") {
@@ -68,9 +68,8 @@ sub answer {
         when(/^sudo\s+make/) {
             $reply = "OKAY"
         }
-        when(/(?:早上|中午|晚上|早餐|午餐|晚餐|宵夜|現在|\A)要?(吃|喫)(啥|什麼)?/) {
+        when(/(?:早上|中午|晚上|早餐|午餐|晚餐|宵夜|現在|今天|明天|等一下|\A)?要?(吃|喫)(啥|什麼)?/) {
             $reply = $foods[ int(rand( @foods )) ];
-            $confidence = 0.9;
         }
     }
 
