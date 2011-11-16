@@ -7,7 +7,8 @@ use AnyEvent::MP::Global;
 
 sub get {
     my ($collection, $key, $cb) = @args;
-    my $ports = grp_get "jabbot-memory" or die "Failed to find ports for jabbot-memory";
+    return unless $collection && $key && $cb;
+    my $ports = grp_get "jabbot-memory" or return;
 
     my $value = AE::cv;
     $value->cb(sub {$cb->($_[0]->recv) });
@@ -20,7 +21,7 @@ sub get {
 sub set {
     my ($collection, $key, $value) = @args;
     return unless $collection && $key && defined($value);
-    my $ports = grp_get "jabbot-memory" or die "Failed to find ports for jabbot-memory";
+    my $ports = grp_get "jabbot-memory" or return;
 
     for (@$ports) {
         snd $_, "set" => $collection, $key, $value;
