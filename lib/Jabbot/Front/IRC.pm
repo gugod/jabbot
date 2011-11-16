@@ -54,6 +54,8 @@ sub init_irc_client {
             my $to_me = $text =~ s/^jabbot_*:\s+//;
             my $from_nick = AnyEvent::IRC::Util::prefix_nick($ircmsg->{prefix}) || "";
 
+            return if $from_nick =~ /jabbot_*/;
+
             my $ports = grp_get "jabbot_core" or return;
 
             for (@$ports) {
