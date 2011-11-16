@@ -70,6 +70,11 @@ sub answer {
         }
         when(/(?:早上|中午|晚上|早餐|午餐|晚餐|宵夜|現在|今天|明天|等一下|\A)?要?(吃|喫)(啥|什麼)?/) {
             $reply = $foods[ int(rand( @foods )) ];
+            if (rand > 0.8) {
+                for (1..7) {
+                    $reply .= ", " . $foods[ int(rand( @foods )) ];
+                }
+            }
         }
     }
 
