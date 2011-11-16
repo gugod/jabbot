@@ -52,3 +52,4 @@ YAML
 common::sense
 inc::Module::Install
 self
+Giddy
