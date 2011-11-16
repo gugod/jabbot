@@ -28,4 +28,14 @@ sub set {
     }
 }
 
+sub update {
+    my ($collection, $query, $object, $options) = @args;
+    return unless $collection && $query && $object;
+    my $ports = grp_get "jabbot-memory" or return;
+
+    for (@$ports) {
+        snd $_, "update" => $collection, $query, $object, $options;
+    }
+}
+
 1;

@@ -50,6 +50,25 @@ sub run {
             }
 
             db->commit("memorize: ${collection}.${key}");
+        },
+
+        update => sub {
+            my ($collection, $query, $object, $options) = @_;
+            return unless $collection && $query && defined($object);
+
+            my $co = db->get_collection($collection);
+
+            if ($co->find_one($query)) {
+                $co->update($query, $object, $options);
+            }
+            else {
+                $co->insert($query, {});
+                db->commit;
+
+                $co->update($query, $object, $options);
+            }
+
+            db->commit;
         };
 
     AE::cv->recv;
