@@ -41,28 +41,6 @@ sub new {
     return $self;
 }
 
-sub post {
-    my ($self, %args) = @_;
-    my $channel = $args{channel};
-    my $text    = $args{text};
-
-    my $ports = grp_get "jabbot_irc"
-        or return;
-
-    if ($channel =~ m{^/irc/networks/([^/]+)/channels/([^/]+)}) {
-        my ($irc_network, $irc_channel) = ($1, $2);
-
-        for (@$ports) {
-            snd $_, message => {
-                network => $irc_network,
-                channel => $irc_channel,
-                body    => $text
-            };
-        }
-    }
-    return $self;
-}
-
 sub answer {
     my ($self, %args) = @_;
     return $self->answers(%args)->[0];
