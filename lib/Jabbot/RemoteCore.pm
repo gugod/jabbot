@@ -11,7 +11,7 @@ sub new {
     my $self = bless {}, __PACKAGE__;
 
     $self->{_aemp_port} = port;
-    $self->{_aemp_node} = "jabbot_remotecore_" . refaddr($self);
+    $self->{_aemp_node} = "jabbot-remotecore-" . refaddr($self);
 
     grp_reg $self->{_aemp_node} =>
         rcv $self->{_aemp_port},
@@ -35,7 +35,7 @@ sub answers {
     my $ready;
 
     $ready = AE::idle sub {
-        if (my $ports = grp_get "jabbot_core") {
+        if (my $ports = grp_get "jabbot-core") {
             undef $ready;
 
             for (@$ports) {

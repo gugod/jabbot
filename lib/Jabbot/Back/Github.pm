@@ -31,7 +31,7 @@ sub app {
     return [404, [], ["NOT FOUND"]] if $req->path eq '/';
 
     my ($network, $channel) = $req->path =~ m{/networks/([^/]+)/channels/([^/]+)};
-    my $irc = grp_get "jabbot_irc";
+    my $irc = grp_get "jabbot-irc";
 
     return [404, [], ["NOT FOUND"]] unless $network && $channel && $irc;
 

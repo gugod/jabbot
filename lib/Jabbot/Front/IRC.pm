@@ -56,12 +56,12 @@ sub init_irc_client {
 
             return if $from_nick =~ /jabbot_*/;
 
-            my $ports = grp_get "jabbot_core" or return;
+            my $ports = grp_get "jabbot-core" or return;
 
             for (@$ports) {
                 snd $_, action => {
                     name => 'answer',
-                    node     => "jabbot_irc",
+                    node => "jabbot-irc",
                     args => {
                         network  => $network->{name},
                         channel  => $channel,
@@ -103,6 +103,7 @@ sub run {
                 unless ($client->channel_list($channel)) {
                     $client->send_srv("JOIN", $channel);
                 }
+
                 $client->send_chan($channel, "PRIVMSG", $channel, $body);
             }
         },
@@ -124,7 +125,7 @@ sub run {
         }
     );
 
-    my $guard = grp_reg "jabbot_irc", $port;
+    my $guard = grp_reg "jabbot-irc", $port;
 
     AnyEvent->condvar->recv;
 }
@@ -137,7 +138,7 @@ sub cat {
     my $w = AnyEvent->timer(
         after => 1,
         cb => sub {
-            my $irc = grp_get "jabbot_irc";
+            my $irc = grp_get "jabbot-irc";
 
             if ($irc) {
 		snd $_, post => {

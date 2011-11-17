@@ -71,7 +71,7 @@ sub run {
 
     configure profile => "jabbot-core";
 
-    grp_reg jabbot_core => rcv(
+    grp_reg 'jabbot-core' => rcv(
         port,
         action => sub {
             my ($data) = @_;
