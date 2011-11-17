@@ -81,16 +81,17 @@ sub run {
             my $reply;
 
             try {
-                $reply = $self->$name(%{$data->{args}});
-                my $reply_port = grp_get($data->{node});
+                if ($reply = $self->$name(%{$data->{args}})) {
+                    my $reply_port = grp_get($data->{node});
 
-                snd $_, reply => {
-                    $name   => $reply,
-                    network => $data->{args}{network},
-                    channel => $data->{args}{channel},
-                    from    => $data->{args}{from},
-                    to_me   => $data->{args}{to_me},
-                } for @$reply_port;
+                    snd $_, reply => {
+                        $name   => $reply,
+                        network => $data->{args}{network},
+                        channel => $data->{args}{channel},
+                        from    => $data->{args}{from},
+                        to_me   => $data->{args}{to_me},
+                    } for @$reply_port;
+                }
             } catch {
                 say "ERROR:  $_";
             };
