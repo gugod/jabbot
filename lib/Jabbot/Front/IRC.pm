@@ -4,6 +4,7 @@ use utf8;
 use JSON qw(decode_json encode_json);
 use Encode qw(encode_utf8);
 use Jabbot;
+
 use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
@@ -79,7 +80,6 @@ sub init_irc_client {
 }
 
 sub run {
-
     configure profile => "jabbot-irc";
 
     my $IRC_CLIENTS = {};
@@ -133,6 +133,8 @@ sub run {
 sub cat {
     my ($class, $network, $channel, $body) = @_;
 
+    configure;
+
     my $cv = AnyEvent->condvar;
 
     my $w = AnyEvent->timer(
@@ -146,6 +148,9 @@ sub cat {
 		    channel => $channel,
 		    body    => $body
 		} for @$irc;
+            }
+            else {
+                warn "No port found for jabbot-irc. Huh?";
             }
 
             $cv->send;
