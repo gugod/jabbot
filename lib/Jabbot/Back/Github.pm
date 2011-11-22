@@ -5,7 +5,6 @@ use Plack::Request;
 use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
-use Time::HiRes qw(usleep);
 
 sub committer_name {
     my $commit = shift;
@@ -47,7 +46,6 @@ sub app {
     my $limit = 10;
     my @commits = @{ $payload->{commits} || [] };
     for my $commit ( @commits ) {
-        usleep 300_000;
         if(++$cnt > $limit ) {  # avoid flood
             snd $_ , post => { 
                 network => $network,

@@ -90,38 +90,46 @@ sub run {
         $IRC_CLIENTS->{$_} = init_irc_client($networks->{$_})
     }
 
+    my @irc_privmsg_q;
+    my $irc_privmsg_t;
+    my $irc_send_privmsg  = sub {
+        return unless $IRC_CLIENTS->{$_[0]};
+
+        push @irc_privmsg_q, [@_];
+
+        $irc_privmsg_t ||= AE::timer 1, 1, sub {
+            my ($network, $channel, $body) = @{shift @irc_privmsg_q};
+
+            my $client  = $IRC_CLIENTS->{$network};
+
+            unless ($client->channel_list($channel)) {
+                $client->send_srv("JOIN", $channel);
+            }
+
+            $client->send_chan($channel, "PRIVMSG", $channel, $body);
+
+            undef $irc_privmsg_t unless @irc_privmsg_q;
+        };
+    };
+
     my $port = rcv(
         port,
 
         post => sub {
             my ($data, $reply_port) = @_;
 
-            if (my $client = $IRC_CLIENTS->{$data->{network}}) {
-                my $channel = $data->{channel};
-                my $body    = $data->{body};
-
-                unless ($client->channel_list($channel)) {
-                    $client->send_srv("JOIN", $channel);
-                }
-
-                $client->send_chan($channel, "PRIVMSG", $channel, $body);
-            }
+            $irc_send_privmsg->($data->{network}, $data->{channel}, $data->{body});
         },
 
         reply => sub {
             my ($data) = @_;
-
             return unless $data->{to_me} || $data->{answer}{confidence} == 1;
 
-            my $client  = $IRC_CLIENTS->{$data->{network}} or return;
-            my $channel = $data->{channel};
-            my $body    = ($data->{to_me} ? ($data->{from} . ": ") : "") . $data->{answer}{content};
+            my $body = encode_utf8(
+                ($data->{to_me} ? ($data->{from} . ": ") : "") . $data->{answer}{content}
+            );
 
-            unless ($client->channel_list($channel)) {
-                $client->send_srv("JOIN", $channel);
-            }
-
-            $client->send_chan($channel, "PRIVMSG", $channel, encode_utf8($body));
+            $irc_send_privmsg->($data->{network}, $data->{channel}, $body);
         }
     );
 
