@@ -5,6 +5,7 @@ use Plack::Request;
 use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
+use Time::HiRes qw(usleep);
 
 sub committer_name {
     my $commit = shift;
@@ -43,6 +44,7 @@ sub app {
     }
 
     for my $commit (@{ $payload->{commits} || [] }) {
+        usleep 300_000;
         snd $_, post => {
             network => $network,
             channel => $channel,

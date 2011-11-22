@@ -14,6 +14,7 @@ requires(
          POE::Component::IRC => 6.06,
          POE::Component::IKC => 0,
          Time::Interval => 0,
+         Time::HiRes => 0,
          Perl6::Say => 0,
          URI::Title => 0,
          Regexp::Common => 0,
