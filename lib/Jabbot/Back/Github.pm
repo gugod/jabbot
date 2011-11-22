@@ -9,8 +9,8 @@ use Time::HiRes qw(usleep);
 
 sub committer_name {
     my $commit = shift;
-    my $name = $commit->{author}{email};
-    $name =~ s/@.+$//;
+    my $name = $commit->{author}->{name};
+    # $name =~ s/@.+$//;
     return $name;
 }
 
