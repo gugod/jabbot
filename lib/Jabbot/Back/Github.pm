@@ -74,3 +74,12 @@ sub run {
 }
 
 1;
+__END__
+
+=pod
+
+GitHub post-hook
+
+L<http://help.github.com/post-receive-hooks/>
+
+=cut
