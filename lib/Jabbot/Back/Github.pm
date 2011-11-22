@@ -43,8 +43,18 @@ sub app {
         $channel = "#" . $channel;
     }
 
-    for my $commit (@{ $payload->{commits} || [] }) {
+    my $cnt = 0;
+    my $limit = 10;
+    my @commits = @{ $payload->{commits} || [] };
+    for my $commit ( @commits ) {
         usleep 300_000;
+        if(++$cnt > $limit ) {  # avoid flood
+            snd $_ , post => { 
+                network => $network,
+                channel => $channel,
+                body => 'and pushed other ' . (scalar(@commits) - $cnt). ' commits.'
+            } for @$irc;
+        }
         snd $_, post => {
             network => $network,
             channel => $channel,
