@@ -6,3 +6,4 @@ aemp profile jabbot-core   nodeid jabbot-core binds '*:4040'
 aemp profile jabbot-memory nodeid jabbot-memory
 aemp profile jabbot-irc    nodeid jabbot-irc
 aemp profile jabbot-github nodeid jabbot-github
+aemp profile jabbot-cpantw nodeid jabbot-cpantw

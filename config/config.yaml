@@ -35,7 +35,5 @@ feeds:
 
 cpanfeeds:
   CPAN-Upload:
-    type: rss
-    url: 'http://search.cpan.org/uploads.rdf'
     publish_to:
       - "freenode:chupei.pm"
