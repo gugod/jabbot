@@ -33,7 +33,7 @@ feeds:
     publish_to:
       - "freenode:jabbot"
 
-cpanfeeds:
-  CPAN-Upload:
-    publish_to:
-      - "freenode:chupei.pm"
+cpantw:
+  publish_to:
+#    - "freenode:chupei.pm"
+    - "freenode:jabbot"
