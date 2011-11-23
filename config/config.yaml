@@ -11,6 +11,8 @@ irc:
       port: 6667
       channels:
         - jabbot
+        - chupei.pm
+        - perl.tw
 
 plugins: []
   # - HandlinoRedmine

@@ -8,15 +8,12 @@ use AnyEvent::HTTP;
 use URI;
 use XML::RSS;
 use Acme::CPANAuthors;
+use Encode qw(encode_utf8);
 
 sub publish_message {
     my %args = @_;
     my $irc = grp_get "jabbot-irc";
-    snd $_ , post => { 
-        network => $args{network},
-        channel => $args{channel},
-        body => $args{msg},
-            } for @$irc;
+    snd $_ , post => \%args for @$irc;
 }
 
 
@@ -27,8 +24,7 @@ sub run {
 
     die 'config is not defined.' unless $config;
 
-    my %publish_to = map { split /:/ } @{ $config->{publish_to} };
-
+    my %publish_to = map { $_ => [ split /:/ ] } @{ $config->{publish_to} };
     die 'network or channel is required' unless %publish_to;
 
     my %displayed = ();
@@ -55,9 +51,13 @@ sub run {
 
                 next if $displayed{ $link };
                 $displayed{ $link } = 1;
-                while( my ($network,$channel) = each %publish_to ) {
+
+                my $msg = sprintf('%s by %s', $link , $author_id);
+                for my $to ( values %publish_to ) {
+                    my ($network,$channel) = @$to;
+                    print "$network:$channel => $msg\n";
                     publish_message 
-                            msg => $link, 
+                            body    => $msg, 
                             network => $network, 
                             channel => $channel;
                 }

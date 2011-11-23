@@ -26,14 +26,13 @@ use YAML;
         my $config2 = {};
         my $x = root . "/config/site_config.yaml";
 
-        if( -f $x ) {
+        if( -e $x ) {
             say "found config: $x";
             $config2 = YAML::LoadFile($x);
         }
 
         my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
         $config = $merger->merge($config1, $config2);
-
         return $config;
     }
 }
