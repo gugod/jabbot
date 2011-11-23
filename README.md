@@ -10,8 +10,6 @@ front:
 back:
   github: 15201
 
-
-
 Current Status
 --------------
 
@@ -20,6 +18,30 @@ Current Status
 
     lib/Jabbot/Front      - new anyevent frontend
     lib/jabbot/FrontEnd   - old frontend
+
+Setup
+-----
+Make sure AnyEvent::MP is installed.
+
+copy and edit config:
+
+    cp config/config.yaml config/site_config.yaml
+    vim config/site_config.yaml
+
+setup anyevent mp group node:
+
+    bin/jabbot-setup
+
+boot up jabbot core, irc and any other daemons:
+
+    bin/jabbot-boot
+
+
+Debugging
+---------
+
+    export PERL_ANYEVENT_MP_TRACE=1
+    perl bin/jabbot-irccat freenode "#chupei.pm" testing message
 
 Getting Started
 ---------------
@@ -39,7 +61,7 @@ Declare a class in `lib/Jabbot/Back/NewBack.pm`, a basic structure:
     sub run {
         configure profile => "jabbot-newback";
         my $config = Jabbot->config->{newback};  # hash
-        my $irc    = grp_get "jabbot-irc";       # irc object
+        my $irc    = grp_get "jabbot-irc";       # get irc object
         snd $_ , post => { 
             network => 'freenode',
             channel => 'chupei.pm',
