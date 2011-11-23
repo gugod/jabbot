@@ -15,7 +15,6 @@ requires(
          POE::Component::IKC => 0,
          Time::Interval => 0,
          Time::HiRes => 0,
-         Perl6::Say => 0,
          URI::Title => 0,
          Regexp::Common => 0,
          'WWW::Shorten' => 0,
