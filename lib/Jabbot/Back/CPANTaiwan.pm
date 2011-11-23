@@ -16,7 +16,6 @@ sub publish_message {
     snd $_ , post => \%args for @$irc;
 }
 
-
 sub run {
     configure profile => "jabbot-cpantw";
     my $taiwan_authors     = Acme::CPANAuthors->new('Taiwanese');
