@@ -11,8 +11,6 @@ irc:
       port: 6667
       channels:
         - jabbot
-        - chupei.pm
-        - perl.tw
 
 plugins: []
   # - HandlinoRedmine
@@ -37,8 +35,7 @@ feeds:
 
 cpantw:
   publish_to:
-    - "freenode:#perl.tw"
-    - "freenode:#chupei.pm"
+#    - "freenode:#chupei.pm"
     - "freenode:#jabbot"
 
 twitter:

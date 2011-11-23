@@ -118,7 +118,7 @@ sub run {
 
         post => sub {
             my ($data, $reply_port) = @_;
-            $irc_send_privmsg->($data->{network}, $data->{channel}, $data->{body}, $data->{command});
+            $irc_send_privmsg->($data->{network}, $data->{channel}, encode_utf8($data->{body}) , $data->{command});
         },
 
         reply => sub {

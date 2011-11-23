@@ -8,6 +8,8 @@ use AnyEvent::MP;
 use AnyEvent::MP::Global;
 use AnyEvent::HTTP;
 use AE;
+use utf8;
+use Encode qw(decode_utf8);
 
 sub publish_message {
     my %args = @_;

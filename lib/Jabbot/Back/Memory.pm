@@ -31,7 +31,6 @@ sub run {
 
             my $co = db->get_collection($collection);
             my $doc = $co->find_one($key);
-
             snd $reply_port, $doc;
         },
 
