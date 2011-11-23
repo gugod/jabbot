@@ -101,6 +101,7 @@ sub run {
         $irc_privmsg_t ||= AE::timer 1, 1, sub {
             my ($network, $channel, $body, $command) = @{shift @irc_privmsg_q};
             $command ||= 'PRIVMSG';
+            $command = uc $command;
 
             my $client  = $IRC_CLIENTS->{$network};
             unless ($client->channel_list($channel)) {
