@@ -13,6 +13,7 @@ my %runnables = (
     github  => 'Jabbot::Back::GitHub',
     memory  => 'Jabbot::Back::Memory',
     cpantw  => 'Jabbot::Back::CPANTaiwan',
+    twitter => 'Jabbot::Back::Twitter',
     core    => 'Jabbot::Core'
 );
 

@@ -24,6 +24,7 @@ sub run {
     die 'config is not defined.' unless $config;
 
     my %publish_to = map { $_ => [ split /:/ ] } @{ $config->{publish_to} };
+
     die 'network or channel is required' unless %publish_to;
 
     my %displayed = ();
