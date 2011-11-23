@@ -35,5 +35,5 @@ feeds:
 
 cpantw:
   publish_to:
-#    - "freenode:chupei.pm"
-    - "freenode:jabbot"
+    - "freenode:#chupei.pm"
+    - "freenode:#jabbot"

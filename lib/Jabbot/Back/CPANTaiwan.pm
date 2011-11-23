@@ -1,20 +1,17 @@
 package Jabbot::Back::CPANTaiwan;
-use warnings;
-use strict;
 use common::sense;
 use JSON qw(decode_json encode_json);
 use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
-use URI;
 use AnyEvent::HTTP;
+use URI;
 use XML::RSS;
 use Acme::CPANAuthors;
-use WWW::Shorten 'TinyURL';
 
 sub publish_message {
     my %args = @_;
-    my $irc = grp_get "jabbot-cpantw";
+    my $irc = grp_get "jabbot-irc";
     snd $_ , post => { 
         network => $args{network},
         channel => $args{channel},
@@ -34,14 +31,19 @@ sub run {
 
     die 'network or channel is required' unless %publish_to;
 
+    my %displayed = ();
+
     my $uri                = URI->new( $config->{url} || 'http://frepan.org/feed/index.rss' );
-    my $w = AnyEvent->timer(after => 0,  interval => 10, cb => sub {
+    my $w = AnyEvent->timer(after => 1,  interval => 10, cb => sub {
         http_get $uri, sub { 
             my ($content,$headers) = @_;
             my $rss = XML::RSS->new;
             $rss->parse($content);
-            my @items = @{ $rss->{items} };
-            # my @items = grep { defined($taiwan_authors->{ $_->{dc}->{creator} }) } @{ $rss->{items} };
+
+            # for testing:
+            # my @items = @{ $rss->{items} };
+
+            my @items = grep { defined($taiwan_authors->{ $_->{dc}->{creator} }) } @{ $rss->{items} };
             for my $item (@items) {
                 # Item structure:
                 #   Title: Net-Netfilter-NetFlow-1.113260 OLIVER
@@ -51,6 +53,9 @@ sub run {
                 my $author_id = $item->{dc}->{creator};
                 my $link = $item->{link};
                 warn $link;
+
+                next if $displayed{ $link };
+                $displayed{ $link } = 1;
                 while( my ($network,$channel) = each %publish_to ) {
                     publish_message 
                             msg => $link, 
