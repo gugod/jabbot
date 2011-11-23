@@ -25,7 +25,7 @@ given($cmd) {
         my $runnable = shift @ARGV or die "Need a name.";
         my $module = $runnables{$runnable};
         die "Do not know how to run $runnable\n" unless $module;
-        $module->require or die "Fail to load $module\n";
+        $module->require or die "Fail to load $module: $@\n";
         $module->run;
     }
 }
