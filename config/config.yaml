@@ -13,6 +13,7 @@ irc:
         - jabbot
 
 plugins: []
+  # - URLPreview
   # - HandlinoRedmine
   # - en_us::Facts
   # - en_us::Eliza

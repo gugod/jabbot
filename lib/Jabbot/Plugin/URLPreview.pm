@@ -15,14 +15,13 @@ sub answer {
     my ($url) = ($text =~ m{(https?://\S+)});
 
     # XXX: do something with metacpan or search.cpan.org ?
-
     my $title;
     wq($url)->find('title')
             ->each(sub {
                 my $i = shift;
                 $title = $_->text;
             });
-    my $reply = sprintf '[ %s ]', $url;
+    my $reply = sprintf ' => %s', $title;
     return { content => $reply, confidence => 1 };
 }
 
