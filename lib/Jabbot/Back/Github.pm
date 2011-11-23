@@ -1,4 +1,4 @@
-package Jabbot::Back::Github;
+package Jabbot::Back::GitHub;
 use common::sense;
 use JSON qw(decode_json encode_json);
 use Plack::Request;

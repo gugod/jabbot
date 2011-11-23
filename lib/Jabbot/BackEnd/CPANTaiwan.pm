@@ -4,7 +4,6 @@ use Jabbot::BackEnd -base;
 use POE;
 use POE::Component::RSSAggregator;
 use POE::Component::AtomAggregator;
-
 use POE::Component::IKC::ClientLite;
 use WWW::Shorten 'TinyURL';
 use Encode;

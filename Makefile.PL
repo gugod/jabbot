@@ -50,7 +50,7 @@ feature 'CPANAuthor Plugin' =>
         'Cache' => 0,
         ;
 
-feature 'Github' =>
+feature 'GitHub' =>
         -default => 0,
         'POE::Component::Server::HTTP' => 0,
         'POE::Component::IKC::ClientLite' => 0,
