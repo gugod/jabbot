@@ -52,7 +52,6 @@ sub run {
                 my $title = $item->{title};
                 my $author_id = $item->{dc}->{creator};
                 my $link = $item->{link};
-                warn $link;
 
                 next if $displayed{ $link };
                 $displayed{ $link } = 1;
