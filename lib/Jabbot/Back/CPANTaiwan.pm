@@ -27,15 +27,21 @@ sub run {
     configure profile => "jabbot-cpantw";
     my $taiwan_authors     = Acme::CPANAuthors->new('Taiwanese');
     my $config             = Jabbot->config->{cpanfeeds}->{'CPAN-Upload'};
+
+    die 'config is not defined.' unless $config;
+
     my ($network,$channel) = split /:/,$config->{publish_to};
-    my $url                = $config->{url};
-    my $w = AnyEvent->timer(after => 0,  interval => 100, cb => sub {
-        my $uri = URI->new('http://frepan.org/feed/index.rss');
+
+    die 'network or channel is required' unless $network && $channel;
+
+    my $uri                = URI->new( $config->{url} || 'http://frepan.org/feed/index.rss' );
+    my $w = AnyEvent->timer(after => 0,  interval => 10, cb => sub {
         http_get $uri, sub { 
             my ($content,$headers) = @_;
             my $rss = new XML::RSS;
             $rss->parse($content);
-            my @items = grep { defined($taiwan_authors->{ $_->{dc}->{creator} }) } @{ $rss->{items} };
+            my @items = @{ $rss->{items} };
+            # my @items = grep { defined($taiwan_authors->{ $_->{dc}->{creator} }) } @{ $rss->{items} };
             for my $item (@items) {
                 # Item structure:
                 #   Title: Net-Netfilter-NetFlow-1.113260 OLIVER

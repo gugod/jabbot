@@ -1,6 +1,6 @@
 #!/bin/sh
-
 bin/jabbot run core &
 bin/jabbot run memory &
 bin/jabbot run irc &
 bin/jabbot run github &
+bin/jabbot run cpantw &

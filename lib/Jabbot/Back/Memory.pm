@@ -10,7 +10,6 @@ use YAML;
 
 {
     my $db;
-
     sub db {
         return $db if $db;
 
