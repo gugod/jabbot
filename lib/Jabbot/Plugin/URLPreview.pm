@@ -21,7 +21,7 @@ sub answer {
                 my $i = shift;
                 $title = $_->text;
             });
-    my $reply = sprintf ' => %s', $title;
+    my $reply = sprintf '  %s => %s', $title, $url;
     return { content => $reply, confidence => 1 };
 }
 
