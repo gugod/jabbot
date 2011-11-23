@@ -43,8 +43,8 @@ Debugging
     export PERL_ANYEVENT_MP_TRACE=1
     perl bin/jabbot-irccat freenode "#chupei.pm" testing message
 
-Getting Started
----------------
+Hacking
+-------
 
 To create a new backend:
 
@@ -70,3 +70,32 @@ Declare a class in `lib/Jabbot/Back/NewBack.pm`, a basic structure:
     }
 
     1;
+
+
+To create a basic plugin, you should consult the URLPreview plugin `lib/Jabbot/Plugin/URLPreview.pm`,
+it's pretty simple. the basic structure:
+
+    package Jabbot::Plugin::URLPreview;
+    use warnings;
+    use strict;
+    use Jabbot::Plugin;
+    use LWP::Simple;
+    use Web::Query;
+
+    sub can_answer {
+
+        # $self is inject from 'self' module.
+
+        return 1;  # return true or false
+    }
+
+    sub answer {
+        my ($text) = @args;
+
+        # $self is inject from 'self' module.
+
+        return { content => 'reply', confidence => 1 };
+    }
+
+    1;
+
