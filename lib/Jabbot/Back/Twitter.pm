@@ -20,7 +20,7 @@ sub publish_message {
 sub run {
     configure profile => "jabbot-twitter";
     my $config = Jabbot->config->{twitter};
-
+    my $command = $config->{command};
     die 'config for twitter is required' unless $config;
 
     my $irc = grp_get "jabbot-irc";
@@ -38,7 +38,7 @@ sub run {
                 print "$network:$channel => $msg\n";
                 publish_message 
                         body    => $msg, 
-                        command => 'NOTICE',
+                        command => $command || 'PRIVMSG',
                         network => $network, 
                         channel => $channel;
             }
@@ -46,6 +46,5 @@ sub run {
     );
     AE::cv->recv;
 }
-
 
 1;
