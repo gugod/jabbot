@@ -37,5 +37,6 @@ feeds:
 
 cpantw:
   publish_to:
+    - "freenode:#perl.tw"
     - "freenode:#chupei.pm"
     - "freenode:#jabbot"
