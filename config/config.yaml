@@ -42,3 +42,8 @@ cpantw:
     - "freenode:#jabbot"
 
 twitter:
+  username:
+  password:
+  track: perl,jabbot,music
+  publish_to:
+    - "freenode:#jabbot"
