@@ -50,6 +50,7 @@ sub app {
             snd $_ , post => { 
                 network => $network,
                 channel => $channel,
+                command => 'NOTICE',
                 body => 'and pushed other ' . (scalar(@commits) - $cnt). ' commits.'
             } for @$irc;
         }

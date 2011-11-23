@@ -38,7 +38,7 @@ sub run {
                 print "$network:$channel => $msg\n";
                 publish_message 
                         body    => $msg, 
-                        command => $command || 'PRIVMSG',
+                        command => $command || 'NOTICE',
                         network => $network, 
                         channel => $channel;
             }
