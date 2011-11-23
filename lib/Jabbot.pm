@@ -2,6 +2,7 @@ package Jabbot;
 use common::sense;
 use Object::Tiny;
 use Hash::Merge;
+use v5.12;
 
 use Cwd ();
 
@@ -24,7 +25,11 @@ use YAML;
         my $config1 = YAML::LoadFile(root . "/config/config.yaml");
         my $config2 = {};
         my $x = root . "/config/site_config.yaml";
-        $config2 = YAML::LoadFile($x) if -f $x;
+
+        if( -f $x ) {
+            say "found config: $x";
+            $config2 = YAML::LoadFile($x);
+        }
 
         my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
         $config = $merger->merge($config1, $config2);
