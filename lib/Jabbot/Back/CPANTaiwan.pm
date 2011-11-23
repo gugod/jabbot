@@ -14,7 +14,7 @@ use WWW::Shorten 'TinyURL';
 
 sub publish_message {
     my %args = @_;
-    my $irc = grp_get "jabbot-irc";
+    my $irc = grp_get "jabbot-cpantw";
     snd $_ , post => { 
         network => $args{network},
         channel => $args{channel},
@@ -24,7 +24,7 @@ sub publish_message {
 
 
 sub run {
-    configure profile => "jabbot-cpantaiwan";
+    configure profile => "jabbot-cpantw";
     my $taiwan_authors     = Acme::CPANAuthors->new('Taiwanese');
     my $config             = Jabbot->config->{cpanfeeds}->{'CPAN-Upload'};
     my ($network,$channel) = split /:/,$config->{publish_to};
