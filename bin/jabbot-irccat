@@ -1,3 +1,6 @@
 #!/bin/sh
-
+if [[ -z $@ ]] ; then
+    echo "Usage:  $0 [network] [channel] [msg]"
+    echo "    $0 freenode \"#jabbot\" test";
+fi
 perl -I`dirname $0`/../lib/ -MJabbot::Front::IRC -e 'Jabbot::Front::IRC->cat(@ARGV)' "$@"
