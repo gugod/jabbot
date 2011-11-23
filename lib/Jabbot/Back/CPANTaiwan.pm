@@ -26,19 +26,19 @@ sub publish_message {
 sub run {
     configure profile => "jabbot-cpantw";
     my $taiwan_authors     = Acme::CPANAuthors->new('Taiwanese');
-    my $config             = Jabbot->config->{cpanfeeds}->{'CPAN-Upload'};
+    my $config             = Jabbot->config->{cpantw};
 
     die 'config is not defined.' unless $config;
 
-    my ($network,$channel) = split /:/,$config->{publish_to};
+    my %publish_to = map { split /:/ } @{ $config->{publish_to} };
 
-    die 'network or channel is required' unless $network && $channel;
+    die 'network or channel is required' unless %publish_to;
 
     my $uri                = URI->new( $config->{url} || 'http://frepan.org/feed/index.rss' );
     my $w = AnyEvent->timer(after => 0,  interval => 10, cb => sub {
         http_get $uri, sub { 
             my ($content,$headers) = @_;
-            my $rss = new XML::RSS;
+            my $rss = XML::RSS->new;
             $rss->parse($content);
             my @items = @{ $rss->{items} };
             # my @items = grep { defined($taiwan_authors->{ $_->{dc}->{creator} }) } @{ $rss->{items} };
@@ -51,7 +51,12 @@ sub run {
                 my $author_id = $item->{dc}->{creator};
                 my $link = $item->{link};
                 warn $link;
-                publish_message msg => $link, network => $network, channel => $channel;
+                while( my ($network,$channel) = each %publish_to ) {
+                    publish_message 
+                            msg => $link, 
+                            network => $network, 
+                            channel => $channel;
+                }
             }
         };
     });
