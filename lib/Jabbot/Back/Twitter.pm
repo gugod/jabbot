@@ -32,13 +32,13 @@ sub run {
         track    => ($config->{track} || "perl,jabbot"),
         on_tweet => sub { 
             my $tweet = shift;
-            my $msg =  "$tweet->{user}{screen_name}: $tweet->{text}";
+            my $msg =  "Twitter: $tweet->{user}{screen_name}: $tweet->{text}";
             for my $to ( values %publish_to ) {
                 my ($network,$channel) = @$to;
                 print "$network:$channel => $msg\n";
                 publish_message 
                         body    => $msg, 
-                        # command => 'NOTICE',
+                        command => 'NOTICE',
                         network => $network, 
                         channel => $channel;
             }
