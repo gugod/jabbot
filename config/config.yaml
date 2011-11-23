@@ -41,7 +41,7 @@ cpantw:
 twitter:
   username:
   password:
-  track: perl,jabbot
+  track: "#perl,#jabbot"
   publish_to:
     - "freenode:#chupei.pm"
     - "freenode:#jabbot"
