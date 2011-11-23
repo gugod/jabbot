@@ -35,12 +35,13 @@ feeds:
 
 cpantw:
   publish_to:
-#    - "freenode:#chupei.pm"
+    - "freenode:#chupei.pm"
     - "freenode:#jabbot"
 
 twitter:
   username:
   password:
-  track: perl,jabbot,music
+  track: perl,jabbot
   publish_to:
+    - "freenode:#chupei.pm"
     - "freenode:#jabbot"
