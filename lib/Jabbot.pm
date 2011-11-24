@@ -1,8 +1,8 @@
 package Jabbot;
+use v5.12;
 use common::sense;
 use Object::Tiny;
 use Hash::Merge;
-use v5.12;
 
 use Cwd ();
 
