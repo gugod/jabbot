@@ -7,8 +7,7 @@ use Cache::Memory;
 
 sub can_answer {
     my ($text, $message) = @args;
-    return 1;
-    return 1 if $text =~ /authors?/i;
+    return 1 if $text =~ /!cpan\s+/i;
 }
 
 
@@ -24,7 +23,7 @@ sub _get_country_authors {
 
 sub answer {
     my ($text, $message) = @args;
-    $text =~ s{^\w+:\s*}{};
+    $text =~ s{^\w+:\s*!cpan\s+}{};
 
     my $reply = '';
     # country
