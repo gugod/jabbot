@@ -109,7 +109,6 @@ sub run {
             }
 
             $client->send_chan($channel, $command, $channel, $body);
-
             undef $irc_privmsg_t unless @irc_privmsg_q;
         };
     };
@@ -119,7 +118,8 @@ sub run {
 
         post => sub {
             my ($data, $reply_port) = @_;
-            $irc_send_privmsg->($data->{network}, $data->{channel}, encode_utf8($data->{body}) , $data->{command});
+            $irc_send_privmsg->($data->{network}, $data->{channel}, encode_utf8($_) , $data->{command})
+                for split /\n/,$data->{body};
         },
 
         reply => sub {
@@ -130,7 +130,8 @@ sub run {
                 ($data->{to_me} ? ($data->{from} . ": ") : "") . $data->{answer}{content}
             );
 
-            $irc_send_privmsg->($data->{network}, $data->{channel}, $body);
+            $irc_send_privmsg->($data->{network}, $data->{channel}, $_)
+                for split /\n/,$body;
         }
     );
 
