@@ -2,7 +2,7 @@ package Jabbot::Front::IRC;
 use 5.012;
 use utf8;
 use JSON qw(decode_json encode_json);
-use Encode qw(encode_utf8);
+use Encode qw(encode_utf8 decode_utf8);
 use Jabbot;
 
 use AnyEvent;
@@ -142,6 +142,8 @@ sub run {
 
 sub cat {
     my ($class, $network, $channel, $body) = @_;
+
+    $body = Enocde::decode_utf8($body) unless Encode::is_utf8($body);
 
     configure;
 
