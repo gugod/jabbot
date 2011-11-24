@@ -27,7 +27,6 @@ use YAML;
         my $x = root . "/config/site_config.yaml";
 
         if( -e $x ) {
-            say "found config: $x";
             $config2 = YAML::LoadFile($x);
         }
 
