@@ -31,7 +31,7 @@ sub answer {
         my $author_id = uc( $+{AUTHOR_ID} );
 
         my $cache = Cache::Memory->new(
-            namespace => 'MyNamespace',
+            namespace => 'cpan_authors',
             default_expires => '10 days',
         );
 
