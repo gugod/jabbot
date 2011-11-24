@@ -143,7 +143,7 @@ sub run {
 sub cat {
     my ($class, $network, $channel, $body) = @_;
 
-    $body = Enocde::decode_utf8($body) unless Encode::is_utf8($body);
+    $body = Encode::decode_utf8($body) unless Encode::is_utf8($body);
 
     configure;
 
