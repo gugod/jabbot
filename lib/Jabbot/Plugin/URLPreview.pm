@@ -14,7 +14,13 @@ sub answer {
     my ($text) = @args;
     my ($url) = ($text =~ m{(https?://\S+)});
 
-    # XXX: do something with metacpan or search.cpan.org ?
+
+
+    # TODO: 
+    #  * do something with metacpan or search.cpan.org ?
+    #  * consider circumstances of large file or non-html content.
+    #     my $request = HTTP::Request->new(HEAD => $url);
+    #     my $response = $ua->request($request);
     my $title;
     wq($url)->find('title')
             ->each(sub {
