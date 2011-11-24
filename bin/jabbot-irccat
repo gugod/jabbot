@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -z $@ ] ; then
+if [ -z "$*" ] ; then
     echo "Usage:  $0 [network] [channel] [msg]"
     echo "    $0 freenode \"#jabbot\" test";
     exit;
