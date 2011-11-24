@@ -7,6 +7,7 @@ use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
 use YAML;
+use Encode ();
 use Jabbot;
 
 sub app {
@@ -24,7 +25,7 @@ sub app {
 
     if ($req->content_type =~ '^multipart/form-data;') {
         for (qw(token body command)) {
-            $payload->{$_} = $req->param($_);
+            $payload->{$_} = Encode::decode_utf8($req->param($_))
         }
     }
     else {
@@ -89,6 +90,6 @@ Testing:
 
     curl -D - -X POST --data-binary '{"token":"b00814438ff3c7433a2248e725b8e7d2080cfb5f","body":"ohai"}' http://localhost:15202/networks/freenode/channels/jabbot
 
-    curl -D - -X POST -d token=b00814438ff3c7433a2248e725b8e7d2080cfb5f -d body=ohai http://localhost:15202/networks/freenode/channels/jabbot
+    curl -D - -X POST -F token=b00814438ff3c7433a2248e725b8e7d2080cfb5f -F body=ohai http://localhost:15202/networks/freenode/channels/jabbot
 
 =cut
