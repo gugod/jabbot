@@ -22,9 +22,16 @@ sub app {
 
     my $payload = {};
 
-    try {
-        $payload = decode_json($req->content);
-    };
+    if ($req->content_type =~ '^multipart/form-data;') {
+        for (qw(token body command)) {
+            $payload->{$_} = $req->param($_);
+        }
+    }
+    else {
+        try {
+            $payload = decode_json($req->content);
+        }
+    }
 
     unless (ref($payload) eq 'HASH' && $payload->{token} && $payload->{body}) {
         return [400, [], ["NEED TOKEN AND BODY"]];
@@ -68,14 +75,20 @@ irccat as web api.
 
     POST /networks/:network/channels/:channel
 
+    HTTP request body can be a json like this:
+
     {
         token => "xxx",      // anti-abuse
         body => "...",
         command => "notice", // optional. default to "privmsg"
     }
 
+    Or encoded as multipart/form with "token", "body", "command" fields.
+
 Testing:
 
     curl -D - -X POST --data-binary '{"token":"b00814438ff3c7433a2248e725b8e7d2080cfb5f","body":"ohai"}' http://localhost:15202/networks/freenode/channels/jabbot
+
+    curl -D - -X POST -d token=b00814438ff3c7433a2248e725b8e7d2080cfb5f -d body=ohai http://localhost:15202/networks/freenode/channels/jabbot
 
 =cut
