@@ -4,6 +4,7 @@ use strict;
 use Jabbot::Plugin;
 use LWP::Simple;
 use Web::Query;
+use Try::Tiny;
 
 sub can_answer {
     my ($text) = @args;
@@ -22,13 +23,17 @@ sub answer {
     #     my $request = HTTP::Request->new(HEAD => $url);
     #     my $response = $ua->request($request);
     my $title;
-    wq($url)->find('title')
-            ->each(sub {
-                my $i = shift;
-                $title = $_->text;
-            });
-    my $reply = sprintf '=>  %s', $title;
-    return { content => $reply, confidence => 1 };
+    try {
+        wq($url)->find('title')
+                ->each(sub {
+                    my $i = shift;
+                    $title = $_->text;
+                });
+        my $reply = sprintf '=>  %s', $title;
+        return { content => $reply, confidence => 1 };
+    } catch {
+
+    };
 }
 
 1;
