@@ -57,6 +57,7 @@ sub app {
         snd $_, post => {
             network => $network,
             channel => $channel,
+            command => 'NOTICE',
             body    => build_commit_message($repo, $commit)
         } for @$irc;
     }
