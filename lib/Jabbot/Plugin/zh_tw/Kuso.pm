@@ -54,7 +54,13 @@ sub answer {
             $reply = "驚嘆號是棒槌";
         }
         when(/好男人|nice *man/) {
-            $reply = "不做嗎？";
+            $self->{niceman_count} ||= 0;
+            $self->{niceman_count} += 1;
+
+            if ($self->{niceman_count} > 10 * rand) {
+                $reply = "不做嗎？";
+                $self->{niceman_count} = 0;
+            }
         }
         when(/還不賴/) {
             $self->{habiulai_count} ||= 0;
