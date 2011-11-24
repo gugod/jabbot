@@ -1,33 +1,44 @@
-package Jabbot::CPANAuthors;
+package Jabbot::Plugin::CPANAuthors;
+use Jabbot;
 use Jabbot::Plugin;
 use Acme::CPANAuthors;
 use WWW::Shorten qw(TinyURL);
 use Cache::Memory;
 
 sub can_answer {
-    my ($text) = @_;
-    return 1 if $text =~ /author/;
+    my ($text, $message) = @args;
+    return 1;
+    return 1 if $text =~ /authors?/i;
 }
 
+
+sub _get_country_authors {
+    my ($country) = @args;
+    $country = ucfirst $country;
+    $country =~ s/^Taiwan$/Taiwanese/;  # patch
+    my $acme_authors = Acme::CPANAuthors->new($country);  # taiwanese
+    return unless  $acme_authors ;
+}
+
+
+
 sub answer {
-    my ($text) = @_;
+    my ($text, $message) = @args;
+    $text =~ s{^\w+:\s*}{};
 
     my $reply = '';
     # country
     if($text =~ /^(?<COUNTRY>\w+)\s+authors/ ) {
         my $country = ucfirst $+{COUNTRY};
-        $country =~ s/^Taiwan$/Taiwanese/;  # patch
-        my $acme_authors = Acme::CPANAuthors->new($country);  # taiwanese
-        unless( $acme_authors ) {
-            $reply= "there is no such module for $country";
-        }
+        my $acme_authors = $self->_get_country_authors( $country );
+        return { content => "there is no such module for $country" } unless $acme_authors;
 
-        $reply = qq!  There are @{[  $acme_authors->count ]} in $country. They are !;
+        $reply = qq!There are @{[  $acme_authors->count ]} in $country. They are !;
         $reply .= join( ', ' , map { $_ } keys %$acme_authors ) . ' ..etc';
-        return { content => $reply };
+        return { content => $reply , confidence => 1 };
     }
     # id
-    elsif( $text =~ /^author (?<AUTHOR_ID>\w+)$/ ) {
+    elsif( $text =~ /^author\s+(?<AUTHOR_ID>\w+)/ ) {
         my $author_id = uc( $+{AUTHOR_ID} );
 
         my $cache = Cache::Memory->new(
@@ -36,9 +47,12 @@ sub answer {
         );
 
         my $reply = $cache->get( $author_id );
-        return { content => $reply };
+        return { content => $reply , confidence => 1 } if $reply;
 
         my @authors = Acme::CPANAuthors->look_for($author_id);
+
+        return { content => 'author not found' ,confidence => 1 } unless @authors;
+
         for my $author ( @authors) {
 
             $reply .= sprintf("%s (%s) belongs to %s. ",
@@ -51,10 +65,11 @@ sub answer {
 
             my $url = makeashorterlink( $acme_authors->avatar_url( $author->{id} ) );
             $reply .= sprintf(" %s looks like this: %s", $author->{id} , $acme_authors->avatar_url( $author->{id} ) );
+            $reply .= "\n";
         }
-        $cache->get( $author_id , $reply );
+        $cache->set( $author_id , $reply );
+        return { content => $reply , confidence => 1 };
     }
-    return { content => $reply };
 }
 
 1;

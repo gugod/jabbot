@@ -30,7 +30,6 @@ sub answer {
 
     say YAML::Dump($self);
 
-
     return { reply => $reply,  confidence => 0.9 };
 }
 
