@@ -1,19 +1,20 @@
 package Jabbot::CPANAuthors;
-use Jabbot::Plugin -Base;
+use Jabbot::Plugin;
 use Acme::CPANAuthors;
 use WWW::Shorten qw(TinyURL);
 use Cache::Memory;
 
-const class_id => 'cpanauthors';
+sub can_answer {
+    my ($text) = @_;
+    return 1 if $text =~ /author/;
+}
 
-
-sub process {
-    my $msg = shift;
-    my $nick = $msg->from;
+sub answer {
+    my ($text) = @_;
 
     my $reply = '';
     # country
-    if($msg->text =~ /^(?<COUNTRY>\w+)\s+authors/ ) {
+    if($text =~ /^(?<COUNTRY>\w+)\s+authors/ ) {
         my $country = ucfirst $+{COUNTRY};
         $country =~ s/^Taiwan$/Taiwanese/;  # patch
         my $acme_authors = Acme::CPANAuthors->new($country);  # taiwanese
@@ -23,10 +24,10 @@ sub process {
 
         $reply = qq!  There are @{[  $acme_authors->count ]} in $country. They are !;
         $reply .= join( ', ' , map { $_ } keys %$acme_authors ) . ' ..etc';
-
+        return { content => $reply };
     }
     # id
-    elsif( $msg->text =~ /^author (?<AUTHOR_ID>\w+)$/ ) {
+    elsif( $text =~ /^author (?<AUTHOR_ID>\w+)$/ ) {
         my $author_id = uc( $+{AUTHOR_ID} );
 
         my $cache = Cache::Memory->new(
@@ -35,7 +36,7 @@ sub process {
         );
 
         my $reply = $cache->get( $author_id );
-        return $self->reply( $reply, 1 ) if ($reply);
+        return { content => $reply };
 
         my @authors = Acme::CPANAuthors->look_for($author_id);
         for my $author ( @authors) {
@@ -53,6 +54,7 @@ sub process {
         }
         $cache->get( $author_id , $reply );
     }
-    $self->reply($reply,1);
+    return { content => $reply };
 }
 
+1;
