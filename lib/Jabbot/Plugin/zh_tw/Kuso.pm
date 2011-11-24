@@ -47,11 +47,14 @@ sub answer {
 
     my $reply;
 
-    my $confidence = 0.9;
+    my $confidence = 0.6;
 
     given($text) {
         when("!") {
             $reply = "驚嘆號是棒槌";
+        }
+        when(/好男人|nice *man/) {
+            $reply = "不做嗎？";
         }
         when(/還不賴/) {
             $self->{habiulai_count} ||= 0;
