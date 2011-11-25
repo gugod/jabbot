@@ -53,3 +53,5 @@ common::sense
 inc::Module::Install
 self
 Giddy
+Web::Query
+XML::RSS
