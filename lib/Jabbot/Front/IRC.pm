@@ -141,9 +141,20 @@ sub run {
 }
 
 sub cat {
-    my ($class, $network, $channel, $body) = @_;
+    my ($class, $network, $channel, $command, $body) = @_;
+
+    if ($command && !$body) {
+        $body = $command;
+        $command = "PRIVMSG";
+    }
 
     $body = Encode::decode_utf8($body) unless Encode::is_utf8($body);
+
+    $command = uc($command);
+
+    unless(grep { $command eq $_ } qw(PRIVMSG NOTICE)) {
+        $command = "PRIVMSG";
+    }
 
     configure;
 
@@ -157,6 +168,7 @@ sub cat {
                 snd $_, post => {
                     network => $network,
                     channel => $channel,
+                    command => $command,
                     body    => $body
                 } for @$irc;
             }
@@ -182,5 +194,9 @@ Launch the irc clients
 Post to the givent channel (auto-joined if not alreay joined):
 
     perl -MJabbot::Front::IRC -e 'Jabbot::Front::IRC->cat(@ARGV)' freenode '#jabbot' "Ni Hao";
+
+Post a NOTICE to the givent channel.
+
+    perl -MJabbot::Front::IRC -e 'Jabbot::Front::IRC->cat(@ARGV)' freenode '#jabbot' NOTICE "Ni Hao";
 
 =cut
