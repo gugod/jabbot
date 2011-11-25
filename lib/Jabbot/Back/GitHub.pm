@@ -70,7 +70,7 @@ sub run {
 
     require Plack::Runner;
 
-    my $runner = Plack::Runner->new(server => "Twiggy", env => "production");
+    my $runner = Plack::Runner->new(env => "production");
     $runner->parse_options("--port" => "15201");
     $runner->run(\&app);
 }
