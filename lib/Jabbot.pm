@@ -3,40 +3,39 @@ use v5.12;
 use common::sense;
 use Object::Tiny;
 use Hash::Merge;
-
-use Cwd ();
-
-{
-    my $root;
-    sub root {
-        return $root if $root;
-        $root = $ENV{'JABBOT_ROOT'} || Cwd::getcwd();
-        return $root;
-    }
-}
-
+use Path::Class;
 use YAML;
+use Jabbot::Memory;
 
-{
-    my $config;
-    sub config {
-        return $config if $config;
+## Returns a Path::Class::Dir object.
+sub root {
+    state $root;
 
-        my $config1 = YAML::LoadFile(root . "/config/config.yaml");
-        my $config2 = {};
-        my $x = root . "/config/site_config.yaml";
+    return $root if defined $root;
 
-        if( -e $x ) {
-            $config2 = YAML::LoadFile($x);
-        }
+    $root = file(__FILE__)->absolute->dir->parent;
 
-        my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
-        $config = $merger->merge($config1, $config2);
-        return $config;
-    }
+    return $root;
 }
 
-use Jabbot::Memory;
+sub config {
+    state $config;
+
+    return $config if defined $config;
+
+    my $config1 = YAML::LoadFile( root->file("config", "config.yaml") );
+    my $config2 = {};
+    my $x = root . "/config/site_config.yaml";
+
+    if ( -e $x ) {
+        $config2 = YAML::LoadFile($x);
+    }
+
+    $config = Hash::Merge->new('RIGHT_PRECEDENT')->merge($config1, $config2);
+
+    return $config;
+}
+
 sub memory { "Jabbot::Memory" }
 
 1;
