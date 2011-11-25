@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 aemp gensecret
 aemp seeds '*:4040' nodeid "anon/"
 aemp profile jabbot-core   nodeid jabbot-core binds '*:4040'
