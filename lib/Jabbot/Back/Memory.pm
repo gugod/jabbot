@@ -1,4 +1,5 @@
 package Jabbot::Back::Memory;
+use v5.12;
 use common::sense;
 use Giddy;
 use Jabbot;
@@ -8,18 +9,17 @@ use AnyEvent::MP;
 use AnyEvent::MP::Global;
 use YAML;
 
-{
-    my $db;
-    sub db {
-        return $db if $db;
+sub db {
+    state $db;
 
-        my $giddy = Giddy->new;
-        my $db_path = Jabbot->root . "/var/memory";
+    return $db if defined $db;
 
-        $db = $giddy->get_database($db_path);
+    my $giddy = Giddy->new;
+    my $db_path = Jabbot->root->subdir("var", "memory");
 
-        return $db;
-    }
+    $db = $giddy->get_database("$db_path");
+
+    return $db;
 }
 
 sub run {
