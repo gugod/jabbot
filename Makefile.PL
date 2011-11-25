@@ -9,8 +9,9 @@ license('perl');
 include     'Module::AutoInstall';
 requires(
          Spoon => '0,23',
-         Date::Day => 0,
-         POE => 0,
+         'Date::Day' => 0,
+         'Object::Tiny' => 0,
+         'POE' => 0,
          POE::Component::IRC => 6.06,
          POE::Component::IKC => 0,
          Time::Interval => 0,

@@ -18,6 +18,7 @@ irccat:
     - b00814438ff3c7433a2248e725b8e7d2080cfb5f
 
 plugins: []
+  # - CPANAuthors
   # - URLPreview
   # - HandlinoRedmine
   # - en_us::Facts
