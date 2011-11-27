@@ -4,56 +4,68 @@ use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
 use Scalar::Util qw(refaddr);
+use YAML;
 
 configure;
 
-sub new {
-    my $self = bless {}, __PACKAGE__;
+sub core_port {
+    my $ports;
+    my $p = AE::cv;
 
-    $self->{_aemp_port} = port;
-    $self->{_aemp_node} = "jabbot-remotecore-" . refaddr($self);
+    my $t;
+    $t = AE::idle sub {
+        $ports = grp_get "jabbot-core";
 
-    grp_reg $self->{_aemp_node} =>
-        rcv $self->{_aemp_port},
-            reply => sub {
-                my $data = shift;
-                $self->{answers}->send(@{ $data->{answers} });
-            };
+        if (@$ports > 0) {
+            undef $t;
+            $p->send;
+        }
+    };
 
-    return $self;
+    $p->recv;
+
+    return $ports->[0];
 }
 
+sub new {
+    return bless {}, shift;
+}
 
 sub answers {
     my ($self, %args) = @_;
     my @answers;
     my $q = $args{question};
-    return if $self->{answers};
 
-    $self->{answers} = AE::cv;
+    my $answers = AnyEvent->condvar;
 
-    my $ready;
+    my $ports = grp_get "jabbot-core";
 
-    $ready = AE::idle sub {
-        if (my $ports = grp_get "jabbot-core") {
-            undef $ready;
+    return [] unless $ports;
 
-            for (@$ports) {
-                snd $_, action => { node => $self->{_aemp_node}, name => "answers", args => \%args };
-            }
-        }
+    snd $ports->[0], action => { name => "answers", args => \%args }, port {
+        my ($data) = @_;
+        $answers->send(@{ $data->{answers} });
     };
 
-    my @answers = $self->{answers}->recv;
-
-    delete $self->{answers};
-    return [sort { $b->{confidence} <=> $a->{confidence} } @answers];
+    return [sort { $b->{confidence} <=> $a->{confidence} } $answers->recv]
 }
 
 sub answer {
     my ($self, %args) = @_;
 
-    return $self->answers(%args)->[0];
+    my $ans = AE::cv;
+    my $port = core_port;
+
+    my $t;
+    $t = AE::idle sub {
+        snd $port, action => { name => "answer", args => \%args }, port {
+            my ($tag, $data) = @_;
+            $ans->send($tag, $data);
+            undef $t;
+        };
+    };
+
+    return $ans->recv;
 }
 
 1;
