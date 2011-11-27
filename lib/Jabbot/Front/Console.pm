@@ -15,12 +15,13 @@ sub run {
 
     print "jabbot> ";
 
-    while( $_ = <>) {
+    while( <> ) {
         chomp;
-        my $answer = $jabbot->answer(question => $_);
 
-        if ($answer) {
-            say $answer->{content}
+        my $reply = $jabbot->answer(question => $_);
+
+        if ($reply) {
+            say $reply->{answer}{content};
         }
         else {
             say "NO ANSWER";
@@ -28,8 +29,6 @@ sub run {
 
         print "jabbot> ";
     }
-
-    AE::cv->recv;
 }
 
 1;

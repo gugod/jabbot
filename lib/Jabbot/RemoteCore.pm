@@ -59,8 +59,8 @@ sub answer {
     my $t;
     $t = AE::idle sub {
         snd $port, action => { name => "answer", args => \%args }, port {
-            my ($tag, $data) = @_;
-            $ans->send($tag, $data);
+            my (undef, $data) = @_;
+            $ans->send($data);
             undef $t;
         };
     };
