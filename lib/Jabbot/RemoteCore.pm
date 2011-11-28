@@ -10,19 +10,24 @@ configure;
 
 sub core_port {
     my $ports;
-    my $p = AE::cv;
 
-    my $t;
-    $t = AE::idle sub {
-        $ports = grp_get "jabbot-core";
+    $ports = grp_get "jabbot-core";
 
-        if (@$ports > 0) {
-            undef $t;
-            $p->send;
-        }
-    };
+    if (@$ports == 0) {
+        my $p = AE::cv;
 
-    $p->recv;
+        my $t;
+        $t = AE::idle sub {
+            $ports = grp_get "jabbot-core";
+
+            if (@$ports > 0) {
+                undef $t;
+                $p->send;
+            }
+        };
+
+        $p->recv;
+    }
 
     return $ports->[0];
 }
