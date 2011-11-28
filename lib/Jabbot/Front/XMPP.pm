@@ -1,5 +1,5 @@
 package Jabbot::Front::XMPP;
-use 5.012;
+use v5.12;
 use utf8;
 use JSON qw(decode_json encode_json);
 use Encode qw(encode_utf8 decode_utf8);
@@ -14,11 +14,17 @@ sub ask {
 
     my $ports = grp_get "jabbot-core" or return;
 
+    my $from = $message->from;
+    $from =~ s{/.+$}{};
+
+    my $to = $message->to;
+    $to =~ s{/.+$}{};
+
     my $m = {
         question => $message->body,
-        network  => "xmpp-" . $message->to,
-        channel  => $message->from,
-        from     => $message->from,
+        network  => "xmpp-$to",
+        channel  => $from,
+        from     => $from,
         to_me    => 1
     };
 

@@ -24,7 +24,10 @@ sub db {
 
 sub run {
     configure profile => "jabbot-memory";
-    grp_reg "jabbot-memory", rcv port,
+
+    grp_reg "jabbot-memory" => rcv(
+        port,
+
         get => sub {
             my ($collection, $key, $reply_port) = @_;
             return unless $collection && $key && $reply_port;
@@ -56,18 +59,15 @@ sub run {
 
             my $co = db->get_collection($collection);
 
-            if ($co->find_one($query)) {
-                $co->update($query, $object, $options);
-            }
-            else {
+            unless ($co->find_one($query)) {
                 $co->insert($query, {});
                 db->commit;
-
-                $co->update($query, $object, $options);
             }
 
+            $co->update($query, $object, $options);
             db->commit;
-        };
+        }
+    );
 
     AE::cv->recv;
 }
