@@ -1,0 +1,48 @@
+# -*- org -*-
+# Status: planning
+
+* Classes
+
+- attribute
+  ? optional
+. method
++ service
+
+** Node
+- name
++ ask  := Message -> Answer
++ post := Message -> undef
+
+** Core extends Node
+- channels isa ArrayRef[Channel]
+- messages isa ArrayRef[Message]
+- plugins  ref ArrayRef[Plugin]
+
+. ask Message -> Answer
+
+** Plugin
+- core ref Core
+. can_answer := Message => Bool
+. answer     := Message => Answer
+
+** Channel
+- name       isa Str
+- network  ? isa Str
+- messages   isa ArrayRef[Message]
+. post := Message -> undef
+
+** Message
+- channel       ref Channel
+- body
+- from
+- to ?
+- in_reply_to ? ref Message
+
+** Answer extends Message
+- question isa Message
+
+** Front::IRC extends Node
+** Front::XMPP extends Node
+** Back::GitHub2IRC extends Node
+
+* Synopsis
