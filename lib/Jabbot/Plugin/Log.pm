@@ -6,8 +6,6 @@ use DateTime;
 sub can_answer {
     my ($text, $message) = @args;
 
-    say "Logging: $text";
-
     my $today = DateTime->today;
     my $name = join("-", $message->{network}, $message->{channel}, $today->year, $today->month, $today->day);
 
