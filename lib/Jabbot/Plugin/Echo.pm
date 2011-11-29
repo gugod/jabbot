@@ -9,7 +9,7 @@ sub answer {
     my ($text, $message) = @args;
 
     return {
-        confidence => 1,
+        confidence => 0.9,
         content => $text
     }
 }
