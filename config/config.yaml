@@ -18,12 +18,12 @@ irccat:
     - b00814438ff3c7433a2248e725b8e7d2080cfb5f
 
 xmpp:
-  accounts:
-    google-talk-account@gmail.com: 
-      - password-here
-      - talk.google.com
-      - 5223
-      - { domain: gmail.com, old_style_ssl: 1 }
+  accounts: {}
+    # google-talk-account@gmail.com: 
+    #   - password-here
+    #   - talk.google.com
+    #   - 5223
+    #   - { domain: gmail.com, old_style_ssl: 1 }
 
 plugins: []
   # - CPANAuthors
