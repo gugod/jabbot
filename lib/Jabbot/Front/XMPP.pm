@@ -1,8 +1,5 @@
 package Jabbot::Front::XMPP;
 use v5.12;
-use utf8;
-use JSON qw(decode_json encode_json);
-use Encode qw(encode_utf8 decode_utf8);
 use AnyEvent;
 use AnyEvent::XMPP::Client;
 use AnyEvent::MP;
@@ -47,14 +44,11 @@ sub run {
     $cl->reg_cb(
         message => sub {
             my ($client, $account, $message) = @_;
-
             ask(
                 $message,
                 sub {
                     my ($reply) = @_;
-                    my $msg = $message->make_reply();
-                    $msg->add_body( $reply->{answer}{content} );
-                    $client->send_message($msg);
+                    $client->send_message($reply->{answer}{content}, $message->from, $account->jid);
                 }
             );
         },
@@ -62,7 +56,12 @@ sub run {
         contact_request_subscribe => sub {
             my ($client, $account, $roster, $contact, $message) = @_;
             $contact->send_subscribed;
-        }
+        },
+#        error => sub {
+#            my ($client, $account, $error) = @_;
+#            require YAML;
+#            say YAML::Dump(\@_);
+#        }
     );
 
     $cl->start;
