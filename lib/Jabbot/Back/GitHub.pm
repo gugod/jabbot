@@ -18,8 +18,7 @@ sub build_commit_message {
     my $commit = shift;
 
     # trim message
-    my $msg = substr($commit->{message} , 0 , 20) . ' ... ';
-
+    my $msg = substr( shift(split(/\n/,$commit->{message})) , 0 , 20) . ' ... ';
     my $committer = committer_name $commit;
     return sprintf("%s | %s++ | %s" , $repo , $committer, $commit->{message});
 }
@@ -43,7 +42,7 @@ sub app {
     }
 
     my $cnt = 0;
-    my $limit = 10;
+    my $limit = 3;
     my @commits = @{ $payload->{commits} || [] };
     for my $commit ( @commits ) {
         if(++$cnt > $limit ) {  # avoid flood
@@ -54,6 +53,7 @@ sub app {
                 body => 'and pushed other ' . (scalar(@commits) - $cnt). ' commits.'
             } for @$irc;
         }
+
         snd $_, post => {
             network => $network,
             channel => $channel,
