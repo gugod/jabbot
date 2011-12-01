@@ -1,5 +1,6 @@
 package Jabbot::Core;
-use 5.012;
+use v5.12;
+use strict;
 use utf8;
 use encoding 'utf8';
 use JSON qw(to_json);
@@ -11,8 +12,9 @@ use AnyEvent;
 use AnyEvent::MP;
 use AnyEvent::MP::Global;
 
-my $core;
 sub new {
+    state $core;
+
     return $core if $core;
 
     my $class = shift;
@@ -33,7 +35,7 @@ sub new {
             next;
         }
 
-        push @{ $self->{plugins} }, $plugin->new;
+        push @{ $self->{plugins} }, $plugin->new( core => $self );
         warn "* LOAD $plugin\n";
     }
 
@@ -74,31 +76,24 @@ sub run {
     grp_reg 'jabbot-core' => rcv(
         port,
         action => sub {
-            my ($data) = @_;
+            my ($data, $reply_port) = @_;
+            my $reply_ports = $reply_port ? [ $reply_port ] : grp_get($data->{node});
             my $name = $data->{name};
-            return unless $self->can($name);
+            return unless $reply_ports && $self->can($name);
 
-            my $reply;
+            my $reply = $self->$name(%{$data->{args}});
 
-            try {
-                if ($reply = $self->$name(%{$data->{args}})) {
-                    my $reply_port = grp_get($data->{node});
-
-                    snd $_, reply => {
-                        $name   => $reply,
-                        network => $data->{args}{network},
-                        channel => $data->{args}{channel},
-                        from    => $data->{args}{from},
-                        to_me   => $data->{args}{to_me},
-                    } for @$reply_port;
-                }
-            } catch {
-                say "ERROR:  $_";
-            };
+            snd $_, reply => {
+                $name   => $reply,
+                network => $data->{args}{network},
+                channel => $data->{args}{channel},
+                from    => $data->{args}{from},
+                to_me   => $data->{args}{to_me},
+            } for @$reply_ports;
         }
     );
 
-    AnyEvent->condvar->recv
+    AnyEvent->condvar->recv;
 }
 
 1;

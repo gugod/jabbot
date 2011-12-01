@@ -1,6 +1,6 @@
 package Jabbot::Plugin;
 use common::sense;
-use Object::Tiny;
+use Object::Tiny qw(core);
 use B::Hooks::Parser;
 
 sub import {

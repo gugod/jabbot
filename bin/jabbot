@@ -10,6 +10,7 @@ $ENV{JABBOT_ROOT} = "$FindBin::Bin/..";
 my %runnables = (
     irc     => 'Jabbot::Front::IRC',
     console => 'Jabbot::Front::Console',
+    xmpp    => 'Jabbot::Front::XMPP',
     github  => 'Jabbot::Back::GitHub',
     memory  => 'Jabbot::Back::Memory',
     cpantw  => 'Jabbot::Back::CPANTaiwan',

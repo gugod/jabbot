@@ -52,10 +52,11 @@ sub init_irc_client {
         publicmsg => sub {
             my ($client, $channel, $ircmsg) = @_;
             my $text = Encode::decode("utf8", $ircmsg->{params}[1]);
-            my $to_me = $text =~ s/^jabbot_*:\s+//;
+            my $nick = $client->nick;
+            my $to_me = $text =~ s/^${nick}:\s+//;
             my $from_nick = AnyEvent::IRC::Util::prefix_nick($ircmsg->{prefix}) || "";
 
-            return if $from_nick =~ /jabbot_*/;
+            return if $from_nick =~ /${nick}_*/;
 
             my $ports = grp_get "jabbot-core" or return;
 
