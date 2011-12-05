@@ -57,6 +57,12 @@ sub run {
             my ($client, $account, $roster, $contact, $message) = @_;
             $contact->send_subscribed;
         },
+
+        disconnect => sub {
+            my $client = shift;
+            $client->connect;
+        }
+
 #        error => sub {
 #            my ($client, $account, $error) = @_;
 #            require YAML;
