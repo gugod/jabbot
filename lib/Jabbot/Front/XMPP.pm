@@ -60,14 +60,9 @@ sub run {
 
         disconnect => sub {
             my $client = shift;
-            $client->connect;
-        }
 
-#        error => sub {
-#            my ($client, $account, $error) = @_;
-#            require YAML;
-#            say YAML::Dump(\@_);
-#        }
+            $client->update_connections;
+        }
     );
 
     $cl->start;
