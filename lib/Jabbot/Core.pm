@@ -36,7 +36,6 @@ sub new {
         }
 
         push @{ $self->{plugins} }, $plugin->new( core => $self );
-        warn "* LOAD $plugin\n";
     }
 
     $core = $self;
