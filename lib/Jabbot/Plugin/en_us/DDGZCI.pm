@@ -15,6 +15,17 @@ sub can_answer {
          (.+)
          \?+\s*$/ix;
 
+    unless ($question) {
+        ($question) = $text =~
+            m/^(?:
+                  !ddg |
+                  give \s+ me \s+ an? |
+                  tell \s+ me \s+ about
+              )
+              \s+ (.+) \s* $
+             /ix;
+    }
+
     if ($question) {
         $self->{question} = $question;
         return 1;
@@ -30,10 +41,16 @@ sub answer {
 
     my $result = $duck->zci($self->{question});
 
-    return unless $result->has_abstract;
+    my $content;
+
+    for (qw(abstract answer)) {
+        $content = $result->$_ if $result->can("has_$_")->($result);
+    }
+
+    return unless $content;
 
     return {
-        content    => $result->abstract,
+        content    => $content,
         confidence => 0.9
     }
 }
