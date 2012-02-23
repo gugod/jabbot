@@ -27,7 +27,8 @@ sub answer {
     my ($text) = @args;
 
     my $duck = WWW::DuckDuckGo->new;
-    my $result = $duck->zci($text);
+
+    my $result = $duck->zci($self->{question});
 
     return unless $result->has_abstract;
 
