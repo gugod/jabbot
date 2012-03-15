@@ -1,11 +1,12 @@
 package Jabbot::Plugin::zh_tw::SorrySorry;
 use 5.012;
 use utf8;
-use encoding 'utf8';
 use Jabbot::Plugin;
 
 sub can_answer {
     my ($text) = @args;
+    utf8::decode($text) unless utf8::is_utf8($text);
+
     my ($x) = $text =~ m{(
                             可惡 |
                             (打|踢|踩|踹) 你 |
@@ -13,6 +14,7 @@ sub can_answer {
                             (fu|ki)ck |
 
                     )}x;
+
     return $x;
 }
 
