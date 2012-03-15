@@ -9,6 +9,7 @@ sub can_answer {
     utf8::decode($text) unless utf8::is_utf8($text);
 
     my ($x) = $text =~ m{(
+                            對不起 | 道歉
                             !+ | ！+ |
                             可惡 | 混蛋 | 雜(碎｜種) | 幹你 |
                             靠(你|夭) |
