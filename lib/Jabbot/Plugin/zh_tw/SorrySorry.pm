@@ -1,6 +1,7 @@
 package Jabbot::Plugin::zh_tw::SorrySorry;
 use 5.012;
 use utf8;
+use encoding 'utf8';
 use Jabbot::Plugin;
 
 sub can_answer {
