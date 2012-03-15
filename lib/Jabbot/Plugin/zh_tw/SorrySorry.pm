@@ -9,13 +9,13 @@ sub can_answer {
     utf8::decode($text) unless utf8::is_utf8($text);
 
     my ($x) = $text =~ m{(
+                            !+ | ！+ |
                             可惡 | 混蛋 | 雜(碎｜種) | 幹你 |
                             靠(你|夭) |
                             豬 | 狗 | 雞 |
                             (打|踢|踩|踹) 你 |
                             punch |
-                            (fu|ki)ck |
-
+                            (fu|ki)ck
                     )}x;
 
     return $x;
