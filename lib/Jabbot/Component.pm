@@ -9,7 +9,7 @@ sub daemonize {
     my $pid = fork;
     exit if $pid;
 
-    my ($class) = @_;
+    my ($class, $cb) = @_;
     my ($shortname) = $class =~ m/::([^:]+)$/;
     $shortname = lc($shortname);
 
@@ -24,6 +24,10 @@ sub daemonize {
 
     my $w1 = AE::signal INT  => $exit;
     my $w2 = AE::signal TERM => $exit;
+
+    if (ref($cb) eq 'CODE') {
+        $cb->();
+    }
 
     $exit->recv;
 };

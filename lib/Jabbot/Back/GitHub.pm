@@ -1,5 +1,6 @@
 package Jabbot::Back::GitHub;
-use common::sense;
+use strict;
+use parent 'Jabbot::Component';
 use JSON qw(decode_json encode_json);
 use Plack::Request;
 use AnyEvent;
@@ -68,11 +69,14 @@ sub app {
 sub run {
     configure profile => "jabbot-github";
 
-    require Plack::Runner;
-
-    my $runner = Plack::Runner->new(env => "production");
-    $runner->parse_options("--port" => "15201");
-    $runner->run(\&app);
+    __PACKAGE__->daemonize(
+        sub {
+            require Plack::Runner;
+            my $runner = Plack::Runner->new(env => "production");
+            $runner->parse_options("--port" => "15201");
+            $runner->run(\&app);
+        }
+    );
 }
 
 1;
