@@ -1,5 +1,6 @@
 package Jabbot::Back::CPANTaiwan;
 use common::sense;
+use parent 'Jabbot::Component';
 use JSON qw(decode_json encode_json);
 use AnyEvent;
 use AnyEvent::MP;
@@ -65,7 +66,8 @@ sub run {
             }
         };
     });
-    AE::cv->recv;
+
+    __PACKAGE__->daemonize;
 }
 
 1;
