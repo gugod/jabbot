@@ -18,15 +18,27 @@ my %runnables = (
 );
 
 use Jabbot;
+use Path::Class;
 
 my $cmd = shift @ARGV;
+my $runnable = shift @ARGV or die "Need a name.";
 
 given($cmd) {
     when('run') {
-        my $runnable = shift @ARGV or die "Need a name.";
         my $module = $runnables{$runnable};
         die "Do not know how to run $runnable\n" unless $module;
+
         $module->require or die "Fail to load $module: $@\n";
         $module->run;
+    }
+    when('stop') {
+        my $pidfile = file(Jabbot->root, "var", "run", "jabbot-${runnable}.pid");
+        die "PID File $pidfile is missing.\n" unless -f "$pidfile";
+        my $pid = $pidfile->slurp;
+        kill "TERM", $pid;
+    }
+    when('restart') {
+        system $0, "stop", $runnable;
+        system $0, "run", $runnable;
     }
 }
