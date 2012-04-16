@@ -1,5 +1,6 @@
 package Jabbot::Back::Irccat;
-use common::sense;
+use strict;
+use parent 'Jabbot::Component';
 use JSON qw(decode_json);
 use Plack::Request;
 use Try::Tiny;
@@ -60,11 +61,15 @@ sub app {
 sub run {
     configure;
 
-    require Plack::Runner;
+    __PACKAGE__->daemonize(
+        sub {
+            require Plack::Runner;
 
-    my $runner = Plack::Runner->new(env => "production");
-    $runner->parse_options("--port" => "15202");
-    $runner->run(\&app);
+            my $runner = Plack::Runner->new(env => "production");
+            $runner->parse_options("--port" => "15202");
+            $runner->run(\&app);
+        }
+    );
 }
 
 1;
