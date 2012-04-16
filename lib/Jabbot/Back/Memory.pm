@@ -1,6 +1,7 @@
 package Jabbot::Back::Memory;
 use v5.12;
 use common::sense;
+use parent 'Jabbot::Component';
 use Giddy;
 use Jabbot;
 
@@ -25,7 +26,7 @@ sub db {
 sub run {
     configure profile => "jabbot-memory";
 
-    grp_reg "jabbot-memory" => rcv(
+    my $guard = grp_reg "jabbot-memory" => rcv(
         port,
 
         get => sub {
@@ -69,7 +70,7 @@ sub run {
         }
     );
 
-    AE::cv->recv;
+    __PACKAGE__->daemonize;
 }
 
 1;
