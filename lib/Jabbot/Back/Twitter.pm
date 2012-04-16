@@ -1,7 +1,7 @@
 package Jabbot::Back::Twitter;
-use warnings;
 use strict;
-use parent qw(Jabbot::Back);
+use warnings;
+use parent qw(Jabbot::Component);
 use AnyEvent::Twitter::Stream;
 use AnyEvent;
 use AnyEvent::MP;
@@ -44,7 +44,8 @@ sub run {
             }
         },
     );
-    AE::cv->recv;
+
+    __PACKAGE__->daemonize;
 }
 
 1;
