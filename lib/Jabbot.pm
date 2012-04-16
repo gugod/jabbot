@@ -13,7 +13,12 @@ sub root {
 
     return $root if defined $root;
 
-    $root = file(__FILE__)->absolute->dir->parent;
+    if ($ENV{JABBOT_ROOT}) {
+        $root = dir($ENV{JABBOT_ROOT});
+    }
+    else {
+        $root = file(__FILE__)->absolute->dir->parent;
+    }
 
     return $root;
 }

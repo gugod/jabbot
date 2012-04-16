@@ -3,8 +3,6 @@ use common::sense;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-$ENV{JABBOT_ROOT} = "$FindBin::Bin/..";
-
 use Jabbot::Core;
 use IO::Handle;
 use encoding 'utf8';

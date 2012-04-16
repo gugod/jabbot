@@ -3,6 +3,8 @@ use v5.12;
 use strict;
 use utf8;
 use encoding 'utf8';
+use parent 'Jabbot::Component';
+
 use JSON qw(to_json);
 use UNIVERSAL::require;
 use Jabbot;
@@ -72,7 +74,7 @@ sub run {
 
     configure profile => "jabbot-core";
 
-    grp_reg 'jabbot-core' => rcv(
+    my $guard = grp_reg 'jabbot-core' => rcv(
         port,
         action => sub {
             my ($data, $reply_port) = @_;
@@ -92,7 +94,7 @@ sub run {
         }
     );
 
-    AnyEvent->condvar->recv;
+    __PACKAGE__->daemonize;
 }
 
 1;

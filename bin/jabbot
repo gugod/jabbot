@@ -5,8 +5,6 @@ use lib "$FindBin::Bin/../lib";
 
 use UNIVERSAL::require;
 
-$ENV{JABBOT_ROOT} = "$FindBin::Bin/..";
-
 my %runnables = (
     irc     => 'Jabbot::Front::IRC',
     console => 'Jabbot::Front::Console',
