@@ -1,5 +1,7 @@
 package Jabbot::Front::XMPP;
 use v5.12;
+use strict;
+use parent 'Jabbot::Component';
 use AnyEvent;
 use AnyEvent::XMPP::Client;
 use AnyEvent::MP;
@@ -67,8 +69,7 @@ sub run {
 
     $cl->start;
 
-    AE::cv->wait;
-
+    __PACKAGE__->daemonize;
 }
 
 1;
