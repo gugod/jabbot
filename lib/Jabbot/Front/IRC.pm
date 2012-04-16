@@ -1,5 +1,6 @@
 package Jabbot::Front::IRC;
 use 5.012;
+use parent 'Jabbot::Component';
 use utf8;
 use JSON qw(decode_json encode_json);
 use Encode qw(encode_utf8 decode_utf8);
@@ -137,7 +138,7 @@ sub run {
 
     my $guard = grp_reg "jabbot-irc", $port;
 
-    AnyEvent->condvar->recv;
+    __PACKAGE__->daemonize;
 }
 
 sub cat {
