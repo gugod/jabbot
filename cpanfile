@@ -1,57 +1,52 @@
-Acme::CPANAuthors
-Acme::Lingua::ZH::Remix
-AnyEvent
-AnyEvent::IRC::Client
-B::Hooks::Parser
-CGI::Minimal
-CGI::Simple
-Cache::Memory
-Chatbot::Eliza
-Data::Thunk
-Feersum
-HTML::Strip
-HTML::TreeBuilder::Select
-HTTP::Lite
-HTTP::Request::Common
-HTTP::Status
-Hash::Merge
-IO::All
-JSON
-JSON::XS
-LWP::UserAgent
-Lingua::JA::Romanize::Japanese
-Log::Log4perl
-Math::Expression::Evaluator
-Mojo::DOM
-Net::Delicious
-Net::Jabber::Bot
-Net::Msmgr
-Net::Msmgr::Session
-Net::Msmgr::User
-Net::OSCAR
-Net::Twitter
-Net::YahooMessenger
-Net::YahooMessenger::EventHandler
-Object::Tiny
-POE
-POE::Component::AtomAggregator
-POE::Component::IKC::ClientLite
-POE::Component::RSSAggregator
-POE::Component::Server::HTTP
-Plack::Request
-Quantum::Superpositions
-Regexp::Common
-Scalar::Defer
-Time::Interval
-Try::Tiny
-UNIVERSAL::require
-URI::Title
-WWW::Mechanize
-WWW::Shorten
-YAML
-common::sense
-inc::Module::Install
-self
-Giddy
-Web::Query
-XML::RSS
+requires 'Acme::CPANAuthors';
+requires 'Acme::Lingua::ZH::Remix';
+requires 'AnyEvent';
+requires 'AnyEvent::IRC::Client';
+requires 'B::Hooks::Parser';
+requires 'CGI::Minimal';
+requires 'CGI::Simple';
+requires 'Cache::Memory';
+requires 'Chatbot::Eliza';
+requires 'Data::Thunk';
+requires 'Feersum';
+requires 'HTML::Strip';
+requires 'HTML::TreeBuilder::Select';
+requires 'HTTP::Lite';
+requires 'HTTP::Request::Common';
+requires 'HTTP::Status';
+requires 'Hash::Merge';
+requires 'IO::All';
+requires 'JSON';
+requires 'JSON::XS';
+requires 'LWP::UserAgent';
+requires 'Lingua::JA::Romanize::Japanese';
+requires 'Log::Log4perl';
+requires 'Math::Expression::Evaluator';
+requires 'Mojo::DOM';
+requires 'Net::Delicious';
+requires 'Net::Jabber::Bot';
+requires 'Net::Msmgr';
+requires 'Net::Msmgr::Session';
+requires 'Net::Msmgr::User';
+requires 'Net::OSCAR';
+requires 'Net::Twitter';
+requires 'Net::YahooMessenger';
+requires 'Net::YahooMessenger::EventHandler';
+requires 'Object::Tiny';
+requires 'Plack::Request';
+requires 'Quantum::Superpositions';
+requires 'Regexp::Common';
+requires 'Scalar::Defer';
+requires 'Time::Interval';
+requires 'Try::Tiny';
+requires 'UNIVERSAL::require';
+requires 'URI::Title';
+requires 'WWW::Mechanize';
+requires 'WWW::Shorten';
+requires 'YAML';
+requires 'common::sense';
+requires 'inc::Module::Install';
+requires 'self';
+requires 'Giddy';
+requires 'Web::Query';
+requires 'XML::RSS';
