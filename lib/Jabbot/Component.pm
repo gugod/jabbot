@@ -20,7 +20,7 @@ sub daemonize {
     );
 
     if ($pidfile->alive) {
-        die "${shortname}is already running";
+        die "${shortname} is already running";
         exit;
     }
 
