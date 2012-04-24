@@ -1,7 +1,9 @@
 package Jabbot::Front::IRC;
 use 5.012;
-use parent 'Jabbot::Component';
+use strict;
 use utf8;
+use parent 'Jabbot::Component';
+
 use JSON qw(decode_json encode_json);
 use Encode qw(encode_utf8 decode_utf8);
 use Jabbot;
@@ -74,6 +76,11 @@ sub init_irc_client {
                     }
                 };
             }
+        },
+
+        error => sub {
+            local $, = ", ";
+            say STDERR "ERROR: @_";
         }
     );
 
@@ -81,7 +88,8 @@ sub init_irc_client {
     return $client;
 }
 
-sub run {
+my $AEMP_PORT_GUARD;
+sub run2 {
     configure profile => "jabbot-irc";
 
     my $IRC_CLIENTS = {};
@@ -136,9 +144,15 @@ sub run {
         }
     );
 
-    my $guard = grp_reg "jabbot-irc", $port;
+    $AEMP_PORT_GUARD = grp_reg "jabbot-irc", $port;
+}
 
-    __PACKAGE__->daemonize;
+sub run {
+    __PACKAGE__->daemonize(
+        sub {
+            __PACKAGE__->run2
+        }
+    );
 }
 
 sub cat {

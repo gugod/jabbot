@@ -1,5 +1,6 @@
 package Jabbot::Component;
 use v5.12;
+use strict;
 
 use Jabbot;
 use Proc::PID::File;
@@ -34,10 +35,15 @@ sub daemonize {
     my $w2 = AE::signal TERM => $exit;
 
     if (ref($cb) eq 'CODE') {
+        say "Running...";
         $cb->();
     }
 
+    say "WHA??";
+
     $exit->recv;
+
+    say "WHA 222 ??";
 };
 
 
