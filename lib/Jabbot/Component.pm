@@ -39,11 +39,7 @@ sub daemonize {
         $cb->();
     }
 
-    say "WHA??";
-
     $exit->recv;
-
-    say "WHA 222 ??";
 };
 
 
