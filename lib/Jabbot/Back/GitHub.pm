@@ -19,7 +19,8 @@ sub build_commit_message {
     my $commit = shift;
 
     # trim message
-    my $msg = substr( shift(split(/\n/,$commit->{message})) , 0 , 20) . ' ... ';
+    my ($x) = split(/\n/, $commit->{message});
+    my $msg = length($x) > 40 ? substr($x, 0, 40) . '...' : $x;
     my $committer = committer_name $commit;
     return sprintf("%s | %s++ | %s" , $repo , $committer, $commit->{message});
 }
