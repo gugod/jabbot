@@ -58,12 +58,11 @@ sub _save {
         $self->db->{$X} = $orig;
     }
     elsif (defined $orig) {
-        return "But $X is $orig";
     }
     else {
         $self->db->{$X} = $Y;
-        return "roger that"
     }
+    return
 }
 
 sub _reset {
