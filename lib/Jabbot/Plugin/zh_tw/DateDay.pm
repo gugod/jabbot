@@ -1,5 +1,7 @@
 package Jabbot::Plugin::zh_tw::DateDay;
-use Jabbot::Plugin;
+use v5.18;
+use utf8;
+use Object::Tiny qw(core);
 
 my %ZhDay = (
     MON => "星期一",
@@ -20,7 +22,7 @@ sub trim {
 
 sub can_answer {
     my ($self, $text) = @_;
-    if ($text =~ /^(.*(?:號|日))(?:是)?(?:星期幾)?\s*$/) {
+    if ($text =~ /^(.*(?:號|日))(?:是)?(?:星期幾)?\s*/) {
         $self->{matched} = $1;
         return 1;
     }
@@ -84,8 +86,8 @@ sub answer {
     if(defined $reply) {
         $reply = "${target}是${reply}";
         return {
-            content => $reply,
-            confidence => 0.9
+            body => $reply,
+            score => 1
         }
     }
 }

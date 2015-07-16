@@ -1,16 +1,17 @@
 package Jabbot::Plugin::zh_tw::Polite;
-use Jabbot::Plugin;
+use v5.18;
+use utf8;
+use Object::Tiny qw(core);
 
 sub can_answer {
-    my ($text) = @args;
-
+    my ($self, $text) = @_;
     return $text =~ /謝謝/;
 }
 
 sub answer {
     return {
-        content    => "不客氣",
-        confidence => 0.5
+        body => "不客氣",
+        score => 1,
     }
 }
 
