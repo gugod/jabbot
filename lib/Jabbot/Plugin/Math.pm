@@ -1,5 +1,6 @@
 package Jabbot::Plugin::Math;
-use Jabbot::Plugin;
+use v5.18;
+use Object::Tiny qw(core);
 
 use Try::Tiny;
 use Math::Expression::Evaluator;
@@ -30,8 +31,8 @@ sub answer {
     };
 
     return {
-        content => $val,
-        confidence => 0.9
+        body  => $val,
+        score => 1,
     };
 }
 
