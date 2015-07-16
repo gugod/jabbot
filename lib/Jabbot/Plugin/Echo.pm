@@ -10,7 +10,7 @@ sub answer {
     my ($self, $text, $message) = @_;
 
     return {
-        score => 1,
+        score => 0,
         body  => $text
     }
 }
