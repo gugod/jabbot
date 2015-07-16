@@ -26,9 +26,7 @@ get '/' => sub {
 get '/answers' => sub {
     my $c = shift;
     my $q = $c->req->json("/q") || $c->param('q');
-    my %args = (
-        question => $q
-    );
+    my %args = ( question => $q );
     my $begin_t = Time::HiRes::time;
     my $answers = $CORE->answers(%args);
     my $took = Time::HiRes::time - $begin_t;

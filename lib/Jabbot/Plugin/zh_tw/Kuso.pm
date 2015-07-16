@@ -1,8 +1,7 @@
 package Jabbot::Plugin::zh_tw::Kuso;
-use 5.012;
+use v5.18;
 use utf8;
-use encoding 'utf8';
-use Jabbot::Plugin;
+use Object::Tiny qw(core);
 
 my @foods = (
     "永康街肉圓", "排骨飯" , "酸白鍋",
@@ -43,17 +42,15 @@ my @foods = (
 sub can_answer { 1 }
 
 sub answer {
-    my ($text) = @args;
+    my ($self,$text) = @_;
 
     my $reply;
 
-    my $confidence = 0.6;
-
-    given($text) {
-        when("!") {
+    for($text) {
+        if($_ eq "!") {
             $reply = "驚嘆號是棒槌";
         }
-        when(/好男人|nice *man/) {
+        elsif(/好男人|nice *man/) {
             $self->{niceman_count} ||= 0;
             $self->{niceman_count} += 1;
 
@@ -62,7 +59,7 @@ sub answer {
                 $self->{niceman_count} = 0;
             }
         }
-        when(/還不賴/) {
+        elsif(/還不賴/) {
             $self->{habiulai_count} ||= 0;
             $self->{habiulai_count} +=  1;
 
@@ -71,25 +68,23 @@ sub answer {
                 $self->{habiulai_count} = 0;
             }
         }
-        when(/^make\s+me\s?./i) {
+        elsif(/^make\s+me\s?./i) {
             $reply = "WHAT? MAKE IT YOURSELF"
         }
-        when(/^sudo\s+make/) {
+        elsif(/^sudo\s+make/) {
             $reply = "OKAY"
         }
-        when(/(?:早上|中午|晚上|早餐|午餐|晚餐|宵夜|現在|今天|明天|等一下|\A)?要?(吃|喫)(啥|什麼)?/) {
+        elsif(/(?:早上|中午|晚上|早餐|午餐|晚餐|宵夜|現在|今天|明天|等一下|\A)?要?(吃|喫)(啥|什麼)?/) {
             $reply = $foods[ int(rand( @foods )) ];
             if (rand > 0.8) {
-                for (1..7) {
-                    $reply .= ", " . $foods[ int(rand( @foods )) ];
-                }
+                $reply .= join(", ", map { $foods[ int(rand( @foods )) ] } (1..7));
             }
         }
     }
 
     return {
-        content => $reply,
-        confidence => $confidence
+        body => $reply,
+        score => 1
     } if $reply;
 }
 

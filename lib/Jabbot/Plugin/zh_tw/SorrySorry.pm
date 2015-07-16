@@ -1,11 +1,10 @@
 package Jabbot::Plugin::zh_tw::SorrySorry;
-use 5.012;
+use v5.18;
 use utf8;
-use encoding 'utf8';
-use Jabbot::Plugin;
+use Object::Tiny qw(core);
 
 sub can_answer {
-    my ($text) = @args;
+    my ($self, $text) = @_;
     utf8::decode($text) unless utf8::is_utf8($text);
 
     my ($x) = $text =~ m{(
@@ -23,7 +22,7 @@ sub can_answer {
 }
 
 sub answer {
-    my ($text) = @args;
+    my ($self, $text) = @_;
     my @emoticons = qw{T_T ocz orz >_<" (>_<) (-_-)||| XD :P};
 
     my @answers = (
@@ -49,8 +48,8 @@ sub answer {
     $reply .= " ". $emoticons[rand($#emoticons)];
 
     return {
-        content => $reply,
-        confidence => 0.9
+        body => $reply,
+        score => 1
     }
 }
 

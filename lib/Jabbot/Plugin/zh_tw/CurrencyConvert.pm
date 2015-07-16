@@ -1,11 +1,13 @@
 package Jabbot::Plugin::zh_tw::CurrencyConvert;
-use Jabbot::Plugin;
+use v5.18;
+use utf8;
+use Object::Tiny qw(core);
+
 use HTTP::Request::Common qw(GET);
 use LWP::UserAgent;
 use Encode;
 use List::Util qw(shuffle);
-use utf8;
-use encoding 'utf8';
+
 use Mojo::DOM;
 use Try::Tiny;
 
@@ -33,7 +35,7 @@ my %calias = ( GRP => 'GBP', "RMB" => "MCY", "YEN" => "JPY", "CHF" =>"SWF", "NTD
 sub can_answer { 1 }
 
 sub answer {
-    my ($s) = @args;
+    my ($self, $s) = @_;
     my $reply;
     my $allsymbol = join("|",keys %coin) . "|" . join("|",keys %calias);
     my $qmark = '(?:[\s\?]|？)*';
@@ -61,7 +63,7 @@ sub answer {
 }
 
 sub get_ex_money {
-    my ($money,$from,$to) = @args;
+    my ($self,$money,$from,$to) = @_;
     $to ||= "TWD"; # Default to TWD
     $from = $self->expand_alias(uc($from));
     $to   = $self->expand_alias(uc($to));
@@ -96,7 +98,7 @@ sub get_ex_money {
 }
 
 sub expand_alias {
-    my ($from) = @args;
+    my ($self,$from) = @_;
     if(defined $calias{$from}) {
 	$from = $calias{$from};
     }

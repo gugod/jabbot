@@ -1,9 +1,12 @@
 package Jabbot::Plugin::zh_tw::Weather;
-use Jabbot::Plugin;
+use v5.18;
+use utf8;
+use Object::Tiny qw(core);
+use YAML;
 use Weather::Google;
 
 sub can_answer {
-    my ($text) = @args;
+    my ($self, $text) = @_;
 
     if ($text =~ /^\s*(.+)\s*天氣[?？]?\s*$/) {
         $self->{area} = $1;
@@ -18,9 +21,8 @@ sub can_answer {
     return $self->{area} && $self->{hint};
 }
 
-use YAML;
 sub answer {
-    my ($text) = @args;
+    my ($self, $text) = @_;
 
     my $weather = Weather::Google->new($self->{area}, { language => 'zh-TW' });
     my $current = $weather->current_conditions;
@@ -46,7 +48,7 @@ sub answer {
 
     $reply ||= "不知道...";
 
-    return { content => $reply, confidence => 1 };
+    return { body => $reply, score => 1 };
 }
 
 
