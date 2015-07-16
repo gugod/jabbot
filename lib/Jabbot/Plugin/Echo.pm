@@ -1,12 +1,13 @@
 package Jabbot::Plugin::Echo;
-use Jabbot::Plugin;
+use v5.18;
+use Object::Tiny qw(core);
 
 sub can_answer {
     1;
 }
 
 sub answer {
-    my ($text, $message) = @args;
+    my ($self, $text, $message) = @_;
 
     return {
         confidence => 0.9,

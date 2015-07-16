@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+use v5.18;
+
+our $VERSION = "0.1";
+
+use Jabbot;
+use Jabbot::Core;
+
+use Time::HiRes;
+
+use Mojolicious::Lite;
+
+my $CORE = Jabbot::Core->new;
+
+get '/' => sub {
+    my $c = shift;
+    $c->render(json => {
+        service => "jabber-core",
+        version => $VERSION,
+        plugins => [ map { ref($_) } @{ $CORE->{plugins} } ],
+    });
+};
+
+get '/answers' => sub {
+    my $c = shift;
+    my %args = (
+        question => $c->param('q')
+    );
+    my $begin_t = Time::HiRes::time;
+    my $answers = $CORE->answers(%args);
+    my $took = Time::HiRes::time - $begin_t;
+
+    $c->render(json => {
+        _took   => $took,
+        answers => $answers
+    });
+};
+
+app->start;

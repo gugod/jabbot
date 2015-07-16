@@ -1,18 +1,12 @@
 package Jabbot::Core;
-use v5.12;
-use strict;
+use v5.18;
 use utf8;
-use encoding 'utf8';
 use parent 'Jabbot::Component';
 
 use JSON qw(to_json);
 use UNIVERSAL::require;
 use Jabbot;
 use Try::Tiny;
-
-use AnyEvent;
-use AnyEvent::MP;
-use AnyEvent::MP::Global;
 
 sub new {
     state $core;
@@ -46,7 +40,8 @@ sub new {
 
 sub answer {
     my ($self, %args) = @_;
-    return $self->answers(%args)->[0];
+    my $answers = $self->answers(%args);
+    return (sort { $b->{confidence} <=> $a->{confidence} } @$answers)[0];
 }
 
 sub answers {
@@ -66,35 +61,7 @@ sub answers {
             }
         }
     }
-    return [sort { $b->{confidence} <=> $a->{confidence} } @answers];
-}
-
-sub run {
-    my $self = Jabbot::Core->new;
-
-    configure profile => "jabbot-core";
-
-    my $guard = grp_reg 'jabbot-core' => rcv(
-        port,
-        action => sub {
-            my ($data, $reply_port) = @_;
-            my $reply_ports = $reply_port ? [ $reply_port ] : grp_get($data->{node});
-            my $name = $data->{name};
-            return unless $reply_ports && $self->can($name);
-
-            my $reply = $self->$name(%{$data->{args}});
-
-            snd $_, reply => {
-                $name   => $reply,
-                network => $data->{args}{network},
-                channel => $data->{args}{channel},
-                from    => $data->{args}{from},
-                to_me   => $data->{args}{to_me},
-            } for @$reply_ports;
-        }
-    );
-
-    __PACKAGE__->daemonize;
+    return \@answers;
 }
 
 1;
