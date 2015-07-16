@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 use v5.18;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
 our $VERSION = "0.1";
 
@@ -23,8 +25,9 @@ get '/' => sub {
 
 get '/answers' => sub {
     my $c = shift;
+    my $q = $c->req->json("/q") || $c->param('q');
     my %args = (
-        question => $c->param('q')
+        question => $q
     );
     my $begin_t = Time::HiRes::time;
     my $answers = $CORE->answers(%args);
