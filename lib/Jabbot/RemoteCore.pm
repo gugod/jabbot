@@ -1,76 +1,46 @@
 package Jabbot::RemoteCore;
-use common::sense;
-use AnyEvent;
-use AnyEvent::MP;
-use AnyEvent::MP::Global;
+use v5.18;
+
 use Scalar::Util qw(refaddr);
+
+use Hijk;
+use Mojo::JSON qw(encode_json decode_json);
+
 use YAML;
 
-configure;
-
-sub core_port {
-    my $ports;
-
-    $ports = grp_get "jabbot-core";
-
-    if (@$ports == 0) {
-        my $p = AE::cv;
-
-        my $t;
-        $t = AE::idle sub {
-            $ports = grp_get "jabbot-core";
-
-            if (@$ports > 0) {
-                undef $t;
-                $p->send;
-            }
-        };
-
-        $p->recv;
-    }
-
-    return $ports->[0];
-}
-
 sub new {
-    return bless {}, shift;
+    my ($class, %params) = @_;
+    $params{host} //= "localhost";
+    $params{port} //= "18000";
+    return bless { %params }, $class;
 }
 
 sub answers {
     my ($self, %args) = @_;
     my @answers;
-    my $q = $args{question};
 
-    my $answers = AnyEvent->condvar;
+    my $q = $args{q};
 
-    my $ports = grp_get "jabbot-core";
+    my $res = Hijk::request({
+        method => "GET",
+        host => $self->{host},
+        port => $self->{port},
+        path => "/answers",
+        body => encode_json({ q => $q })
+    });
 
-    return [] unless $ports;
-
-    snd $ports->[0], action => { name => "answers", args => \%args }, port {
-        my ($data) = @_;
-        $answers->send(@{ $data->{answers} });
-    };
-
-    return [sort { $b->{confidence} <=> $a->{confidence} } $answers->recv]
+    die "Error: (Hijk) $res->{error}" if exists $res->{error};
+    return decode_json( $res->{body} );
 }
 
 sub answer {
     my ($self, %args) = @_;
-
-    my $ans = AE::cv;
-    my $port = core_port;
-
-    my $t;
-    $t = AE::idle sub {
-        snd $port, action => { name => "answer", args => \%args }, port {
-            my (undef, $data) = @_;
-            $ans->send($data);
-            undef $t;
-        };
-    };
-
-    return $ans->recv;
+    my $res = $self->answers(%args);
+    my $best = $res->{answers}[0];
+    for (@{$res->{answers}}) {
+        $best = $_ if $best->{score} < $_->{score};
+    }
+    return $best;
 }
 
 1;
@@ -79,4 +49,4 @@ __END__
 
 A console:
 
-perl -Ilib -MJabbot::RemoteCore -E 'while(<>) { say Jabbot::RemoteCore->new->answer(question => $_)->{content}; } AE::cv->recv'
+perl -Ilib -MJabbot::RemoteCore -E 'while(<>) { say Jabbot::RemoteCore->new->answer(question => $_)->{body}; }'
