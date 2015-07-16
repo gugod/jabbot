@@ -37,7 +37,7 @@ sub send_reply {
 }
 
 sub get_updates {
-    state $RECV = {};
+    my $RECV = {};
     state $max_update_id = -1;
 
     $api_telegram->api_request(
