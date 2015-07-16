@@ -1,10 +1,8 @@
 package Jabbot::RemoteCore;
 use v5.18;
 
-use Scalar::Util qw(refaddr);
-
-use Hijk;
-use Mojo::JSON qw(encode_json decode_json);
+use Encode qw(decode_utf8 encode_utf8);
+use Mojo::UserAgent;
 
 use YAML;
 
@@ -21,16 +19,17 @@ sub answers {
 
     my $q = $args{q};
 
-    my $res = Hijk::request({
-        method => "GET",
-        host => $self->{host},
-        port => $self->{port},
-        path => "/answers",
-        body => encode_json({ q => $q })
-    });
+    $q = decode_utf8($q) unless Encode::is_utf8($q);
 
-    die "Error: (Hijk) $res->{error}" if exists $res->{error};
-    return decode_json( $res->{body} );
+    my $ua = Mojo::UserAgent->new;
+    my $tx = $ua->get(
+        ("http://" . $self->{host} . ":" . $self->{port} . "/answers"),
+        {},
+        json => {
+            q => $q
+        }
+    );
+    return $tx->res->json();
 }
 
 sub answer {
