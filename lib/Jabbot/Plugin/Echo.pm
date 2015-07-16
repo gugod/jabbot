@@ -10,7 +10,7 @@ sub answer {
     my ($self, $text, $message) = @_;
 
     return {
-        confidence => 0.9,
+        score   => 1,
         content => $text
     }
 }
