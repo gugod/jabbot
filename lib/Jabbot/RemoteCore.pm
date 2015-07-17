@@ -4,8 +4,6 @@ use v5.18;
 use Encode qw(decode_utf8 encode_utf8);
 use Mojo::UserAgent;
 
-use YAML;
-
 sub new {
     my ($class, %params) = @_;
     $params{host} //= "localhost";
