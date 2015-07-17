@@ -1,21 +1,24 @@
 package Jabbot::Plugin::URLPreview;
-use warnings;
-use strict;
-use Jabbot::Plugin;
-use LWP::Simple;
+use v5.18;
+use utf8;
+use Object::Tiny qw(core);
+
 use Web::Query;
 use Try::Tiny;
+use Regexp::Common qw/URI/;
 
 sub can_answer {
-    my ($text) = @args;
-    return $text =~ m{https?://};  # match a url pattern ?
+    my ($self, $text) = @_;
+    if ($text =~ /($RE{URI}{HTTP})/) {
+        $self->{matched} = $1;
+        return 1;
+    }
+    return 0;
 }
 
 sub answer {
-    my ($text) = @args;
-    my ($url) = ($text =~ m{(https?://\S+)});
-
-
+    my ($self, $text) = @_;
+    my ($url) = $self->{matched};
 
     # TODO: 
     #  * do something with metacpan or search.cpan.org ?
@@ -29,11 +32,14 @@ sub answer {
                     my $i = shift;
                     $title = $_->text;
                 });
-        my $reply = sprintf '=>  %s', $title;
-        return { content => $reply, confidence => 1 };
     } catch {
 
     };
+
+    if (defined($title)) {
+        my $reply = sprintf '=>  %s', $title;
+        return { body => $reply, score => 1 };
+    }
 }
 
 1;
