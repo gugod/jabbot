@@ -1,10 +1,12 @@
 package Jabbot::Plugin::en_us::DDGZCI;
-use v5.14;
-use Jabbot::Plugin;
+use v5.18;
+use utf8;
+use Object::Tiny qw(core);
+
 use WWW::DuckDuckGo;
 
 sub can_answer {
-    my ($text) = @args;
+    my ($self, $text) = @_;
     my ($question) = $text =~
         /^(?:
              what \s* is|
@@ -35,7 +37,7 @@ sub can_answer {
 }
 
 sub answer {
-    my ($text) = @args;
+    my ($self, $text) = @_;
 
     my $duck = WWW::DuckDuckGo->new;
 
@@ -50,8 +52,8 @@ sub answer {
     return unless $content;
 
     return {
-        content    => $content,
-        confidence => 0.9
+        body  => $content,
+        score => 1,
     }
 }
 

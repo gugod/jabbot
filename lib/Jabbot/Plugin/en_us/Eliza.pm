@@ -1,14 +1,17 @@
 package Jabbot::Plugin::en_us::Eliza;
-use Jabbot::Plugin;
+use v5.18;
+use utf8;
+use Object::Tiny qw(core);
+
 use Chatbot::Eliza;
 
 sub can_answer {
-    my ($text) = @args;
+    my ($self, $text) = @_;
     return length($text) > 2;
 }
 
 sub answer {
-    my ($text) = @args;
+    my ($self, $text) = @_;
 
     $self->{chatbot} ||= Chatbot::Eliza->new();
     my $ans  = $self->{chatbot}->transform($text);
@@ -21,8 +24,8 @@ sub answer {
     }
 
     return {
-        content    => $ans,
-        confidence => 0 - rand
+        body  => $ans,
+        score => 0,
     }
 }
 
