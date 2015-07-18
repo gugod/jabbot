@@ -12,6 +12,7 @@ use Time::HiRes;
 
 use UnQLite;
 use Mojolicious::Lite;
+use Mojo::UserAgent;
 
 sub __open_db {
     state $cache = {};
@@ -38,7 +39,7 @@ sub open_db_and_set {
 get '/' => sub {
     my $c = shift;
     $c->render(json => {
-        service => "jabber-memory",
+        name => "jabbot-memoryd",
         version => $VERSION,
     });
 };
@@ -74,5 +75,15 @@ put '/:collection/:key' => sub {
         success => 1,
     });
 };
+
+my $core_hostport = "localhost:18000";
+my $ua = Mojo::UserAgent->new;
+my $tx = $ua->post(
+    "http://${core_hostport}/services",
+    json => { name => "jabbot-memoryd", host => "localhost", port => "18002" }
+);
+unless (my $res = $tx->success) {
+    die "jabbot-cored is not running.";
+}
 
 app->start;
