@@ -40,3 +40,4 @@ requires "YAML";
 requires "common::sense";
 requires "self";
 requires "Proc::PID::File";
+requires "UnQLite";
