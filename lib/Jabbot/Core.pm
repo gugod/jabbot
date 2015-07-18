@@ -1,7 +1,6 @@
 package Jabbot::Core;
 use v5.18;
 use utf8;
-use parent 'Jabbot::Component';
 
 use JSON qw(to_json);
 use UNIVERSAL::require;
@@ -17,6 +16,7 @@ sub new {
 
     my $self = bless {}, $class;
     $self->{plugins} = [];
+    $self->{services} = [];
 
     for my $plugin (map { "Jabbot::Plugin::$_"} @{Jabbot->config->{plugins}}) {
         unless ($plugin->require) {
@@ -62,6 +62,11 @@ sub answers {
         }
     }
     return \@answers;
+}
+
+sub register_service {
+    my ($self, $srv) = @_;
+    push @{ $self->{services} }, $srv;
 }
 
 1;

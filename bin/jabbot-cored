@@ -37,4 +37,22 @@ get '/answers' => sub {
     });
 };
 
+post '/services' => sub {
+    my $c = shift;
+
+    my $srv = $c->req->json(); # { "name": "...", "host", "...", "port": "..." }
+
+    my $sucess = 0;
+    if ( defined($srv->{name}) && defined($srv->{host}) && defined($srv->{port}) ) {
+        $CORE->register_service($srv);
+        $success = 1;
+    }
+
+    $c->render(json => {
+        _took   => $took,
+        success => $success
+    });
+};
+
+
 app->start;
