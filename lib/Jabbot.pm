@@ -1,11 +1,10 @@
 package Jabbot;
-use v5.12;
-use common::sense;
+use v5.18;
+
 use Object::Tiny;
 use Hash::Merge;
 use Path::Class;
 use YAML;
-use Jabbot::Memory;
 
 ## Returns a Path::Class::Dir object.
 sub root {
@@ -40,8 +39,6 @@ sub config {
 
     return $config;
 }
-
-sub memory { "Jabbot::Memory" }
 
 1;
 
