@@ -69,4 +69,9 @@ sub register_service {
     push @{ $self->{services} }, $srv;
 }
 
+sub unregister_service {
+    my ($self, $service_name) = @_;
+    @{ $self->{services} } = grep { $service_name ne $_->{name} } @{ $self->{services} };
+}
+
 1;
