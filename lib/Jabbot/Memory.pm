@@ -1,41 +1,31 @@
 package Jabbot::Memory;
-use common::sense;
-use self;
-use AnyEvent;
-use AnyEvent::MP;
-use AnyEvent::MP::Global;
+# ABSTRACT: client interface to jabbot-memoryd
 
-sub get {
-    my ($collection, $key, $cb) = @args;
-    return unless $collection && $key && $cb;
-    my $ports = grp_get "jabbot-memory" or return;
+use v5.18;
+use Object::Tiny;
 
-    my $value = AE::cv;
-    $value->cb(sub {$cb->($_[0]->recv) });
+use Mojo::UserAgent;
 
-    snd $ports->[0], "get" => "person", "gugod", port {
-        $value->send(@_);
-    };
-}
+my $server_uri_base = "http://localhost:18002";
 
 sub set {
-    my ($collection, $key, $value) = @args;
-    return unless $collection && $key && defined($value);
-    my $ports = grp_get "jabbot-memory" or return;
-
-    for (@$ports) {
-        snd $_, "set" => $collection, $key, $value;
-    }
+    my ($self, $collection, $key, $value) = @_;
+    my $ua = Mojo::UserAgent->new;
+    $ua->put(
+        "${server_uri_base}/${collection}/{$key}",
+        {},
+        $value
+    );
 }
 
-sub update {
-    my ($collection, $query, $object, $options) = @args;
-    return unless $collection && $query && $object;
-
-    my $ports = grp_get "jabbot-memory" or return;
-
-    for (@$ports) {
-        snd $_, "update" => $collection, $query, $object, $options;
+sub get {
+    my ($self, $collection, $key) = @_;
+    my $ua = Mojo::UserAgent->new;
+    my $tx = $ua->get("${server_uri_base}/${collection}/{$key}");
+    if (my $res = $tx->success) {
+        return $res->body;
+    } else {
+        return undef;
     }
 }
 

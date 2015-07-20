@@ -11,6 +11,7 @@ use Jabbot::Core;
 use Time::HiRes;
 
 use UnQLite;
+use Mojo::JSON;
 use Mojolicious::Lite;
 use Mojo::UserAgent;
 
@@ -52,11 +53,8 @@ get '/:collection/:key' => sub {
     my $v = open_db_and_get($c->param('collection'), $k);
     my $took = Time::HiRes::time - $begin_t;
 
-    $c->render(json => {
-        _took => $took,
-        success => 1,
-        value => $v
-    });
+    $c->res->headers->append("X-Jabbot-Memoryd", Mojo::JSON::encode_json({ _took => $took }));
+    $c->render(data => $v);
 };
 
 put '/:collection/:key' => sub {
@@ -76,7 +74,7 @@ put '/:collection/:key' => sub {
     });
 };
 
-mi $core_hostport = ( Jabbot->config->{core}{host} // "localhost" ) . ":" . ( Jabbot->config->{core}{port} // 18000 );
+my $core_hostport = ( Jabbot->config->{core}{host} // "localhost" ) . ":" . ( Jabbot->config->{core}{port} // 18000 );
 my $ua = Mojo::UserAgent->new;
 my $tx = $ua->post(
     "http://${core_hostport}/services",
