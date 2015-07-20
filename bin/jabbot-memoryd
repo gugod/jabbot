@@ -76,7 +76,7 @@ put '/:collection/:key' => sub {
     });
 };
 
-my $core_hostport = "localhost:18000";
+mi $core_hostport = ( Jabbot->config->{core}{host} // "localhost" ) . ":" . ( Jabbot->config->{core}{port} // 18000 );
 my $ua = Mojo::UserAgent->new;
 my $tx = $ua->post(
     "http://${core_hostport}/services",
