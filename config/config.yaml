@@ -2,6 +2,9 @@
 
 nick: jabbot
 
+core:
+  port: 18000
+
 irc:
   listen: 127.0.0.1:15101
   networks:
