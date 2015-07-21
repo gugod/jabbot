@@ -33,10 +33,9 @@ sub answers {
 sub answer {
     my ($self, %args) = @_;
     my $res = $self->answers(%args);
-    my $best = $res->{answers}[0];
-    for (@{$res->{answers}}) {
-        $best = $_ if $best->{score} < $_->{score};
-    }
+    my @all_answers = sort { $b->{score} <=> $a->{score} } @{$res->{answers}};
+    my @best_answers = grep { $_->{score} == $all_answers[0]{score} } @all_answers;
+    my $best = $best_answers[rand(@best_answers)];
     return $best;
 }
 
