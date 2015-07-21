@@ -1,7 +1,5 @@
 package Jabbot::Front::Console;
-use v5.12;
-use common::sense;
-use AnyEvent;
+use v5.18;
 use Jabbot::RemoteCore;
 
 sub run {
@@ -18,10 +16,10 @@ sub run {
     while( <> ) {
         chomp;
 
-        my $reply = $jabbot->answer(question => $_);
+        my $reply = $jabbot->answer(q => $_);
 
         if ($reply) {
-            say $reply->{answer}{content};
+            say $reply->{body};
         }
         else {
             say "NO ANSWER";
