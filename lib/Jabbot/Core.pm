@@ -38,12 +38,6 @@ sub new {
     return $self;
 }
 
-sub answer {
-    my ($self, %args) = @_;
-    my $answers = $self->answers(%args);
-    return (sort { $b->{confidence} <=> $a->{confidence} } @$answers)[0];
-}
-
 sub answers {
     my ($self, %args) = @_;
     my @answers;
