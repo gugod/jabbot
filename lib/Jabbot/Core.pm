@@ -16,7 +16,6 @@ sub new {
 
     my $self = bless {}, $class;
     $self->{plugins} = [];
-    $self->{services} = [];
 
     for my $plugin (map { "Jabbot::Plugin::$_"} @{Jabbot->config->{plugins}}) {
         unless ($plugin->require) {
@@ -56,16 +55,6 @@ sub answers {
         }
     }
     return \@answers;
-}
-
-sub register_service {
-    my ($self, $srv) = @_;
-    push @{ $self->{services} }, $srv;
-}
-
-sub unregister_service {
-    my ($self, $service_name) = @_;
-    @{ $self->{services} } = grep { $service_name ne $_->{name} } @{ $self->{services} };
 }
 
 1;

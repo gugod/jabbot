@@ -61,22 +61,4 @@ post '/services' => sub {
 };
 
 my $app = app;
-my $ioloop = Mojo::IOLoop->singleton;
-$ioloop->recurring(
-    15 => sub {
-        $app->log->debug("Ping services");
-        for (@{$CORE->{services}}) {
-            my $uri = "http://" . $_->{host} . ":" . $_->{port};
-            my $service_name = $_->{name};
-            my $tx = Mojo::UserAgent->new->get($uri);
-            if ($tx->success && $tx->res->json('/name') eq $service_name) {
-                $app->log->debug("ALIVE: $service_name");
-            } else {
-                $app->log->debug("DEAD: $service_name");
-                $CORE->unregister_service($service_name);
-            }
-        }
-    }
-);
-
 $app->start;
