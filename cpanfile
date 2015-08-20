@@ -22,6 +22,7 @@ requires "Lingua::JA::Romanize::Japanese";
 requires "List::UtilsBy";
 requires "Math::Expression::Evaluator";
 requires "Mojo::DOM";
+requires "Mojo::IRC";
 requires "Net::Delicious";
 requires "Object::Tiny";
 requires "Path::Class";
