@@ -2,8 +2,11 @@
 
 nick: jabbot
 
-core:
+cored:
   port: 18000
+
+memoryd:
+  port: 18002
 
 irc:
   listen: 127.0.0.1:15101

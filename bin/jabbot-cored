@@ -8,6 +8,19 @@ our $VERSION = "0.1";
 use Jabbot;
 use Jabbot::Core;
 
+use constant SHOULD_RELAUNCH_WITH_MORBO => !grep {/Server\/(Morbo|Hypnotoad)/} keys %INC;
+
+if (SHOULD_RELAUNCH_WITH_MORBO) {
+    require Mojo::Server::Morbo;
+    my $config = Jabbot->config->{cored};
+    my $hostport = ( $config->{host} // "localhost" ) . ":" . ( $config->{port} // 18000 );
+    my $morbo = Mojo::Server::Morbo->new;
+    $morbo->daemon->listen([ "http://". $hostport ]);
+    $morbo->run($0);
+    exit;
+}
+
+
 use Time::HiRes;
 
 use Mojo::IOLoop;
