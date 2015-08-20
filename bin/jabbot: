@@ -3,18 +3,21 @@ use common::sense;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Jabbot::Core;
+use Jabbot;
+use Jabbot::RemoteCore;
+use List::UtilsBy qw(rev_nsort_by);
+
 use IO::Handle;
 use encoding 'utf8';
 
-my $j = Jabbot::Core->new;
+my $j = Jabbot::RemoteCore->new;
 my $ans = [];
 
 if (@ARGV > 0) {
     my $q = join(" ", @ARGV);
-    $ans = $j->answers(question => $q, channel => ($ENV{CHANNEL} || '/console/jabbot:'));
+    $ans = $j->answers(q => $q);
     say "\nA:";
-    say "     [$_->{plugin}] $_->{content}" for @$ans;
+    say "     [$_->{plugin}] $_->{body}" for @{$ans->{answers}};
 }
 else {
     STDOUT->autoflush(1);
@@ -24,10 +27,10 @@ else {
         chomp;
         my $q = $_;
 
-        $ans = $j->answers(question => $q, channel => ($ENV{CHANNEL} || '/console/jabbot:'));
+        $ans = $j->answers(q => $q);
 
         say "A: ";
-        say "    [$_->{plugin}] $_->{content}" for @$ans;
+        say "    [$_->{plugin}] $_->{body}" for rev_nsort_by { $_->{score} } @{$ans->{answers}};
         print "\n";
         print "Q: ";
     }

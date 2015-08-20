@@ -19,6 +19,7 @@ requires "JSON";
 requires "LWP::Simple";
 requires "LWP::UserAgent";
 requires "Lingua::JA::Romanize::Japanese";
+requires "List::UtilsBy";
 requires "Math::Expression::Evaluator";
 requires "Mojo::DOM";
 requires "Net::Delicious";
