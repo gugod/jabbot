@@ -53,16 +53,25 @@ sub process_remember {
 sub process_recall {
     my ($self, $k) = @_;
     my $score = {};
-    for my $t (@{ tokenize($k) }) {
+    my $query_tokens = tokenize($k);
+    my $max_score = @$query_tokens;
+    for my $t (@$query_tokens) {
         for (@{ $MEMORY->{token}{$t} }) {
             $score->{ $_->{doc_id} }++;
         }
     }
     my $best = max_by { $score->{$_} } keys %$score;
     my $doc = $MEMORY->{doc}{$best};
-    return {
-        score => 1,
-        body => $doc,
+    if ($doc) {
+        return {
+            score => ($best / $max_score),
+            body => $doc,
+        }
+    } else {
+        return {
+            score => 1,
+            body => "No idea"
+        }
     }
 }
 
