@@ -3,88 +3,12 @@ use v5.18;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-our $VERSION = "0.1";
-
 use Jabbot;
-use Jabbot::Core;
+use Mojo::Server::Morbo;
 
-use constant SHOULD_RELAUNCH_WITH_MORBO => !grep {/Server\/(Morbo|Hypnotoad)/} keys %INC;
+my $config = Jabbot->config->{memoryd};
+my $hostport = ( $config->{host} // "localhost" ) . ":" . ( $config->{port} // 18002 );
 
-if (SHOULD_RELAUNCH_WITH_MORBO) {
-    require Mojo::Server::Morbo;
-
-    my $config = Jabbot->config->{memoryd};
-    my $hostport = ( $config->{host} // "localhost" ) . ":" . ( $config->{port} // 18002 );
-
-    my $morbo = Mojo::Server::Morbo->new;
-    $morbo->daemon->listen([ "http://". $hostport ]);
-    $morbo->run($0);
-    exit;
-}
-
-use Time::HiRes;
-use UnQLite;
-use Mojo::JSON;
-use Mojolicious::Lite;
-use Mojo::UserAgent;
-
-sub __open_db {
-    state $cache = {};
-    my ($collection) = @_;
-    my $c = $cache->{$collection} ||= {
-        db => UnQLite->open(Jabbot->config->{memory}{database_root}."/${collection}.db", UnQLite::UNQLITE_OPEN_READWRITE|UnQLite::UNQLITE_OPEN_CREATE)
-    };
-    $c->{last_used} = time;
-    return $c->{db};
-}
-
-sub open_db_and_get {
-    my ($collection, $key) = @_;
-    my $db = __open_db($collection);
-    return $db->kv_fetch($key);
-}
-
-sub open_db_and_set {
-    my ($collection, $key, $value) = @_;
-    my $db = __open_db($collection);
-    return $db->kv_store($key,$value);
-}
-
-get '/' => sub {
-    my $c = shift;
-    $c->render(json => {
-        name => "jabbot-memoryd",
-        version => $VERSION,
-    });
-};
-
-get '/:collection/:key' => sub {
-    my $c = shift;
-    my $k = $c->param('key');
-
-    my $begin_t = Time::HiRes::time;
-    my $v = open_db_and_get($c->param('collection'), $k);
-    my $took = Time::HiRes::time - $begin_t;
-
-    $c->res->headers->append("X-Jabbot-Memoryd", Mojo::JSON::encode_json({ _took => $took }));
-    $c->render(data => $v);
-};
-
-put '/:collection/:key' => sub {
-    my $c = shift;
-    my $k = $c->param('key');
-    my $v = $c->req->body;
-
-    my $begin_t = Time::HiRes::time;
-
-    open_db_and_set($c->param('collection'), $k, $v);
-
-    my $took = Time::HiRes::time - $begin_t;
-
-    $c->render(json => {
-        _took => $took,
-        success => 1,
-    });
-};
-
-app->start;
+my $morbo = Mojo::Server::Morbo->new;
+$morbo->daemon->listen([ "http://". $hostport ]);
+$morbo->run("lib/Jabbot/Back/Memory.pm");

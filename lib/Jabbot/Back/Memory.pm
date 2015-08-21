@@ -1,76 +1,70 @@
 package Jabbot::Back::Memory;
-use v5.12;
-use common::sense;
-use parent 'Jabbot::Component';
-use Giddy;
-use Jabbot;
+use strict;
+our $VERSION = "0.1";
 
-use AnyEvent;
-use AnyEvent::MP;
-use AnyEvent::MP::Global;
-use YAML;
+use Time::HiRes;
+use UnQLite;
+use Mojo::JSON;
+use Mojolicious::Lite;
+use Mojo::UserAgent;
 
-sub db {
-    state $db;
-
-    return $db if defined $db;
-
-    my $giddy = Giddy->new;
-    my $db_path = Jabbot->root->subdir("var", "memory");
-
-    $db = $giddy->get_database("$db_path");
-
-    return $db;
+sub __open_db {
+    state $cache = {};
+    my ($collection) = @_;
+    my $c = $cache->{$collection} ||= {
+        db => UnQLite->open(Jabbot->config->{memory}{database_root}."/${collection}.db", UnQLite::UNQLITE_OPEN_READWRITE|UnQLite::UNQLITE_OPEN_CREATE)
+    };
+    $c->{last_used} = time;
+    return $c->{db};
 }
 
-sub run {
-    configure profile => "jabbot-memory";
-
-    my $guard = grp_reg "jabbot-memory" => rcv(
-        port,
-
-        get => sub {
-            my ($collection, $key, $reply_port) = @_;
-            return unless $collection && $key && $reply_port;
-
-            my $co = db->get_collection($collection);
-            my $doc = $co->find_one($key);
-            snd $reply_port, $doc;
-        },
-
-        set => sub {
-            my ($collection, $key, $value) = @_;
-            return unless $collection && $key && defined($value);
-
-            my $co = db->get_collection($collection);
-
-            if ($co->find_one($key)) {
-                $co->update($key, $value);
-            }
-            else {
-                $co->insert($key, $value);
-            }
-
-            db->commit("memorize: ${collection}.${key}");
-        },
-
-        update => sub {
-            my ($collection, $query, $object, $options) = @_;
-            return unless $collection && $query && defined($object);
-
-            my $co = db->get_collection($collection);
-
-            unless ($co->find_one($query)) {
-                $co->insert($query, {});
-                db->commit;
-            }
-
-            $co->update($query, $object, $options);
-            db->commit;
-        }
-    );
-
-    __PACKAGE__->daemonize;
+sub open_db_and_get {
+    my ($collection, $key) = @_;
+    my $db = __open_db($collection);
+    return $db->kv_fetch($key);
 }
 
-1;
+sub open_db_and_set {
+    my ($collection, $key, $value) = @_;
+    my $db = __open_db($collection);
+    return $db->kv_store($key,$value);
+}
+
+get '/' => sub {
+    my $c = shift;
+    $c->render(json => {
+        name => "jabbot-memoryd",
+        version => $VERSION,
+    });
+};
+
+get '/:collection/:key' => sub {
+    my $c = shift;
+    my $k = $c->param('key');
+
+    my $begin_t = Time::HiRes::time;
+    my $v = open_db_and_get($c->param('collection'), $k);
+    my $took = Time::HiRes::time - $begin_t;
+
+    $c->res->headers->append("X-Jabbot-Memoryd", Mojo::JSON::encode_json({ _took => $took }));
+    $c->render(data => $v);
+};
+
+put '/:collection/:key' => sub {
+    my $c = shift;
+    my $k = $c->param('key');
+    my $v = $c->req->body;
+
+    my $begin_t = Time::HiRes::time;
+
+    open_db_and_set($c->param('collection'), $k, $v);
+
+    my $took = Time::HiRes::time - $begin_t;
+
+    $c->render(json => {
+        _took => $took,
+        success => 1,
+    });
+};
+
+app->start;
