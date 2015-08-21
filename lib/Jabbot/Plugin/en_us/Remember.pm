@@ -32,7 +32,7 @@ my $MEMORY = { doc => {}, token => {} };
 
 sub tokenize {
     my $text = shift;
-    my @t = grep { defined($_) && $_ ne "" } split /\P{Letter}+/, $text;
+    my @t = map { fc($_) } grep { defined($_) && $_ ne "" } split /\P{Letter}+/, $text;
     return \@t;
 }
 
