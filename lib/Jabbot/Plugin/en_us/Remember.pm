@@ -9,6 +9,9 @@ sub can_answer {
     my ($self, $text) = @_;
     my ($op, $k) = $text =~ /\A \s* (remember|recall) (?: \s|\p{Punctuation}) (.+) \z/x;
     if (defined($op) && defined($k)) {
+        $k =~ s/^\s//;
+        $k =~ s/\s$//;
+
         $self->{stash} = {
             op => $op,
             k  => $k
