@@ -44,13 +44,16 @@ sub answers {
 
     for my $plugin (@{$self->{plugins}}) {
         if ($plugin->can_answer($q, \%args)) {
+            my $plugin_name = ref($plugin) =~ s/^Jabbot::Plugin:://r;
+
             try {
                 my $a = $plugin->answer($q, \%args);
                 if (ref $a eq 'HASH') {
-                    $a->{plugin} = ref $plugin;
-                    $a->{plugin} =~ s/^Jabbot::Plugin:://;
+                    $a->{plugin} = $plugin_name;
                     push @answers, $a;
                 }
+            } catch {
+                warn "[Jabbot::Core][ERROR][plugin=${plugin_name}] $_";
             }
         }
     }
