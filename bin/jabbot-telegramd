@@ -8,23 +8,20 @@ use Jabbot::RemoteCore;
 
 use Encode qw(encode_utf8);
 use List::Util qw(max);
-use Mojo::IOLoop;
 use Mojo::JSON qw(decode_json);
+use Mojo::IOLoop;
 use WWW::Telegram::BotAPI;
 
-my $api_telegram = WWW::Telegram::BotAPI->new (
-    token => Jabbot->config->{telegram}{token},
-    async => 1
-);
+my $API_TELEGRAM = WWW::Telegram::BotAPI->new (token => Jabbot->config->{telegram}{token}, async => 1);
 
 sub send_reply {
+    state $jabbot = Jabbot::RemoteCore->new();
     my ($chat_id, $text) = @_;
 
-    my $jabbot = Jabbot::RemoteCore->new();
-    my $answer = $jabbot->answer(q => $text);
+    my $answer = $JABBOT->answer(q => $text);
     my $reply_text = $answer->{body};
 
-    $api_telegram->api_request(
+    $API_TELEGRAM->api_request(
         sendMessage => {
             chat_id => $chat_id,
             text    => $reply_text,
@@ -40,7 +37,7 @@ sub get_updates {
     my $RECV = {};
     state $max_update_id = -1;
 
-    $api_telegram->api_request(
+    $API_TELEGRAM->api_request(
         'getUpdates',
         { offset => $max_update_id + 1 },
         sub {
@@ -63,7 +60,7 @@ sub get_updates {
     );
 }
 
-$api_telegram->api_request(
+$API_TELEGRAM->api_request(
     'getMe',
     sub {
         my ($ua, $tx) = @_;
