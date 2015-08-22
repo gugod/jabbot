@@ -7,7 +7,6 @@ use Object::Tiny;
 use Mojo::UserAgent;
 
 use Jabbot;
-use Jabbot::Core;
 
 use constant SERVER_URI_BASE => "http://" . ( Jabbot->config->{host} // "localhost" ) . ":" . ( Jabbot->config->{port} // 18002 );
 
