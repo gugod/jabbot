@@ -46,3 +46,18 @@
 ** Back::GitHub2IRC extends Node
 
 * Synopsis
+
+* Pub/Sub
+
+** Channel
+
+   - id: A Str that uniquely identify this channel within the swarm of jabbot nodes.
+   - uri: A Str that is used to map to an external, user-facing channel.
+     - irc://chat.freenode.org/jabbot
+     - telegram://the.telegram.server/:telegram_channel_id
+     - xmpp://some.xmpp.server/:id
+     - jabbot://localhost/:id
+
+** Publisher
+** Subscriber
+
