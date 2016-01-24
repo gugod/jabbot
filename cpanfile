@@ -36,6 +36,7 @@ requires "WWW::DuckDuckGo";
 requires "WWW::Mechanize";
 requires "WWW::Shorten";
 requires "Weather::Google";
+requires "Weather::Underground";
 requires "Web::Query";
 requires "XML::RSS";
 requires "YAML";
