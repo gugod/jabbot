@@ -1,0 +1,80 @@
+# -*- restclient -*-
+# perl -Ilib bin/jabbot-cored daemon --listen 'http://127.0.0.1:18000'
+
+:hostport = localhost:18000
+
+#
+GET http://:hostport/
+
+
+#
+GET http://:hostport/answers?q=Nihao
+
+#
+GET http://:hostport/answers
+{"q":"高鐵 新竹 到 台中"}
+
+#
+GET http://:hostport/answers
+{"q":"晚餐吃甚麼？"}
+
+#
+GET http://:hostport/answers
+{"q":"3+3"}
+
+#
+GET http://:hostport/answers
+{"q":"fuck"}
+
+#
+GET http://:hostport/answers
+{"q":"謝謝"}
+
+#
+GET http://:hostport/answers
+{"q":"8月15日星期幾"}
+
+#
+GET http://:hostport/answers
+{"q":"台中天氣？"}
+
+#
+GET http://:hostport/answers
+{"q":"樂透"}
+
+#
+GET http://:hostport/answers
+{"q":"27 EUR to TWD"}
+
+#
+GET http://:hostport/answers
+{"q":"how do you do ?"}
+
+#
+GET http://:hostport/answers
+{"q":"!d http://icook.tw tags:食譜"}
+
+# DDG zci
+GET http://:hostport/answers
+{"q":"what is Apple.com?"}
+
+# 
+GET http://:hostport/answers
+{"q":"check out http://icook.tw ..."}
+
+# 
+GET http://:hostport/answers
+{"q":"romanize ja にわわ"}
+
+# 
+GET http://:hostport/answer
+{"q":"romanize ja にわわ"}
+
+
+# memoryd
+PUT http://localhost:18002/fact/bus
+{"value": "bus is red"}
+
+# memoryd
+GET http://localhost:18002/fact/bus
+{"value": "bus is red"}
