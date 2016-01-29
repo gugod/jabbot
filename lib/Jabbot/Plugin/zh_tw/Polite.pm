@@ -5,7 +5,10 @@ use Object::Tiny qw(core);
 
 sub can_answer {
     my ($self, $text) = @_;
-    return $text =~ /謝謝/;
+    if ($text =~ /謝謝/) {
+        return 1;
+    }
+    return 0;
 }
 
 sub answer {

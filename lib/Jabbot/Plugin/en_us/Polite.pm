@@ -4,7 +4,10 @@ use Jabbot::Plugin;
 sub can_answer {
     my ($text) = @args;
 
-    return $text =~ /(thank(s|\s+you)|\bGJ\b)/i;
+    if ($text =~ /(thank(s|\s+you)|\bGJ\b)/i) {
+        return 1;
+    }
+    return 0;
 }
 
 sub answer {

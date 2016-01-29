@@ -7,7 +7,10 @@ use Acme::Lingua::ZH::Remix 0.90;
 
 sub can_answer {
     my ($self, $text) = @_;
-    return (length($text) > 2);
+    if (length($text) > 2) {
+        return 0.1;
+    }
+    return 0;
 }
 
 sub answer {

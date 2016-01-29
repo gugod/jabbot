@@ -17,8 +17,10 @@ sub can_answer {
                             punch |
                             (fu|ki)ck
                     )}x;
-
-    return $x;
+    if ($x) {
+        return 0.5;
+    }
+    return 0;
 }
 
 sub answer {

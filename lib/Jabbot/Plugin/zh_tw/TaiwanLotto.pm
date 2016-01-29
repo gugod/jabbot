@@ -5,7 +5,10 @@ use Object::Tiny qw(core);
 
 sub can_answer {
     my ($self,$text) = @_;
-    ($self->{matched}) = $text =~ /^(樂透|四星彩)$/;
+    if (($self->{matched}) = $text =~ /^(樂透|四星彩)$/) {
+        return 1;
+    }
+    return 0;
 }
 
 sub answer {

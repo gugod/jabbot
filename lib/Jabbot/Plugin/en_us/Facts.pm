@@ -26,6 +26,7 @@ sub can_answer {
             return 1;
         }
     }
+    return 0;
 }
 
 sub answer {
