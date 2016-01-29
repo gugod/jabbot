@@ -3,7 +3,6 @@ requires "Acme::Lingua::ZH::Remix";
 requires "AnyEvent";
 requires "AnyEvent::HTTP";
 requires "AnyEvent::IRC";
-requires "AnyEvent::MP";
 requires "AnyEvent::Twitter::Stream";
 requires "AnyEvent::XMPP";
 requires "B::Hooks::Parser";
