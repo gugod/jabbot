@@ -18,7 +18,10 @@ sub can_answer {
     ($self->{hint}) = $text =~ m/(weather|冷|暖|寒|暑|熱|涼|雨|晴|天氣|氣象)/;
     ($self->{forcast}) = $text =~ m/([明後]天|預報)/;
 
-    return $self->{area} && $self->{hint};
+    if ( $self->{area} && $self->{hint} ) {
+        return 0.5;
+    }
+    return 0;
 }
 
 sub answer {
