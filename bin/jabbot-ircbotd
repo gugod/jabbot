@@ -8,7 +8,7 @@ use Jabbot::RemoteCore;
 
 use IRC::Utils ();
 use Mojolicious;
-use Mojo::IRC;
+use Mojo::IRC::UA;
 
 my $IRC_CLIENTS = {};
 
@@ -18,7 +18,7 @@ sub init_irc_client {
 
     my $nick = $config->{nick};
 
-    my $irc = Mojo::IRC->new(
+    my $irc = Mojo::IRC::UA->new(
         nick => $config->{nick},
         user => $config->{nick},
         server => $config->{server} . ":" . $config->{port},
@@ -39,7 +39,7 @@ sub init_irc_client {
                  return unless $message_text_without_my_nick_name;
                  my $answer = $jabbot->answer(q => $message_text_without_my_nick_name);
                  my $reply_text = $answer->{body};
-                 $self->write(PRIVMSG => $channel, "${from_nick}: $reply_text")
+                 $self->write(PRIVMSG => $channel, ":${from_nick}: $reply_text", sub {});
              });
 
     $irc->connect(sub {
@@ -49,7 +49,6 @@ sub init_irc_client {
                           my ($channel, $key) = ref($_) ? @$_ : ($_);
                           $channel = "#${channel}" unless index($channel, "#") == 0;
                           say "-- connected, join $channel";
-
                           $irc->write("join", $channel, $key||());
                       }
                   });
