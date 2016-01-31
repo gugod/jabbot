@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+use v5.18;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Jabbot;
+use Jabbot::RemoteCore;
+
+use Mojolicious;
+use Mojo::IRC;
+my $IRC_CLIENTS = {};
+
+sub init_irc_client {
+    my ($config) = @_;
+
+    my $irc = Mojo::IRC->new(
+        nick => $config->{nick},
+        user => $config->{nick},
+        server => $config->{server} . ":" . $config->{port},
+    );
+
+    $irc->on(irc_join => sub {
+                 my($self, $message) = @_;
+                 warn "yay! i joined $message->{params}[0]";
+             });
+
+    $irc->on(irc_privmsg => sub {
+                 my($self, $message) = @_;
+                 say $message->{prefix}, " said: ", $message->{params}[1];
+             });
+
+    $irc->connect(sub {
+                      my($irc, $err) = @_;
+                      return warn $err if $err;
+                      $irc->write(join => '#jabbot');
+                      for (@{$config->{channels}}) {
+                          my ($channel, $key) = ref($_) ? @$_ : ($_);
+                          $channel = "#${channel}" unless index($channel, "#") == 0;
+                          $irc->write("join", $channel, $key||());
+                      }
+                  });
+
+}
+
+my $networks = Jabbot->config->{irc}{networks};
+for (keys %$networks) {
+    $networks->{$_}{name} = $_;
+    $networks->{$_}{nick} ||= (Jabbot->config->{nick} || "jabbot_$$");
+    $IRC_CLIENTS->{$_} = init_irc_client($networks->{$_});
+}
+
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
