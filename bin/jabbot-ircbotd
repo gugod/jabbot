@@ -6,12 +6,17 @@ use lib "$FindBin::Bin/../lib";
 use Jabbot;
 use Jabbot::RemoteCore;
 
+use IRC::Utils ();
 use Mojolicious;
 use Mojo::IRC;
+
 my $IRC_CLIENTS = {};
 
 sub init_irc_client {
     my ($config) = @_;
+    state $jabbot = Jabbot::RemoteCore->new;
+
+    my $nick = $config->{nick};
 
     my $irc = Mojo::IRC->new(
         nick => $config->{nick},
@@ -26,26 +31,38 @@ sub init_irc_client {
 
     $irc->on(irc_privmsg => sub {
                  my($self, $message) = @_;
-                 say $message->{prefix}, " said: ", $message->{params}[1];
+                 my $from_nick = IRC::Utils::parse_user($message->{prefix});
+                 return unless $from_nick;
+                 return if $from_nick =~ /${nick}_*/;
+                 my ($channel, $message_text) = @{$message->{params}};
+                 my ($message_text_without_my_nick_name) = $message_text =~ s/^${nick}[,: ]*//r;
+                 return unless $message_text_without_my_nick_name;
+                 my $answer = $jabbot->answer(q => $message_text_without_my_nick_name);
+                 my $reply_text = $answer->{body};
+                 $self->write(PRIVMSG => $channel, "${from_nick}: $reply_text")
              });
 
     $irc->connect(sub {
                       my($irc, $err) = @_;
                       return warn $err if $err;
-                      $irc->write(join => '#jabbot');
                       for (@{$config->{channels}}) {
                           my ($channel, $key) = ref($_) ? @$_ : ($_);
                           $channel = "#${channel}" unless index($channel, "#") == 0;
+                          say "-- connected, join $channel";
+
                           $irc->write("join", $channel, $key||());
                       }
                   });
 
+    return $irc;
 }
 
 my $networks = Jabbot->config->{irc}{networks};
 for (keys %$networks) {
     $networks->{$_}{name} = $_;
     $networks->{$_}{nick} ||= (Jabbot->config->{nick} || "jabbot_$$");
+
+    say "--- Init IRC Client for network $_";
     $IRC_CLIENTS->{$_} = init_irc_client($networks->{$_});
 }
 
