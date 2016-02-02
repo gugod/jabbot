@@ -4,66 +4,10 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Jabbot;
-use Jabbot::RemoteCore;
+use Mojo::Server::Morbo;
 
-use IRC::Utils ();
-use Mojolicious;
-use Mojo::IRC::UA;
-
-my $IRC_CLIENTS = {};
-
-sub init_irc_client {
-    my ($config) = @_;
-    state $jabbot = Jabbot::RemoteCore->new;
-
-    my $nick = $config->{nick};
-
-    my $irc = Mojo::IRC::UA->new(
-        nick => $config->{nick},
-        user => $config->{nick},
-        server => $config->{server} . ":" . $config->{port},
-    );
-
-    $irc->on(irc_join => sub {
-                 my($self, $message) = @_;
-                 warn "yay! i joined $message->{params}[0]";
-             });
-
-    $irc->on(irc_privmsg => sub {
-                 my($self, $message) = @_;
-                 my $from_nick = IRC::Utils::parse_user($message->{prefix});
-                 return unless $from_nick;
-                 return if $from_nick =~ /${nick}_*/;
-                 my ($channel, $message_text) = @{$message->{params}};
-                 my ($message_text_without_my_nick_name) = $message_text =~ m/\A ${nick} [,:\s]+ (.+) \z/xmas;
-                 return unless $message_text_without_my_nick_name;
-                 my $answer = $jabbot->answer(q => $message_text_without_my_nick_name);
-                 my $reply_text = $answer->{body};
-                 $self->write(PRIVMSG => $channel, ":${from_nick}: $reply_text", sub {});
-             });
-
-    $irc->connect(sub {
-                      my($irc, $err) = @_;
-                      return warn $err if $err;
-                      for (@{$config->{channels}}) {
-                          my ($channel, $key) = ref($_) ? @$_ : ($_);
-                          $channel = "#${channel}" unless index($channel, "#") == 0;
-                          say "-- connected, join $channel";
-                          $irc->write("join", $channel, $key||());
-                      }
-                  });
-
-    return $irc;
-}
-
-my $networks = Jabbot->config->{irc}{networks};
-for (keys %$networks) {
-    $networks->{$_}{name} = $_;
-    $networks->{$_}{nick} ||= (Jabbot->config->{nick} || "jabbot_$$");
-
-    say "--- Init IRC Client for network $_";
-    $IRC_CLIENTS->{$_} = init_irc_client($networks->{$_});
-}
-
-Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-
+my $config = Jabbot->config->{ircbot};
+my $hostport = ( $config->{host} // "localhost" ) . ":" . ( $config->{port} // 18011 );
+my $morbo = Mojo::Server::Morbo->new;
+$morbo->daemon->listen([ "http://". $hostport ]);
+$morbo->run("lib/Jabbot/Front/IRC.pm");
