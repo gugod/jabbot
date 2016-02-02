@@ -35,7 +35,7 @@ sub init_irc_client {
                  return unless $from_nick;
                  return if $from_nick =~ /${nick}_*/;
                  my ($channel, $message_text) = @{$message->{params}};
-                 my ($message_text_without_my_nick_name) = $message_text =~ s/^${nick}[,: ]*//r;
+                 my ($message_text_without_my_nick_name) = $message_text =~ m/\A ${nick} [,:\s]+ (.+) \z/xmas;
                  return unless $message_text_without_my_nick_name;
                  my $answer = $jabbot->answer(q => $message_text_without_my_nick_name);
                  my $reply_text = $answer->{body};
