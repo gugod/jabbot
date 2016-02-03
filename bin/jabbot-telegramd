@@ -7,7 +7,6 @@ use Jabbot;
 use Mojo::Server::Morbo;
 
 my $config = Jabbot->config->{telegram};
-my $hostport = ( $config->{host} // "localhost" ) . ":" . ( $config->{port} // 18000 );
 my $morbo = Mojo::Server::Morbo->new;
-$morbo->daemon->listen([ "http://". $hostport ]);
+$morbo->daemon->listen([ $config->{listen} ]);
 $morbo->run("lib/Jabbot/Front/Telegram.pm");
