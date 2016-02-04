@@ -1,9 +1,34 @@
-#!/bin/sh
+#!/usr/bin/env perl
+use v5.18;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
-if [ -z "$*" ] ; then
-    echo "Usage:  $0 [network] [channel] [msg]"
-    echo "    $0 freenode \"#jabbot\" test";
-    exit;
-fi
+use JSON::PP qw(encode_json);
+use Hijk;
 
-perl -I`dirname $0`/../lib/ -MJabbot::Front::IRC -e 'Jabbot::Front::IRC->cat(@ARGV)' "$@"
+use Getopt::Long;
+
+GetOptions(
+    (my $opt = {}),
+    "network=s",
+    "channel=s",
+    "text=s"
+);
+
+my $res = Hijk::request({
+    method       => "POST",
+    host         => "localhost",
+    port         => "18011",
+    path         => "/",
+    body => encode_json({
+        network => $opt->{network},
+        channel => $opt->{channel},
+        text    => $opt->{text},
+    })
+});
+
+if ($res->{error}) {
+    say $res->{error};
+} else {
+    say "OK";
+}

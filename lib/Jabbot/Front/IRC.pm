@@ -7,6 +7,8 @@ use DDP;
 use Jabbot;
 use Jabbot::RemoteCore;
 
+use Encode qw(decode_utf8);
+
 use IRC::Utils ();
 use Mojo::JSON qw(decode_json);
 use Mojolicious::Lite;
@@ -81,7 +83,7 @@ post '/' => sub {
 
     my $network = $req->{network};
     my $channel = $req->{channel};
-    my $text = $req->{text};
+    my $text = decode_utf8( $req->{text} );
 
     my $error;
     my $response = {};
