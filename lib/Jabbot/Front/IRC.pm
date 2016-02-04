@@ -8,6 +8,7 @@ use Jabbot;
 use Jabbot::RemoteCore;
 
 use IRC::Utils ();
+use Mojo::JSON qw(decode_json);
 use Mojolicious::Lite;
 use Mojo::IRC::UA;
 use Mojo::IOLoop;
@@ -72,6 +73,29 @@ get '/' => sub {
     $c->render(json => {
         name     => "jabbot-ircbotd",
     });
+};
+
+post '/' => sub {
+    my $c = shift;
+    my $req = decode_json( $c->req->body );
+
+    my $network = $req->{network};
+    my $channel = $req->{channel};
+    my $text = $req->{text};
+
+    my $error;
+    my $response = {};
+
+    my $irc_client = $IRC_CLIENTS->{$network};
+    if ( $irc_client ) {
+        $irc_client->write(PRIVMSG => $channel, ":${text}");
+    } else {
+        $error = "Unknown network: $network";
+    }
+    if ($error) {
+        $response->{error} = $error;
+    }
+    $c->render(json => $response);
 };
 
 my $networks = Jabbot->config->{irc}{networks};
