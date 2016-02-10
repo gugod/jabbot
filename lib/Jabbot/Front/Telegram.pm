@@ -16,6 +16,8 @@ use WWW::Telegram::BotAPI;
 
 my $API_TELEGRAM = WWW::Telegram::BotAPI->new (token => Jabbot->config->{telegram}{token}, async => 1);
 
+my $CHATS = {};
+
 sub send_reply {
     state $jabbot = Jabbot::RemoteCore->new();
     my ($chat_id, $text) = @_;
@@ -53,8 +55,23 @@ sub get_updates {
                 $RECV->{updates}{ $_->{update_id} } = { update => $_ };
                 $max_update_id = max($max_update_id, $_->{update_id});
 
+                my $chat_id = $_->{message}{chat}{id};
+                $CHATS->{ $chat_id } //= {
+                    target => $_->{message}{chat},
+                    messages => []
+                };
+                my $message_log = $CHATS->{ $chat_id }{messages};
+
+                my %m = %{$_->{message}};
+                delete @m{"from", "chat"};
+                push @$message_log, \%m;
+
+                if ((my $alength = @$message_log) > 10) {
+                    splice(@$message_log, 0, $alength - 10);
+                }
+
                 say encode_utf8 "<< $_->{message}{text}";
-                send_reply( $_->{message}{chat}{id}, $_->{message}{text} );
+                send_reply( $chat_id, $_->{message}{text} );
             }
 
             say "="x40;
@@ -82,7 +99,8 @@ use Mojolicious::Lite;
 get '/' => sub {
     my $c = shift;
     $c->render(json => {
-        name     => "jabbot-telegramd",
+        name  => "jabbot-telegramd",
+        chats => $CHATS,
     });    
 };
 
