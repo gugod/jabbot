@@ -101,7 +101,39 @@ get '/' => sub {
     $c->render(json => {
         name  => "jabbot-telegramd",
         chats => $CHATS,
-    });    
+    });
+};
+
+post '/' => sub {
+    my $c = shift;
+    my $res = {};
+    my @error;
+    my $req = decode_json( $c->req->body );
+    if (!defined($req->{chat_id})) {
+        push @error, "\"chat_id\" is missig";
+    }
+    if (!defined($req->{text})) {
+        push @error, "\"text\" is missig";
+    }
+    if ($req->{chat_id} && !exists($CHATS->{$req->{chat_id}})) {
+        push @error, "\"chat_id\" $req->{chat_id} is unknown";
+    }
+    
+    if (!@error) {
+        $API_TELEGRAM->api_request(
+            sendMessage => {
+                chat_id => $req->{chat_id},
+                text    => $req->{text},
+            }, sub {
+                my ($ua, $tx) = @_;
+                return unless $tx->success;
+            }
+        );
+    } else {
+        $res->{error} = \@error;
+    }
+
+    $c->render($res);
 };
 
 # Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

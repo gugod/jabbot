@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+use v5.18;
+use JSON::PP qw(encode_json);
+use Hijk;
+use URI;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Jabbot;
+
+use Getopt::Long;
+
+GetOptions(
+    (my $opt = {}),
+    "chat_id=n",
+    "text=s"
+);
+
+my $config = Jabbot->config->{telegram};
+my $uri = URI->new( $config->{listen} );
+
+my $res = Hijk::request({
+    method       => "POST",
+    host         => $uri->host,
+    port         => $uri->port,
+    path         => "/",
+    body => encode_json({
+        chat_id => $opt->{chat_id},
+        text => $opt->{text},
+    })
+});
+
+if ($res->{error}) {
+    say $res->{error};
+} else {
+    say "OK";
+}
