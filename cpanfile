@@ -9,7 +9,6 @@ requires "B::Hooks::Parser";
 requires "CHI";
 requires "Chatbot::Eliza";
 requires "DateTime";
-requires "Giddy";
 requires "HTML::TreeBuilder::Select";
 requires "HTTP::Request::Common";
 requires "Hash::Merge";
