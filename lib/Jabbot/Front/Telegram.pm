@@ -133,7 +133,7 @@ post '/' => sub {
         $res->{error} = \@error;
     }
 
-    $c->render($res);
+    $c->render(json => $res);
 };
 
 # Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
