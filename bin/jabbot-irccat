@@ -8,7 +8,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Jabbot;
-
+use Jabbot::Remote;
 use Getopt::Long;
 
 GetOptions(
@@ -18,23 +18,12 @@ GetOptions(
     "text=s"
 );
 
-my $config = Jabbot->config->{ircbot};
-my $uri = URI->new( $config->{listen} );
-
-my $res = Hijk::request({
-    method       => "POST",
-    host         => $uri->host,
-    port         => $uri->port,
-    path         => "/",
-    body => encode_json({
-        network => $opt->{network},
-        channel => $opt->{channel},
-        text    => $opt->{text},
-    })
-});
+my $remote = Jabbot::Remote->new( target => "ircbot" );
+my $res = $remote->post($opt);
 
 if ($res->{error}) {
     say $res->{error};
 } else {
     say "OK";
 }
+
