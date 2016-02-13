@@ -41,10 +41,9 @@ sub answer {
 
     my $reply = $answers[rand($#answers)];
 
-    for(1..2) {
-        if (rand > 0.5) {
-            $reply .= " " . $answers[rand($#answers)];
-        }
+    for(1..6) {
+        last if rand > 0.5;
+        $reply .= " " . $answers[rand($#answers)];
     }
 
     $reply .= " ". $emoticons[rand($#emoticons)];
