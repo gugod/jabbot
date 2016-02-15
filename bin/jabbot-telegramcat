@@ -1,13 +1,9 @@
 #!/usr/bin/env perl
 use v5.18;
-use JSON::PP qw(encode_json);
-use Hijk;
-use URI;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Jabbot;
 use Jabbot::Remote;
 use Getopt::Long;
 
