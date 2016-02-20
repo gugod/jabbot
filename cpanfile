@@ -1,9 +1,5 @@
 requires "Acme::CPANAuthors";
 requires "Acme::Lingua::ZH::Remix";
-requires "AnyEvent";
-requires "AnyEvent::HTTP";
-requires "AnyEvent::Twitter::Stream";
-requires "AnyEvent::XMPP";
 requires "B::Hooks::Parser";
 requires "CHI";
 requires "Chatbot::Eliza";
@@ -39,5 +35,4 @@ requires "XML::RSS";
 requires "YAML";
 requires "common::sense";
 requires "self";
-requires "Proc::PID::File";
 requires "UnQLite";
