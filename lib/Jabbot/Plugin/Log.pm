@@ -1,21 +1,22 @@
 package Jabbot::Plugin::Log;
-use Jabbot::Plugin;
+use v5.18;
+use utf8;
+use Object::Tiny;
+
 use Jabbot;
-use DateTime;
+use Jabbot::Memory;
+use Time::Moment;
 
 sub can_answer {
-    my ($text, $message) = @args;
+    my ($self, $text, $message) = @_;
 
-    my $today = DateTime->today;
-    my $name = join("-", $message->{network}, $message->{channel}, $today->year, $today->month, $today->day);
+    my $now = Time::Moment->now_utc;
+    my $key = join("-", $message->{network}, $message->{channel}, $now->to_string);
 
-    my %m = %$message;
-    delete $m{channel};
-    delete $m{network};
+    my $mem = Jabbot::Memory->new;
+    $mem->set("log", $key, $text);
 
-    Jabbot->memory->update("log", $name, { '$push' => { messages => \%m } }, { upsert => 1 });
-
-    return;
+    return 0;
 }
 
 sub answer {}
