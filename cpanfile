@@ -36,3 +36,5 @@ requires "YAML";
 requires "common::sense";
 requires "self";
 requires "UnQLite";
+requires "Type::Tiny";
+requires "Types::Standard";
