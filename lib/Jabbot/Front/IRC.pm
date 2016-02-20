@@ -100,7 +100,7 @@ post '/' => sub {
     $c->render(json => $response);
 };
 
-my $networks = Jabbot->config->{irc}{networks};
+my $networks = Jabbot->config->{ircbot}{networks};
 for (keys %$networks) {
     my $config = $networks->{$_};
     $config->{name} = $_;
