@@ -34,7 +34,6 @@ xmpp:
 plugins: []
   # - CPANAuthors
   # - URLPreview
-  # - HandlinoRedmine
   # - en_us::Facts
   # - en_us::Eliza
   # - zh_tw::RandomChatbot
