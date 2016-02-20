@@ -6,7 +6,8 @@ cored:
   listen: http://localhost:18000
 
 memoryd:
-  port: 18002
+  listen: http://localhost:18002
+  database_root: /tmp/jabbot/memory
 
 telegram:
   listen: http://127.0.0.1:18010
