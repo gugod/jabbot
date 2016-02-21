@@ -3,10 +3,10 @@
 nick: jabbot
 
 cored:
-  listen: http://localhost:18000
+  listen: http://127.0.0.1:18000
 
 memoryd:
-  listen: http://localhost:18002
+  listen: http://127.0.0.1:18002
   database_root: /tmp/jabbot/memory
 
 telegram:

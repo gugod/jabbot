@@ -3,11 +3,11 @@ use v5.18;
 
 use Encode qw(decode_utf8 encode_utf8);
 use Mojo::UserAgent;
+use Jabbot;
 
 sub new {
     my ($class, %params) = @_;
-    $params{host} //= "localhost";
-    $params{port} //= "18000";
+    $params{cored} = Jabbot->config->{cored}{listen} // "http://localhost:18000";
     return bless { %params }, $class;
 }
 
@@ -21,7 +21,7 @@ sub answers {
 
     my $ua = Mojo::UserAgent->new;
     my $tx = $ua->get(
-        ("http://" . $self->{host} . ":" . $self->{port} . "/answers"),
+        ($self->{cored} . "/answers"),
         {},
         json => {
             q => $q
