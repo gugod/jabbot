@@ -38,7 +38,7 @@ get '/' => sub {
     });
 };
 
-get '/:collection/:key' => sub {
+get '/:collection/*key' => sub {
     my $c = shift;
     my $k = $c->param('key');
 
@@ -50,7 +50,7 @@ get '/:collection/:key' => sub {
     $c->render(data => $v);
 };
 
-put '/:collection/:key' => sub {
+put '/:collection/*key' => sub {
     my $c = shift;
     my $k = $c->param('key');
     my $v = $c->req->body;
