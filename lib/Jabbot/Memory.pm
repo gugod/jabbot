@@ -5,16 +5,17 @@ use v5.18;
 use Object::Tiny;
 
 use Mojo::UserAgent;
+use Mojo::Util 'url_escape';
 
 use Jabbot;
 
-use constant SERVER_URI_BASE => "http://" . ( Jabbot->config->{host} // "localhost" ) . ":" . ( Jabbot->config->{port} // 18002 );
+use constant SERVER_URI_BASE => Jabbot->config->{memoryd}{listen} // "http://127.0.0.1:18002";
 
 sub set {
     my ($self, $collection, $key, $value) = @_;
     my $ua = Mojo::UserAgent->new;
     $ua->put(
-        SERVER_URI_BASE . "/${collection}/{$key}",
+        join("/", SERVER_URI_BASE, url_escape($collection), url_escape($key)),
         {},
         $value
     );
@@ -23,7 +24,7 @@ sub set {
 sub get {
     my ($self, $collection, $key) = @_;
     my $ua = Mojo::UserAgent->new;
-    my $tx = $ua->get(SERVER_URI_BASE . "/${collection}/{$key}");
+    my $tx = $ua->get( join("/", SERVER_URI_BASE, url_escape($collection), url_escape($key)) );
     if (my $res = $tx->success) {
         return $res->body;
     } else {
