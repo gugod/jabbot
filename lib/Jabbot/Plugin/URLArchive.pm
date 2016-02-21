@@ -1,6 +1,6 @@
 package Jabbot::Plugin::URLArchive;
 use v5.18;
-use Object::Tiny qw(core);
+use Object::Tiny;
 use Regexp::Common qw/URI/;
 
 use Jabbot::Memory;
@@ -8,18 +8,24 @@ use Jabbot::Memory;
 sub can_answer {
     my ($self, $text) = @_;
     if ($text =~ /($RE{URI}{HTTP})/) {
-        my $url = $1;
-        my $mem = Jabbot::Memory->new();
-        $mem->set("url_archive", $url, scalar time);
+        $self->{url} = $1;
+        print STDERR "GOT URL: $1\n";
+        return 1;
     }
     return 0;
 }
 
 sub answer {
-    return {
-        body => "",
-        score => 0,
+    my ($self, $text) = @_;
+    my $ret = {
+        body => "Cool",
+        score => 0.5,
     };
+
+    my $url = $self->{url} or return $ret;
+    my $mem = Jabbot::Memory->new();
+    $mem->set("url_archive", $url, scalar time);
+    return $ret;
 }
 
 1;
