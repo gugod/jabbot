@@ -1,6 +1,5 @@
 requires "Acme::CPANAuthors";
 requires "Acme::Lingua::ZH::Remix";
-requires "B::Hooks::Parser";
 requires "CHI";
 requires "Chatbot::Eliza";
 requires "DateTime";
