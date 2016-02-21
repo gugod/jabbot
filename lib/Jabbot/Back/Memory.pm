@@ -12,7 +12,7 @@ sub __open_db {
     state $cache = {};
     my ($collection) = @_;
     my $c = $cache->{$collection} ||= {
-        db => UnQLite->open(Jabbot->config->{memory}{database_root}."/${collection}.db", UnQLite::UNQLITE_OPEN_READWRITE|UnQLite::UNQLITE_OPEN_CREATE)
+        db => UnQLite->open(Jabbot->config->{memoryd}{database_root}."/${collection}.db", UnQLite::UNQLITE_OPEN_READWRITE|UnQLite::UNQLITE_OPEN_CREATE)
     };
     $c->{last_used} = time;
     return $c->{db};
