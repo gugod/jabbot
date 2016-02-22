@@ -17,7 +17,7 @@ sub answers {
 
     my $q = $args{q};
 
-    $q = decode_utf8($q) unless Encode::is_utf8($q);
+    $q = encode_utf8($q) if Encode::is_utf8($q);
 
     my $ua = Mojo::UserAgent->new;
     my $tx = $ua->get(
