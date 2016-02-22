@@ -8,13 +8,13 @@ use Jabbot::RemoteCore;
 use List::UtilsBy qw(rev_nsort_by);
 
 use IO::Handle;
-use encoding 'utf8';
 
 my $j = Jabbot::RemoteCore->new;
 my $ans = [];
 
 if (@ARGV > 0) {
     my $q = join(" ", @ARGV);
+    $q = Encode::decode_utf8($q);
     $ans = $j->answers(q => $q);
     say "\nA:";
     say "     [$_->{plugin}] $_->{body}" for @{$ans->{answers}};
@@ -26,6 +26,7 @@ else {
     while(<>) {
         chomp;
         my $q = $_;
+        $q = Encode::decode_utf8($q);
 
         $ans = $j->answers(q => $q);
 
