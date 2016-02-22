@@ -9,7 +9,6 @@ sub can_answer {
     my ($self, $text) = @_;
     if ($text =~ /($RE{URI}{HTTP})/) {
         $self->{url} = $1;
-        print STDERR "GOT URL: $1\n";
         return 1;
     }
     return 0;
