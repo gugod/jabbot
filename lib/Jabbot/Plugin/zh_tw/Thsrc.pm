@@ -7,9 +7,10 @@ use HTML::TreeBuilder::Select;
 use WWW::Mechanize;
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
 
-    if ($text =~ m/高鐵\s*[,:]?\s*(..)\s*到\s*(..)\s*/) {
+    if ($text =~ m/^高鐵\s*[,:]?\s*(..)\s*到\s*(..)\s*/) {
         $self->{matched} = [$1, $2];
         return 1;
     }
@@ -17,7 +18,8 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
     return unless $self->{matched};
 
     my $content = $self->thsrc_query(@{ $self->{matched} });

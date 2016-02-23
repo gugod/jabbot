@@ -4,7 +4,8 @@ use utf8;
 use Object::Tiny qw(core);
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
     if ($text =~ /謝謝/) {
         return 1;
     }

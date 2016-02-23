@@ -6,7 +6,8 @@ use Object::Tiny qw(core);
 use Acme::Lingua::ZH::Remix 0.90;
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
     if (length($text) > 2) {
         return 0.1;
     }
@@ -14,7 +15,8 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
     $self->{remix} ||= Acme::Lingua::ZH::Remix->new;
     return {
         body  => $self->{remix}->random_sentence,

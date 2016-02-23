@@ -21,7 +21,9 @@ sub trim {
 }
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+
     if ($text =~ /^(.*(?:號|日))(?:是)?(?:星期幾)?\s*/) {
         $self->{matched} = $1;
         return 1;

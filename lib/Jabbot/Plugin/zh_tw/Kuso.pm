@@ -42,7 +42,8 @@ my @foods = (
 sub can_answer { 1 }
 
 sub answer {
-    my ($self,$text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
 
     my $reply;
 

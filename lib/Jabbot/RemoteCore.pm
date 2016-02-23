@@ -15,7 +15,6 @@ sub new {
 sub answers {
     my ($self, $message) = @_;
     JabbotMessage->assert_valid($message);
-    my @answers;
     my $ua = Mojo::UserAgent->new;
     my $tx = $ua->get(
         ($self->{cored} . "/answers"),

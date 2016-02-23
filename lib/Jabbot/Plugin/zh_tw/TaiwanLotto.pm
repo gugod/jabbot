@@ -4,7 +4,8 @@ use utf8;
 use Object::Tiny qw(core);
 
 sub can_answer {
-    my ($self,$text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
     if (($self->{matched}) = $text =~ /^(樂透|四星彩)$/) {
         return 1;
     }
@@ -12,7 +13,8 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self,$text) = @_;
+    my ($self,$message) = @_;
+    my $text = $message->{body};
     my $reply;
     
     if ($self->{matched} eq "樂透") {

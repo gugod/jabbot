@@ -11,6 +11,7 @@ use Encode qw(encode_utf8);
 use List::Util qw(max);
 
 use Mojo::JSON qw(decode_json);
+use Mojo::Util;
 use Mojo::IOLoop;
 use WWW::Telegram::BotAPI;
 
@@ -23,9 +24,10 @@ sub send_reply {
     my ($chat_id, $text) = @_;
 
     my $answer = $jabbot->answer(
-        q => $text,
+        body    => $text,
         network => "telegram",
         channel => "chat_id:$chat_id",
+        author  => "chat_id:$chat_id",
     );
     my $reply_text = $answer->{body};
 
@@ -87,7 +89,7 @@ $API_TELEGRAM->api_request(
     'getMe',
     sub {
         my ($ua, $tx) = @_;
-        die unless $tx->success;
+        die Mojo::Util::dumper($tx->error) unless $tx->success;
         say "getMe: " . $tx->res->body;
 
         my $interval = Jabbot->config->{telegram}{poll_interval} // 15;

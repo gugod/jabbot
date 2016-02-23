@@ -51,7 +51,12 @@ sub init_irc_client {
             my ($channel, $message_text) = @{$message->{params}};
             my ($message_text_without_my_nick_name) = $message_text =~ m/\A ${nick} [,:\s]+ (.+) \z/xmas;
             return unless $message_text_without_my_nick_name;
-            my $answer = $jabbot->answer(q => $message_text_without_my_nick_name);
+            my $answer = $jabbot->answer({
+                body    => $message_text_without_my_nick_name,
+                author  => $from_nick,
+                network => "irc",
+                channel => "$channel",
+            });
             my $reply_text = $answer->{body};
             $self->write(PRIVMSG => $channel, ":${from_nick}: $reply_text", sub {});
         });
