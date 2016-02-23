@@ -7,7 +7,6 @@ use Jabbot::Types qw(JabbotMessage);
 
 use JSON qw(to_json);
 use UNIVERSAL::require;
-use Try::Tiny;
 
 sub new {
     state $core;
@@ -44,20 +43,19 @@ sub answers {
     JabbotMessage->assert_valid($message);
 
     my @answers;
-
     for my $plugin (@{$self->{plugins}}) {
-        if ($plugin->can_answer($message)) {
-            my $plugin_name = ref($plugin) =~ s/^Jabbot::Plugin:://r;
-
-            try {
-                my $a = $plugin->answer($message);
-                if (ref $a eq 'HASH') {
-                    $a->{plugin} = $plugin_name;
-                    push @answers, $a;
-                }
-            } catch {
-                warn "[Jabbot::Core][ERROR][plugin=${plugin_name}] $_";
+        next unless $plugin->can_answer($message);
+        my $plugin_name = ref($plugin) =~ s/^Jabbot::Plugin:://r;
+        eval {
+            my $a = $plugin->answer($message);
+            if (ref($a) eq 'HASH') {
+                $a->{plugin} = $plugin_name;
+                push @answers, $a;
             }
+            1;
+        } or do {
+            my $err = $@ || "(zombie error)";
+            warn "[Jabbot::Core][ERROR][plugin=${plugin_name}] $err";
         }
     }
     return \@answers;

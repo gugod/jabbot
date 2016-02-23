@@ -1,7 +1,6 @@
 package Jabbot::RemoteCore;
 use v5.18;
 
-use Encode qw(decode_utf8 encode_utf8);
 use Mojo::UserAgent;
 
 use Jabbot;
@@ -16,21 +15,12 @@ sub new {
 sub answers {
     my ($self, $message) = @_;
     JabbotMessage->assert_valid($message);
-
     my @answers;
-
-    my $data;
-    for my $k (keys %$message) {
-        my $v = $message->{$k};
-        $v = encode_utf8($v) if Encode::is_utf8($v);
-        $data->{$k} = $v;
-    }
-
     my $ua = Mojo::UserAgent->new;
     my $tx = $ua->get(
         ($self->{cored} . "/answers"),
         {},
-        json => $data
+        json => $message
     );
     return $tx->res->json();
 }

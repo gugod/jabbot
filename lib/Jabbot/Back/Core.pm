@@ -4,7 +4,6 @@ use strict;
 use Jabbot;
 use Jabbot::Core;
 use Time::HiRes;
-
 use Mojolicious::Lite;
 
 my $VERSION = "0.0.1";
@@ -22,11 +21,11 @@ get '/' => sub {
 
 get '/answers' => sub {
     my $c = shift;
-    my $message = $c->req->json();
+    my $message = $c->req->json;
 
-    my $begin_t = Time::HiRes::time;
+    my $begin_t = Time::HiRes::time();
     my $answers = $CORE->answers($message);
-    my $took = Time::HiRes::time - $begin_t;
+    my $took = Time::HiRes::time() - $begin_t;
 
     $c->render(json => {
         _took   => $took,
