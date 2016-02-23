@@ -9,15 +9,14 @@ package Jabbot::Types {
     declare "JabbotIdentifier", as Str, where { lc($_) eq $_ };
     declare "JabbotNodeIdentifier",    as "JabbotIdentifier";
     declare "JabbotNetworkIdentifier", as "JabbotIdentifier";
-
-    declare "JabbotMessageAuthor", as Dict[
-        network => JabbotNetworkIdentifier(),
-        id      => Str
-    ];
+    declare "JabbotAuthorIdentifier",  as "JabbotIdentifier";
+    declare "JabbotChannelIdentifier", as "JabbotIdentifier";
     
     declare "JabbotMessage", as Dict[
-        author => JabbotMessageAuthor(),
-        body   => Str
+        author  => JabbotAuthorIdentifier(),
+        channel => JabbotChannelIdentifier(),
+        network => JabbotNetworkIdentifier(),
+        body    => Str
     ];
 
     declare "JabbotQA", as Dict[
