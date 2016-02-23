@@ -22,10 +22,10 @@ get '/' => sub {
 
 get '/answers' => sub {
     my $c = shift;
-    my $q = $c->req->json("/q") || $c->param('q');
-    my %args = ( question => $q );
+    my $message = $c->req->json();
+
     my $begin_t = Time::HiRes::time;
-    my $answers = $CORE->answers(%args);
+    my $answers = $CORE->answers($message);
     my $took = Time::HiRes::time - $begin_t;
 
     $c->render(json => {

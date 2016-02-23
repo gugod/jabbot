@@ -1,30 +1,31 @@
 package Jabbot::Plugin::zh_tw::SorrySorry;
 use v5.18;
 use utf8;
+use Encode qw(decode_utf8);
 use Object::Tiny qw(core);
+use Devel::Peek;
 
 sub can_answer {
-    my ($self, $text) = @_;
-    utf8::decode($text) unless utf8::is_utf8($text);
+    my ($self, $message) = @_;
+    my $text = $message->{body};
 
-    my ($x) = $text =~ m{(
-                            對不起 | 道歉
-                            [!！]{2,}+ |
-                            可惡 | 混蛋 | 雜(碎｜種) |
-                            靠(你|夭) |
-                            豬 | 狗 | 雞 | 笨 |
-                            (打|踢|踩|踹|幹) 你 |
-                            punch |
-                            (fu|ki)ck
-                    )}x;
-    if ($x) {
-        return 0.5;
-    }
+    return 0.5 if $text =~ m{(
+                                 對不起 | 道歉
+                                 [!！]{2,}+ |
+                                 可惡 | 混蛋 | 雜(碎｜種) |
+                                 靠(你|夭) |
+                                 豬 | 狗 | 雞 | 笨 |
+                                 (打|踢|踩|踹|幹) 你 |
+                                 punch |
+                                 (fu|ki)ck
+                             )}x;
     return 0;
 }
 
 sub answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+
     my @emoticons = qw{T_T ocz orz >_<" (>_<) (-_-)||| XD :P};
 
     my @answers = (

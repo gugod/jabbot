@@ -22,7 +22,11 @@ sub send_reply {
     state $jabbot = Jabbot::RemoteCore->new();
     my ($chat_id, $text) = @_;
 
-    my $answer = $jabbot->answer(q => $text);
+    my $answer = $jabbot->answer(
+        q => $text,
+        network => "telegram",
+        channel => "chat_id:$chat_id",
+    );
     my $reply_text = $answer->{body};
 
     $API_TELEGRAM->api_request(

@@ -6,8 +6,9 @@ use Regexp::Common qw/URI/;
 use Jabbot::Memory;
 
 sub can_answer {
-    my ($self, $text) = @_;
-    if ($text =~ /($RE{URI}{HTTP})/) {
+    my ($self, $message) = @_;
+    
+    if ($message->{body} =~ /($RE{URI}{HTTP})/) {
         $self->{url} = $1;
         return 1;
     }

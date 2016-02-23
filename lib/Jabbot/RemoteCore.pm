@@ -3,7 +3,9 @@ use v5.18;
 
 use Encode qw(decode_utf8 encode_utf8);
 use Mojo::UserAgent;
+
 use Jabbot;
+use Jabbot::Types qw(JabbotMessage);
 
 sub new {
     my ($class, %params) = @_;
@@ -12,27 +14,30 @@ sub new {
 }
 
 sub answers {
-    my ($self, %args) = @_;
+    my ($self, $message) = @_;
+    JabbotMessage->assert_valid($message);
+
     my @answers;
 
-    my $q = $args{q};
-
-    $q = encode_utf8($q) if Encode::is_utf8($q);
+    my $data;
+    for my $k (keys %$message) {
+        my $v = $message->{$k};
+        $v = encode_utf8($v) if Encode::is_utf8($v);
+        $data->{$k} = $v;
+    }
 
     my $ua = Mojo::UserAgent->new;
     my $tx = $ua->get(
         ($self->{cored} . "/answers"),
         {},
-        json => {
-            q => $q
-        }
+        json => $data
     );
     return $tx->res->json();
 }
 
 sub answer {
-    my ($self, %args) = @_;
-    my $res = $self->answers(%args);
+    my ($self, $message) = @_;
+    my $res = $self->answers($message);
     my @all_answers = sort { $b->{score} <=> $a->{score} } @{$res->{answers}};
     my @best_answers = grep { $_->{score} == $all_answers[0]{score} } @all_answers;
     my $best = $best_answers[rand(@best_answers)];

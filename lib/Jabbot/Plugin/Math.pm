@@ -6,8 +6,9 @@ use Try::Tiny;
 use Math::Expression::Evaluator;
 
 sub can_answer {
-    my ($self, $text) = @_;
-
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+    
     $text =~ s/^\s+//;
     $text =~ s/\s*\?*\s*$//;
     return if $text !~ m{[\+\-\*\/]};

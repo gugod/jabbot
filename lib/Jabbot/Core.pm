@@ -2,9 +2,11 @@ package Jabbot::Core;
 use v5.18;
 use utf8;
 
+use Jabbot;
+use Jabbot::Types qw(JabbotMessage);
+
 use JSON qw(to_json);
 use UNIVERSAL::require;
-use Jabbot;
 use Try::Tiny;
 
 sub new {
@@ -38,16 +40,17 @@ sub new {
 }
 
 sub answers {
-    my ($self, %args) = @_;
+    my ($self, $message) = @_;
+    JabbotMessage->assert_valid($message);
+
     my @answers;
-    my $q = $args{question};
 
     for my $plugin (@{$self->{plugins}}) {
-        if ($plugin->can_answer($q, \%args)) {
+        if ($plugin->can_answer($message)) {
             my $plugin_name = ref($plugin) =~ s/^Jabbot::Plugin:://r;
 
             try {
-                my $a = $plugin->answer($q, \%args);
+                my $a = $plugin->answer($message);
                 if (ref $a eq 'HASH') {
                     $a->{plugin} = $plugin_name;
                     push @answers, $a;

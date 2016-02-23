@@ -5,11 +5,12 @@ use warnings;
 use Object::Tiny;
 
 sub can_answer {
-    1;
+    0.5;
 }
 
 sub answer {
-    my ($self, $text, $message) = @_;
+    my ($self, $message) = @_;
+    my $text   = $message->{body};
 
     my $chance = int(rand()*10);
     my $emotion = {
