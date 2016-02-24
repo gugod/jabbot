@@ -11,4 +11,10 @@ use Mojo::Server::Morbo;
 my $config = Jabbot->config->{cored};
 my $morbo = Mojo::Server::Morbo->new;
 $morbo->daemon->listen([ $config->{listen} ]);
+$morbo->watch([
+    "config",
+    "lib/Jabbot/Core.pm",
+    "lib/Jabbot/Back/Core.pm",
+    "lib/Jabbot/Plugin/"
+]);
 $morbo->run("lib/Jabbot/Back/Core.pm");
