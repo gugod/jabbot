@@ -5,7 +5,8 @@ use YAML;
 use Weather::Underground;
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
 
     if ($text =~ /\A \s* weather \s+ in \s+ ([\p{Letter}, ]+) \s*\z/ix) {
         $self->{area} = $1;
@@ -16,7 +17,8 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
 
     my $weather = Weather::Underground->new(
         place => $self->{area},

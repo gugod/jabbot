@@ -6,7 +6,9 @@ use Jabbot::Memory;
 use List::UtilsBy qw(max_by);
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+
     my ($op, $k) = $text =~ /\A \s* (remember|recall) (?: \s|\p{Punctuation}) (.+) \z/x;
     if (defined($op) && defined($k)) {
         $k =~ s/^\s//;
@@ -22,7 +24,10 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+
+    # process_remember, process_recall
     my $proc = "process_" . $self->{stash}{op};
     my $procsub = $self->can($proc) or die "Unknown processor: $proc";
     return $procsub->($self, $self->{stash}{k});

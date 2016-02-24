@@ -6,7 +6,8 @@ use YAML;
 use Weather::Google;
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
 
     if ($text =~ /^\s*(.+)\s*天氣[?？]?\s*$/) {
         $self->{area} = $1;
@@ -25,7 +26,8 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
 
     my $weather = Weather::Google->new($self->{area}, { language => 'zh-TW' });
     my $current = $weather->current_conditions;

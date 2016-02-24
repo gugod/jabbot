@@ -8,7 +8,9 @@ use Net::Delicious;
 use Regexp::Common qw/URI/;
 
 sub can_answer {
-    my ($self, $text, $message) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+
     if ($text =~ /^(?:!d(?:elicious)?) +($RE{URI}{HTTP})(?: +tags:(.+?))?$/i) {
         $self->{url} = $1;
         $self->{tags} = $2;
@@ -18,7 +20,9 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, $text, $message) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+
     return unless $self->{url};
 
     my $reply = "Posting failed due to alien invasion.";

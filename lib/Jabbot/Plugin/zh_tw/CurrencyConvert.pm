@@ -35,7 +35,8 @@ my %calias = ( GRP => 'GBP', "RMB" => "MCY", "YEN" => "JPY", "CHF" =>"SWF", "NTD
 sub can_answer { 1 }
 
 sub answer {
-    my ($self, $s) = @_;
+    my ($self, $message) = @_;
+    my $s = $message->{body};
     my $reply;
     my $allsymbol = join("|",keys %coin) . "|" . join("|",keys %calias);
     my $qmark = '(?:[\s\?]|？)*';

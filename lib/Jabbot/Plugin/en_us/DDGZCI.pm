@@ -6,7 +6,8 @@ use Object::Tiny qw(core);
 use WWW::DuckDuckGo;
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
     my ($question) = $text =~
         /^(?:
              what \s* is|
@@ -37,7 +38,8 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
 
     my $duck = WWW::DuckDuckGo->new;
 

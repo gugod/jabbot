@@ -6,7 +6,8 @@ use Object::Tiny qw(core);
 use Chatbot::Eliza;
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
     if (length($text) > 2) {
         return 0.1;
     }
@@ -14,8 +15,8 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, $text) = @_;
-
+    my ($self, $message) = @_;
+    my $text = $message->{body};
     $self->{chatbot} ||= Chatbot::Eliza->new();
     my $ans  = $self->{chatbot}->transform($text);
 

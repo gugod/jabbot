@@ -5,7 +5,9 @@ use Object::Tiny;
 use Lingua::JA::Romanize::Japanese;
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+
     if ($text =~ /^\s*romanize\s+(j[ap]|japanese)\s+(.+)$/i) {
         $self->{matched} = $2;
     }
@@ -20,7 +22,9 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+
     my $reply_text = join " ", map { defined($_->[1]) ? "$_->[0]($_->[1])" : "$_->[0]" } $self->romanizer->string($self->{matched});
     return {
         score => 1,

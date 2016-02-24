@@ -8,7 +8,9 @@ use Try::Tiny;
 use Regexp::Common qw/URI/;
 
 sub can_answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+
     if ($text =~ /($RE{URI}{HTTP})/) {
         $self->{matched} = $1;
         return 1;
@@ -17,7 +19,9 @@ sub can_answer {
 }
 
 sub answer {
-    my ($self, $text) = @_;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
+
     my ($url) = $self->{matched};
 
     # TODO: 
