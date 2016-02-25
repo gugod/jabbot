@@ -1,7 +1,9 @@
 package Jabbot::Plugin::en_us::DDGZCI;
 use v5.18;
-use utf8;
-use Object::Tiny qw(core);
+use strict;
+use warnings;
+
+use Object::Tiny;
 
 use WWW::DuckDuckGo;
 
@@ -9,14 +11,13 @@ sub can_answer {
     my ($self, $message) = @_;
     my $text = $message->{body};
     my ($question) = $text =~
-        /^(?:
+        /\A(?:
              what \s* is|
              what's|
              do \s+ you \s+ know
-         )
-         \s+
-         (.+)
-         \?+\s*$/ix;
+         ) \s+
+         (.+) \s*
+         \?+ \s* \z/ix;
 
     unless ($question) {
         ($question) = $text =~
