@@ -38,7 +38,6 @@ sub send_reply {
         }, sub {
             my ($ua, $tx) = @_;
             return unless $tx->success;
-            say encode_utf8 ">> $reply_text";
         }
     );
 }
@@ -53,8 +52,6 @@ sub get_updates {
         sub {
             my ($ua, $tx) = @_;
             return unless $tx->success;
-
-            say time . ": " . $tx->res->body;
 
             my $res = decode_json( $tx->res->body );
             for (@{$res->{result}}) {
@@ -76,11 +73,8 @@ sub get_updates {
                     splice(@$message_log, 0, $alength - 10);
                 }
 
-                say encode_utf8 "<< $_->{message}{text}";
                 send_reply( $chat_id, $_->{message}{text} );
             }
-
-            say "="x40;
         }
     );
 }
@@ -90,11 +84,7 @@ $API_TELEGRAM->api_request(
     sub {
         my ($ua, $tx) = @_;
         die Mojo::Util::dumper($tx->error) unless $tx->success;
-        say "getMe: " . $tx->res->body;
-
         my $interval = Jabbot->config->{telegram}{poll_interval} // 15;
-        say "poll interval = $interval";
-
         Mojo::IOLoop->recurring( $interval  => \&get_updates );
     }
 );
@@ -144,4 +134,3 @@ post '/' => sub {
 
 # Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 app->start;
-
