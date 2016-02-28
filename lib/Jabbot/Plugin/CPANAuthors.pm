@@ -1,27 +1,20 @@
 package Jabbot::Plugin::CPANAuthors;
 use v5.12;
-use Jabbot;
-use Jabbot::Plugin;
+use Object::Tiny;
+
 use Acme::CPANAuthors;
 use WWW::Shorten qw(TinyURL);
 use CHI;
 
 sub can_answer {
-    my ($text, $message) = @args;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
     return 1 if $text =~ /!cpan\s*/i;
 }
 
-
-sub _get_country_authors {
-    my ($country) = @args;
-    $country = ucfirst $country;
-    $country =~ s/^Taiwan$/Taiwanese/;  # patch
-    my $acme_authors = Acme::CPANAuthors->new($country);  # taiwanese
-    return unless  $acme_authors ;
-}
-
 sub answer {
-    my ($text, $message) = @args;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
     $text =~ s{\s*!cpan\s*}{};
 
     my $reply = "Unrecognized command: !cpan $text";
@@ -30,7 +23,7 @@ sub answer {
     if($text =~ /^(?<COUNTRY>\w+)\s+authors/ ) {
         my $country = ucfirst $+{COUNTRY};
         my $acme_authors = $self->_get_country_authors( $country );
-        return { content => "there is no such module for $country" } unless $acme_authors;
+        return { score => 1, body => "there is no such module for $country" } unless $acme_authors;
 
         $reply = qq!There are @{[  $acme_authors->count ]} in $country. They are !;
         $reply .= join( ', ' , map { $_ } keys %$acme_authors ) . ' ..etc';
@@ -50,8 +43,17 @@ sub answer {
         $reply = $cache->compute($author_id, {}, sub { cpanauthor_info($author_id) });
     }
 
-    return { content => $reply, confidence => 0.9 };
+    return { body => $reply, score => 1 };
 }
+
+sub _get_country_authors {
+    my ($self, $country) = @_;
+    $country = ucfirst $country;
+    $country =~ s/^Taiwan$/Taiwanese/;  # patch
+    my $acme_authors = Acme::CPANAuthors->new($country);  # taiwanese
+    return unless  $acme_authors ;
+}
+
 
 sub cpanauthor_info {
     my ($author_id) = @_;
