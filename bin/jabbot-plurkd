@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+use v5.18;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Jabbot;
+use Mojo::Server::Morbo;
+
+my $config = Jabbot->config->{plurk};
+my $morbo = Mojo::Server::Morbo->new;
+$morbo->daemon->listen([ $config->{listen} ]);
+$morbo->run("lib/Jabbot/Front/Plurk.pm");

@@ -65,3 +65,8 @@ twitter:
   publish_to:
     - "freenode:#chupei.pm"
     - "freenode:#jabbot"
+
+plurk:
+  listen: http://localhost:18020/
+  username: ''
+  password: ''
