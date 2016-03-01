@@ -1,8 +1,11 @@
 package Jabbot::Plugin::en_us::Polite;
-use Jabbot::Plugin;
+use strict;
+use warnings;
+use Object::Tiny;
 
 sub can_answer {
-    my ($text) = @args;
+    my ($self, $message) = @_;
+    my $text = $message->{body};
 
     if ($text =~ /(thank(s|\s+you)|\bGJ\b)/i) {
         return 1;
@@ -12,8 +15,8 @@ sub can_answer {
 
 sub answer {
     return {
-        content    => "you are welcome.",
-        confidence => 0.5
+        body  => "you are welcome.",
+        score => 0.8
     }
 }
 
