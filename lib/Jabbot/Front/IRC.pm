@@ -34,6 +34,7 @@ sub init_irc_client {
         error => sub {
             my ($self, $message) = @_;
             p($message);
+            Mojo::IOLoop->timer( 10 => sub { $irc->connect(sub {}) });
         });
 
     $irc->on(
