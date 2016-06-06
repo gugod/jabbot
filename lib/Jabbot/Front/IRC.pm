@@ -40,7 +40,7 @@ sub init_irc_client {
     $irc->on(
         irc_join => sub {
             my($self, $message) = @_;
-            warn "yay! i joined $message->{params}[0]";
+            say "yay! i joined $message->{params}[0]";
         });
 
     $irc->on(
