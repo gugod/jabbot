@@ -50,8 +50,8 @@ sub init_irc_client {
             return unless $from_nick;
             return if $from_nick =~ /${nick}_*/;
             my ($channel, $message_text) = @{$message->{params}};
-            my ($message_text_without_my_nick_name) = $message_text =~ m/\A ${nick} [,:\s]+ (.+) \z/xmas;
-            if (!$message_text_without_my_nick_name && ($message_text =~ m/\A \<(\w+)\> \s ${nick} [,:\s]+ (.+) \z/xmas )) {
+            my ($message_text_without_my_nick_name) = $message_text =~ m/\A ${nick} [,:\s]+ (.+) \z/ixmas;
+            if (!$message_text_without_my_nick_name && ($message_text =~ m/\A \<(\w+)\> \s ${nick} [,:\s]+ (.+) \z/ixmas )) {
                 $from_nick = $1;
                 $message_text_without_my_nick_name = $2;
             }
