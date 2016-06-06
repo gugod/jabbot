@@ -3,12 +3,13 @@ use v5.18;
 use utf8;
 use Object::Tiny qw(core);
 
+use List::Util qw(first);
 use Chatbot::Eliza;
 
 sub can_answer {
     my ($self, $message) = @_;
     my $text = $message->{body};
-    if (length($text) > 2) {
+    if (length($text) > 2 && first { /\A \p{Letter} \z/x && /\A \p{Script=Latin} \z/x  } split("", $text)) {
         return 0.1;
     }
     return 0;
