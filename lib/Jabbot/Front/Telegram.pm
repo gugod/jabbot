@@ -44,16 +44,19 @@ sub send_reply {
 
 sub get_updates {
     my $RECV = {};
+    state $max_update_id = -2;
 
     $API_TELEGRAM->api_request(
         'getUpdates',
-        { },
+        { offset => ($max_update_id+1) },
         sub {
             my ($ua, $tx) = @_;
             return unless $tx->success;
 
             my $res = decode_json( $tx->res->body );
             for (@{$res->{result}}) {
+                $max_update_id = max($max_update_id, $_->{update_id});
+
                 $RECV->{updates}{ $_->{update_id} } = { update => $_ };
 
                 my $chat_id = $_->{message}{chat}{id};
