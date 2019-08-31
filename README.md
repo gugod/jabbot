@@ -2,10 +2,10 @@ Jabbot
 ======
 
 Jabbot is now under ∞.0 developement. It's organized as a group of
-inter-communicating daemons. Daemons ace Plack-based and the protocal
-is JSON over HTTP.
+inter-communicating daemons. Daemons are Plack-based and the protocal is JSON
+over HTTP.
 
-Port number allocation:
+## Port number allocation
 
 - core:  15000
 - front:
