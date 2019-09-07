@@ -30,7 +30,7 @@ sub config {
     my $config1 = YAML::LoadFile( root->file("config", "config.yaml") );
     my $config2 = {};
 
-    $x = $ENV{JABBOT_CONFIG} // root . "/config/site_config.yaml";
+    my $x = $ENV{JABBOT_CONFIG} // root . "/config/site_config.yaml";
 
     if ( -f $x ) {
         $config2 = YAML::LoadFile($x);
