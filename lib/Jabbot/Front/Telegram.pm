@@ -37,7 +37,7 @@ sub send_reply {
             text    => $reply_text,
         }, sub {
             my ($ua, $tx) = @_;
-            return unless $tx->success;
+            return unless $tx->result->is_success;
         }
     );
 }
@@ -51,7 +51,7 @@ sub get_updates {
         { offset => ($max_update_id+1) },
         sub {
             my ($ua, $tx) = @_;
-            return unless $tx->success;
+            return unless $tx->result->is_success;
 
             my $res = decode_json( $tx->res->body );
             for (@{$res->{result}}) {
@@ -124,7 +124,7 @@ post '/' => sub {
                 text    => $req->{text},
             }, sub {
                 my ($ua, $tx) = @_;
-                return unless $tx->success;
+                return unless $tx->result->success;
             }
         );
     } else {
