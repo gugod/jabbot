@@ -84,7 +84,8 @@ $API_TELEGRAM->api_request(
     'getMe',
     sub {
         my ($ua, $tx) = @_;
-        die Mojo::Util::dumper($tx->error) unless $tx->success;
+        my $res = $tx->result;
+        die Mojo::Util::dumper($tx->error) unless $res->is_success;
         my $interval = Jabbot->config->{telegram}{poll_interval} // 15;
         Mojo::IOLoop->recurring( $interval  => \&get_updates );
     }
