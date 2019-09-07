@@ -29,9 +29,10 @@ sub config {
 
     my $config1 = YAML::LoadFile( root->file("config", "config.yaml") );
     my $config2 = {};
-    my $x = root . "/config/site_config.yaml";
 
-    if ( -e $x ) {
+    $x = $ENV{JABBOT_CONFIG} // root . "/config/site_config.yaml";
+
+    if ( -f $x ) {
         $config2 = YAML::LoadFile($x);
     }
 
@@ -50,7 +51,7 @@ Jabbot - the multi-purpose bot.
 
 =head1 COPYRIGHT
 
-Copyright 2005,2006,2007,2008,2009,2010,2011 by Kang-min Liu <gugod@gugod.org>.
+Copyright 2005-2019 by Kang-min Liu <gugod@gugod.org>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
