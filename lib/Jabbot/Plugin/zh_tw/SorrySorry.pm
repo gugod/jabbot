@@ -3,7 +3,6 @@ use v5.18;
 use utf8;
 use Encode qw(decode_utf8);
 use Object::Tiny qw(core);
-use Devel::Peek;
 
 sub can_answer {
     my ($self, $message) = @_;
