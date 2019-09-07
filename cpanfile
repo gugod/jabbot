@@ -94,3 +94,4 @@ requires 'Acme::CPANAuthors::Utils::CPANIndex';
 requires 'Acme::CPANAuthors::Utils::Kwalitee';
 requires 'Acme::CPANAuthors::Utils::Packages';
 requires 'Acme::CPANAuthors::You::re_using';
+requires 'WWW::Telegram::BotAPI';
