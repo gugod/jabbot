@@ -1,14 +1,13 @@
 package Jabbot::Plugin::en_us::Weather;
 use v5.18;
 use Object::Tiny qw(core);
-use YAML;
 use Weather::Underground;
 
 sub can_answer {
     my ($self, $message) = @_;
     my $text = $message->{body};
 
-    if ($text =~ /\A \s* weather \s+ in \s+ ([\p{Letter}, ]+) \s*\z/ix) {
+    if ($text =~ /\A \s* weather \s+ in \s+ ([\p{Letter}, ]+) \s* \?+ \z/ix) {
         $self->{area} = $1;
         return 1;
     }
@@ -36,6 +35,9 @@ sub answer {
             $res_weather->{humidity}
         );
         $res->{body} = $res_body;
+        $res->{score} = 1;
+    } else {
+        $res->{body} = "The weather for " . $self->{area} . " is unknown.";
         $res->{score} = 1;
     }
     return $res;

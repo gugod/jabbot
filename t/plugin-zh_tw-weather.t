@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
-use common::sense;
+use v5.18;
+use utf8;
 use Test::More;
 
 my $builder = Test::More->builder;
