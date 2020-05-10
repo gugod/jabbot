@@ -60,21 +60,24 @@ sub cpanauthor_info {
 
     my @authors = Acme::CPANAuthors->look_for($author_id);
 
-    my $reply = "author not found";
+    return "not fount" unless @authors;
 
-    for my $author (@authors) {
-        $reply .= sprintf("%s (%s) belongs to %s. ",
-                          $author->{id}, $author->{name}, $author->{category});
+    my @orgs = map { $_->{category} } @authors;
+    my $orgs = pop @orgs;
+    $orgs = join(", ", @orgs) . " and " . $orgs if @orgs;
 
-        my $acme_authors = Acme::CPANAuthors->new( $author->{category} );
-        my @dists = $acme_authors->distributions( $author->{id} );
+    my $author = $authors[0];
+    my $acme_authors = Acme::CPANAuthors->new( $author->{category} );
+    my @dists = $acme_authors->distributions( $author->{id} );
 
-        $reply .= sprintf(" %s has %d dists." , $author->{id} , scalar @dists );
-
-        my $url = makeashorterlink( $acme_authors->avatar_url( $author->{id} ) );
-        $reply .= sprintf(" %s looks like this: %s", $author->{id} , $acme_authors->avatar_url( $author->{id} ) );
-        $reply .= "\n";
-    }
+    my $reply = sprintf(
+        '%s (%s) belongs to %s., has %d dists and looks like this: %s ',
+        $author->{id},
+        $author->{name},
+        $orgs,
+        (scalar @dists),
+        $acme_authors->avatar_url( $author->{id} ),
+    );
 
     return $reply;
 }
