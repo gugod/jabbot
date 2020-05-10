@@ -6,12 +6,12 @@ package Jabbot::Types {
     use Type::Utils -all;
     use Types::Standard -all;
 
-    declare "JabbotIdentifier", as Str, where { lc($_) eq $_ };
+    declare "JabbotIdentifier", as Str, where { defined($_) and $_ ne '' and lc($_) eq $_ };
     declare "JabbotNodeIdentifier",    as "JabbotIdentifier";
     declare "JabbotNetworkIdentifier", as "JabbotIdentifier";
     declare "JabbotAuthorIdentifier",  as "JabbotIdentifier";
     declare "JabbotChannelIdentifier", as "JabbotIdentifier";
-    
+
     declare "JabbotMessage", as Dict[
         author  => JabbotAuthorIdentifier(),
         channel => JabbotChannelIdentifier(),
