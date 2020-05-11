@@ -2,6 +2,7 @@
 use v5.26;
 use utf8;
 
+use Acme::RandomEmoji qw(random_emoji);
 use Image::Randim::Source;
 
 use FindBin;
@@ -16,12 +17,21 @@ sub random_image_url {
     return $image->url;
 }
 
-## main
-my $config = Jabbot->config->{plurk};
+sub post_to_plurk {
+    my ($message) = @_;
+    my $config = Jabbot->config->{plurk};
+    my $plurk = PlurkPoster->new(
+        username => $config->{username},
+        password => $config->{password},
+    );
+    $plurk->login();
+    $plurk->post($message);
+}
 
-my $plurk = PlurkPoster->new(
-    username => $config->{username},
-    password => $config->{password},
-);
-$plurk->login();
-$plurk->post(random_image_url(). "\n今日隨機選圖. 來源： [Unsplash](https://unsplash.com)");
+## main
+
+my $message = random_image_url(). "\n今日隨機選圖 ".  random_emoji() . "\n來源： [Unsplash](https://unsplash.com)";
+
+# say $message; exit();
+
+post_to_plurk($message);
