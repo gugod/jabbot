@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+use v5.26;
+use utf8;
+
+use Image::Randim::Source;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Jabbot;
+use PlurkPoster;
+
+sub random_image_url {
+    my $source = Image::Randim::Source->new;
+    $source->set_provider('Unsplash');
+    my $image = $source->get_image;
+    return $image->url;
+}
+
+## main
+my $config = Jabbot->config->{plurk};
+
+my $plurk = PlurkPoster->new(
+    username => $config->{username},
+    password => $config->{password},
+);
+$plurk->login();
+$plurk->post(random_image_url(). "\n今日隨機選圖. 來源： [Unsplash](https://unsplash.com)");

@@ -7,6 +7,7 @@ requires "DateTime";
 requires "HTML::TreeBuilder::Select";
 requires "HTTP::Request::Common";
 requires "Hash::Merge";
+requires "Image::Randim";
 requires "IO::All";
 requires "JSON";
 requires "LWP::Simple";
