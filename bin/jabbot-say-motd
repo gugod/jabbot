@@ -30,7 +30,7 @@ sub post_to_plurk {
 
 ## main
 
-my $message = random_image_url(). "\n今日隨機選圖 ".  random_emoji() . "\n來源： [Unsplash](https://unsplash.com)";
+my $message = random_image_url(). "\n隨機選圖 ".  random_emoji() . "\n來源： [Unsplash](https://unsplash.com)";
 
 # say $message; exit();
 
