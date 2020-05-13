@@ -97,3 +97,4 @@ requires 'Acme::CPANAuthors::Utils::Packages';
 requires 'Acme::CPANAuthors::You::re_using';
 requires 'WWW::Telegram::BotAPI';
 requires 'Acme::RandomEmoji';
+requires 'Time::Moment';
