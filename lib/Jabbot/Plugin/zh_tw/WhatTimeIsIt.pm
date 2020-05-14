@@ -10,8 +10,8 @@ my %tzoffset = (
     溫哥華 => -480,
     提華納 => -480,
     鳳凰城 => -420,
+    舊金山 => -420,
     墨西哥 => -360,
-    聖荷西 => -360,
     紐約 => -300,
     多倫多 => -300,
     聖地牙哥 => -240,
@@ -72,10 +72,15 @@ sub answer {
 
     my $reply;
     my $query;
+    my $simple = 0;
 
-    if ($text =~ /\A (?:現在)? (\p{Letter}+?) (?:那裡)?(?:現在)?幾點 [\?？]?\z/x) {
+    if ($text =~ /\A (?:現在)? (\p{Letter}+?) (?:那裡)?(?:現在)?幾點了? [\?？]?\z/x) {
         $query = $1;
+    } elsif ($text =~ /\A (?:現在)?幾點了? [\?？]?\z/x) {
+        $query = "台灣";
+        $simple = 1;
     }
+
     return unless defined($query);
 
     my $offset = $tzoffset{$query};
@@ -91,10 +96,10 @@ sub answer {
     my $tm_there = $tm_local->with_offset_same_instant($offset);
 
     if ($tm_local->day_of_month == $tm_there->day_of_month) {
-        $reply = "${query}那裡現在是 " . $tm_there->hour . " 點 " . $tm_there->minute . " 分";
+        $reply = ($simple ? "":"${query}現在是 ") . $tm_there->hour . " 點 " . $tm_there->minute . " 分";
     } else {
         my $ymd = $tm_there->year . " 年 " . $tm_there->month . " 月 " . $tm_there->day_of_month . " 日";
-        $reply = "${query}那裡現在是 $ymd " . $tm_there->hour . " 點 " . $tm_there->minute . "分";
+        $reply = ($simple ? "": "${query}現在是 ") . $ymd . " " . $tm_there->hour . " 點 " . $tm_there->minute . "分";
     }
 
     return $reply && {
