@@ -51,6 +51,8 @@ sub answers {
             if (ref($a) eq 'HASH') {
                 $a->{plugin} = $plugin_name;
                 push @answers, $a;
+            } else {
+                say STDERR "No answer from $plugin_name";
             }
             1;
         } or do {
