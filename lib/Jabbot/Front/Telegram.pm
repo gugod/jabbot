@@ -48,7 +48,7 @@ sub get_updates {
 
     $API_TELEGRAM->api_request(
         'getUpdates',
-        { offset => ($max_update_id+1) },
+        { offset => ($max_update_id+1), timeout => 60 },
         sub {
             my ($ua, $tx) = @_;
             return unless $tx->result->is_success;
@@ -86,7 +86,7 @@ $API_TELEGRAM->api_request(
         my ($ua, $tx) = @_;
         my $res = $tx->result;
         die Mojo::Util::dumper($tx->error) unless $res->is_success;
-        my $interval = Jabbot->config->{telegram}{poll_interval} // 15;
+        my $interval = Jabbot->config->{telegram}{poll_interval} // 60;
         Mojo::IOLoop->recurring( $interval  => \&get_updates );
     }
 );
