@@ -56,12 +56,13 @@ my %tzoffset = (
 );
 
 my $re_known_location = '(?:' . join("|", map { "\Q$_\E"} keys %tzoffset) . ')';
+my $re_suffix = qr{(?: 幾點了? | 時間 ) 嗎?\s*[\?？]? }x;
 
 sub can_answer {
     my ($self, $message) = @_;
     my $text = $message->{body};
 
-    if ($text =~ /幾點/) {
+    if ($text =~ / $re_suffix \z/xo) {
         return 1;
     }
 
@@ -76,12 +77,11 @@ sub answer {
     my $query;
     my $simple = 0;
 
-    my $suffix = qr{(?: 幾點了? | 時間 ) 嗎?\s*[\?？]? }x;
-    if ($text =~ m/ $suffix \z/xo) {
+    if ($text =~ m/ $re_suffix \z/xo) {
         if ($text =~ m/ ($re_known_location) /xo) {
             $query = $1;
         } else {
-            $text =~ s/ $suffix \z//x;
+            $text =~ s/ $re_suffix \z//x;
             $text =~ s/(你知道|幫我|[查看]+一下|那裡|現在)+//g;
 
             if ($text) {
