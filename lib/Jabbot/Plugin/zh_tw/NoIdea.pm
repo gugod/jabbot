@@ -6,6 +6,7 @@ use Object::Tiny qw(core);
 sub can_answer {
     my ($self, $message) = @_;
     my $text = $message->{body};
+    return  0 unless $text =~ /\p{Han}/;
     if ($text =~ s/\s*[\!\?？！]+\s*\z//) {
         return 0.5;
     }
