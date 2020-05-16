@@ -48,7 +48,7 @@ sub get_updates {
 
     $API_TELEGRAM->api_request(
         'getUpdates',
-        { offset => ($max_update_id+1), timeout => 60 },
+        { offset => ($max_update_id+1), timeout => 12 },
         sub {
             my ($ua, $tx) = @_;
             return unless $tx->result->is_success;
