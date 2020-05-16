@@ -29,17 +29,20 @@ sub send_reply {
         channel => "chat_id:$chat_id",
         author  => "chat_id:$chat_id",
     });
-    my $reply_text = $answer->{body};
 
-    $API_TELEGRAM->api_request(
-        sendMessage => {
-            chat_id => $chat_id,
-            text    => $reply_text,
-        }, sub {
-            my ($ua, $tx) = @_;
-            return unless $tx->result->is_success;
-        }
-    );
+    if ($answer) {
+        my $reply_text = $answer->{body};
+
+        $API_TELEGRAM->api_request(
+            sendMessage => {
+                chat_id => $chat_id,
+                text    => $reply_text,
+            }, sub {
+                my ($ua, $tx) = @_;
+                return unless $tx->result->is_success;
+            }
+        );
+    }
 }
 
 sub get_updates {
