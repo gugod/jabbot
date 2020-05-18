@@ -62,8 +62,9 @@ sub init_irc_client {
                 network => "irc",
                 channel => "$channel",
             });
-            my $reply_text = $answer->{body};
-            $self->write(PRIVMSG => $channel, ":${from_nick}: $reply_text", sub {});
+            if (my $reply_text = $answer->{body}) {
+                $self->write(PRIVMSG => $channel, ":${from_nick}: $reply_text", sub {});
+            }
         });
 
     $irc->on(
