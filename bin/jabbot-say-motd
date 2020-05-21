@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use v5.26;
+use strict;
 use utf8;
 
 use Acme::RandomEmoji qw(random_emoji);
@@ -9,6 +10,8 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Jabbot;
 use Jabbot::Util qw(time_next_full_moon);
+use Jabbot::External::TaiwanReservoir;
+
 use Time::Moment;
 
 use PlurkPoster;
@@ -30,6 +33,19 @@ sub next_full_moon_is_tonight {
     return $t1 == $t2;
 }
 
+sub random_reservoir_condition {
+    my $o = Jabbot::External::TaiwanReservoir->new;
+    my $d = $o->usage_percentage;
+    my @rows = sort { $a->{"UsagePercentage"} <=> $b->{"UsagePercentage"} } grep { $_->{"UsagePercentage"} && $_->{"ReservoirName"} =~ /水庫$/; } values %$d;
+    my $picked = $rows[rand($#rows)];
+
+    return sprintf(
+        '現在 %s 的蓄水量是 %.2f%% 喔。',
+        $picked->{"ReservoirName"},
+        100*$picked->{"UsagePercentage"}
+    );
+}
+
 sub post_to_plurk {
     my ($message) = @_;
     my $config = Jabbot->config->{plurk};
@@ -41,17 +57,20 @@ sub post_to_plurk {
     $plurk->post($message);
 }
 
+
 ## main
 
 my $message = "";
+
+$message = random_emoji(). " 隨機選圖\n" . random_image_url(). "\n來源： [Unsplash](https://unsplash.com)\n\n";
 
 if (next_full_moon_is_tonight()) {
     $message .= "今晚是滿月呢。\n\n";
 }
 
-$message .= random_emoji(). " 隨機選圖\n" . random_image_url(). "\n來源： [Unsplash](https://unsplash.com)";
+$message .= random_reservoir_condition() . "\n\n";
 
-say $message; exit();
+# say $message; exit();
 
-# post_to_plurk($message);
+post_to_plurk($message);
 
