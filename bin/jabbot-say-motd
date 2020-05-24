@@ -73,7 +73,5 @@ if ($reservoir) {
     $message .= $reservoir . "\n\n";
 }
 
-say $message; exit();
-
 post_to_plurk($message);
 
