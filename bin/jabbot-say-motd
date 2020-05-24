@@ -68,9 +68,12 @@ if (next_full_moon_is_tonight()) {
     $message .= "今晚是滿月呢。\n\n";
 }
 
-$message .= random_reservoir_condition() . "\n\n";
+my $reservoir = eval { random_reservoir_condition() };
+if ($reservoir) {
+    $message .= $reservoir . "\n\n";
+}
 
-# say $message; exit();
+say $message; exit();
 
 post_to_plurk($message);
 
