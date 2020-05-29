@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use v5.26;
 use strict;
+use warnings;
 use utf8;
 
 use Acme::RandomEmoji qw(random_emoji);
@@ -11,16 +12,36 @@ use lib "$FindBin::Bin/../lib";
 use Jabbot;
 use Jabbot::Util qw(time_next_full_moon);
 use Jabbot::External::TaiwanReservoir;
+use Jabbot::External::FlickrPublicFeed;
 
 use Time::Moment;
 
 use PlurkPoster;
 
-sub random_image_url {
+sub random_flickr_photo {
+    my $photos = Jabbot::External::FlickrPublicFeed->photos;
+    my $photo = $photos->[rand(@$photos)];
+    return {
+        preview    => $photo->{enclosure_url},
+        source_url => $photo->{photo_page_url},
+        source     => "flickr: $photo->{author}",
+    };
+}
+
+sub random_unsplash_image {
     my $source = Image::Randim::Source->new;
     $source->set_provider('Unsplash');
     my $image = $source->get_image;
-    return $image->url;
+    return {
+        preview => $image->url,
+        source_url => "https://unsplash.com",
+        source => "Unsplash",
+    }
+}
+
+sub random_image_message {
+    my $image = (rand > .5) ? random_flickr_photo() : random_unsplash_image();
+    return "隨機選圖\n" . $image->{preview}. "\n來源： [$image->{source}]($image->{source_url})\n\n";
 }
 
 sub next_full_moon_is_tonight {
@@ -60,9 +81,9 @@ sub post_to_plurk {
 
 ## main
 
-my $message = "";
-
-$message = random_emoji(). " 隨機選圖\n" . random_image_url(). "\n來源： [Unsplash](https://unsplash.com)\n\n";
+my $message = random_image_message();
+say $message;
+exit;
 
 if (next_full_moon_is_tonight()) {
     $message .= "今晚是滿月呢。\n\n";
