@@ -9,11 +9,8 @@ sub can_answer {
     my ($self, $message) = @_;
     my $text = $message->{body};
 
-    my ($op, $k) = $text =~ /\A \s* (remember|recall) (?: \s|\p{Punctuation}) (.+) \z/x;
+    my ($op, $k) = $text =~ /\A \s* (remember|recall) (?: \s|\p{Punctuation}) \s* (.+) \s* \z/x;
     if (defined($op) && defined($k)) {
-        $k =~ s/^\s//;
-        $k =~ s/\s$//;
-
         $self->{stash} = {
             op => $op,
             k  => $k
@@ -52,7 +49,11 @@ sub process_remember {
             doc_id => $id
         };
     }
-    return;
+
+    return {
+        score => 1,
+        body => "OK"
+    }
 }
 
 sub process_recall {
