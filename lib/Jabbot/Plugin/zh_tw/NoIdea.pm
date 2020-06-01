@@ -19,7 +19,7 @@ sub answer {
     my $text = $res[ rand(@res) ];
     return {
         body  => $text,
-        score => 0.6,
+        score => 0.1,
     }
 }
 

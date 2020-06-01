@@ -9,23 +9,32 @@ my @RULES = (
     [ qr/ 你好 | 早安 | 午安 | 晚安 | 安安 /x,
       'greeting' ],
 
-    [ qr/ 我夢到 (?<thing>.+) /x,
+    [ qr/ 我夢到 (?<thing>\p{Letter}+) /x,
       'dream' ],
 
-    [ qr/ 我記得 (?<thing>.+) /x,
+    [ qr/ 我記得 (?<thing>\p{Letter}+) /x,
       'remember' ],
+
+    [ qr/ (為何|為什麼|什麼是|有沒有|誰[有能會]|什麼時候|何時|怎麼樣|怎樣|在哪裡) /x,
+      'ask_back' ],
+
+    [ qr/ (\p{Han})不\1 /x,
+      'ask_back' ],
+
+    [ qr/ 好?[呢嗎]\s* [\?？] \s* \z /x,
+      'ask_back' ],
 
     [ qr/ 好像|或許|可能|應該|大概 /x,
       'perhaps' ],
 
-    [ qr/ 真是 (?<thing>\p{Han}+) /x,
+    [ qr/ 真是 (?<thing>\p{Letter}+) /x,
       'why_do_you_say_so' ],
 
-    [ qr/ (?<verb>[看讀吃喝]) 了 (?<object>.+) /x,
+    [ qr/ (?<verb>[看讀吃喝]) 了 (?<object>\p{Letter}+) /x,
       'ask_back_is_it_good' ],
-    [ qr/ 好 (?<verb>[看吃喝玩]) (！|\z) /x,
+    [ qr/ 好 (?<verb>[看吃喝玩]) \b /x,
       'it_is_nice' ],
-    [ qr/ 不難 (?<verb> [看吃喝玩]) (！|。|\z) /x,
+    [ qr/ 不難 (?<verb> [看吃喝玩]) \b /x,
       'it_is_not_bad' ],
     [ qr/ 謝謝你?(?<tone>[喔啦])? /x,
       'you_are_welcome' ],
@@ -37,8 +46,8 @@ my @RULES = (
 my %REACTIONS = (
     ask_back_is_it_good => ['好{{verb}}嗎？'],
     you_are_welcome     => ['不客氣', '不客氣{{tone}}'],
-    it_is_nice          => ['太好了呢'],
-    it_is_not_bad       => ['不錯喔'],
+    it_is_nice          => ['太好了呢', '讚喔', '好喔'],
+    it_is_not_bad       => ['不錯喔', '還不賴喔'],
     generic_neutral     => ['嗯嗯', '喔喔'],
 
     greeting => [
@@ -73,6 +82,14 @@ my %REACTIONS = (
         '怎麼說呢？',
         '為何這麼說呢？',
         '為何說{{thing}}呢？',
+    ],
+
+    ask_back => [
+        '為什麼這麼問呢',
+        '這個問題讓你覺得有意思是嗎？',
+        '你覺得呢？',
+        '在你提出此問題時，心裡頭在想什麼？',
+        '你有向其他人問過這個問題嗎',
     ],
 );
 

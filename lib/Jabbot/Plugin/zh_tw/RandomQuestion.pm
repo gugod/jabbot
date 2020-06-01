@@ -24,7 +24,7 @@ sub answer {
     my $text = $self->{__token} . "是甚麼意思？";
     return {
         body  => $text,
-        score => 0.6,
+        score => 0.1,
     }
 }
 
