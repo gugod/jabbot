@@ -20,9 +20,10 @@ sub exchange_rate {
     my ($from_currency, $to_currency) = @_;
     state $i = 0;
     my $conv = sub {
+        my @args = @_;
         my ($error, $res);
         for (0..3) {
-            ($error, $res) = $func[$i]->(@_);
+            ($error, $res) = $func[$i]->(@args);
             $i = 1 - $i;
             sleep(3) if $error;
             last unless $error;
@@ -30,7 +31,7 @@ sub exchange_rate {
         return ($error, $res);
     };
 
-    my $rate = $conv->(1, $from_currency, 'TWD');
+    my $rate = ($from_currency eq 'TWD') ? 1 : $conv->(1, $from_currency, 'TWD');
 
     if ($to_currency ne 'TWD') {
         my $rate2 = $conv->(1, $to_currency, 'TWD');
@@ -49,7 +50,7 @@ sub convert_currency {
 sub can_answer {
     my ($self, $message) = @_;
 
-    if ($message->{body} =~ /\A \s* (?<amount>[0-9]+) \s+ (?<from_currency>$RE_CURRENCY) \s+ to \s+ (?<to_currency>$RE_CURRENCY) \s* \z/x ) {
+    if ($message->{body} =~ /\A \s* (?<amount>[0-9]+(\.[0-9]+)?+) \s+ (?<from_currency>$RE_CURRENCY) \s+ to \s+ (?<to_currency>$RE_CURRENCY) \s* \z/x ) {
         $self->{matched} = {
             amount => $+{amount},
             from_currency => $+{from_currency},
@@ -67,7 +68,7 @@ sub answer {
     my $ans = convert_currency($amount, $from_currency, $to_currency);
 
     return {
-        body => sprintf('%d %s is %d %s', $amount, $from_currency, $ans, $to_currency),
+        body => sprintf('%s %s is %.2f %s', $amount, $from_currency, $ans, $to_currency),
         score => 1,
     }
 }
