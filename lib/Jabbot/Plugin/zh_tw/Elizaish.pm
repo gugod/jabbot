@@ -6,6 +6,21 @@ use Jabbot::Util qw(bag_eq);
 use Ref::Util qw( is_arrayref );
 
 my @RULES = (
+    [ qr/ 你好 | 早安 | 午安 | 晚安 | 安安 /x,
+      'greeting' ],
+
+    [ qr/ 我夢到 (?<thing>.+) /x,
+      'dream' ],
+
+    [ qr/ 我記得 (?<thing>.+) /x,
+      'remember' ],
+
+    [ qr/ 好像|或許|可能|應該|大概 /x,
+      'perhaps' ],
+
+    [ qr/ 真是 (?<thing>\p{Han}+) /x,
+      'why_do_you_say_so' ],
+
     [ qr/ (?<verb>[看讀吃喝]) 了 (?<object>.+) /x,
       'ask_back_is_it_good' ],
     [ qr/ 好 (?<verb>[看吃喝玩]) (！|\z) /x,
@@ -25,6 +40,40 @@ my %REACTIONS = (
     it_is_nice          => ['太好了呢'],
     it_is_not_bad       => ['不錯喔'],
     generic_neutral     => ['嗯嗯', '喔喔'],
+
+    greeting => [
+        '你好。最近過得如何？',
+        '哈囉。最近好嗎？',
+        '嘿，好久不見',
+        '呦，我是個電腦程式',
+        '有什麼讓你覺得心煩的事情嗎？'
+    ],
+
+    remember => [
+        '你常常想起{{thing}}嗎',
+        '你還記得哪些事情呢',
+        '為何突然想起{{thing}}呢',
+        '{{thing}}，有讓你聯想起其他什麼事情嗎',
+    ],
+
+    dream => [
+        '你常常做這個夢嗎',
+        '你以前做過這個夢嗎',
+        '你真的夢到{{thing}}嗎',
+        '在這個夢裡面有出現其他人嗎',
+    ],
+
+    perhaps => [
+        '你好像很不確定',
+        '為何使用不確定的語氣呢',
+        '真的假的',
+    ],
+
+    why_do_you_say_so => [
+        '怎麼說呢？',
+        '為何這麼說呢？',
+        '為何說{{thing}}呢？',
+    ],
 );
 
 sub can_answer {
