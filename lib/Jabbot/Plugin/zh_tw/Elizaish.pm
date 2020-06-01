@@ -2,24 +2,29 @@ package Jabbot::Plugin::zh_tw::Elizaish;
 use v5.18;
 use utf8;
 use Object::Tiny qw(core);
+use Jabbot::Util qw(bag_eq);
 use Ref::Util qw( is_arrayref );
 
 my @RULES = (
-    [ qr/ 看了(?<moovie_name>.+) /x,
-      '好看嗎？' ],
-    [ qr/ 讀了(?<book_name>.+) /x,
-      '好看嗎？' ],
-    [ qr/ 吃了(?<food_name>.+) /x,
-      '好吃嗎？' ],
-    [ qr/ 喝了(?<drink_name>.+) /x,
-      '好喝嗎？' ],
-    [ qr/ 好[看吃喝玩](！|\z) /x,
-      '太好了呢' ],
-    [ qr/ 不難[看吃喝玩](！|。|\z) /x,
-      '不錯喔' ],
+    [ qr/ (?<verb>[看讀吃喝]) 了 (?<object>.+) /x,
+      'ask_back_is_it_good' ],
+    [ qr/ 好 (?<verb>[看吃喝玩]) (！|\z) /x,
+      'it_is_nice' ],
+    [ qr/ 不難 (?<verb> [看吃喝玩]) (！|。|\z) /x,
+      'it_is_not_bad' ],
+    [ qr/ 謝謝你?(?<tone>[喔啦])? /x,
+      'you_are_welcome' ],
     # Generic
     [qr/./x,
-     ['嗯嗯', '喔喔']]
+     'generic_neutral']
+);
+
+my %REACTIONS = (
+    ask_back_is_it_good => ['好{{verb}}嗎？'],
+    you_are_welcome     => ['不客氣', '不客氣{{tone}}'],
+    it_is_nice          => ['太好了呢'],
+    it_is_not_bad       => ['不錯喔'],
+    generic_neutral     => ['嗯嗯', '喔喔'],
 );
 
 sub can_answer {
@@ -30,6 +35,7 @@ sub can_answer {
         my $re = $rule->[0];
         if (my @matched = $body =~ m/($re)/) {
             $self->{__matched} = \@matched;
+            $self->{__matched_vars} = { %+ };
             $self->{__rule} = $rule;
             return 1;
         }
@@ -39,10 +45,17 @@ sub can_answer {
 
 sub answer {
     my ($self, $message) = @_;
-    my ($res) = $self->{__rule}->[1];
 
-    if ( is_arrayref($res) ) {
-        $res = $res->[rand( 0+ @$res )]
+    my @reactions = grep {
+        my @wanted = $_ =~ m/\{\{([a-z]+)\}\}/g;
+        my @got = grep { defined($self->{__matched_vars}{$_}) } @wanted;
+        bag_eq(\@got, \@wanted);
+    } @{$REACTIONS{ $self->{__rule}->[1] }};
+
+    my $res = $reactions[rand(@reactions)];
+
+    for my $var (keys %{$self->{__matched_vars}}) {
+        $res =~ s/\{\{$var\}\}/$self->{__matched_vars}{$var}/g;
     }
 
     return {
