@@ -44,17 +44,11 @@ sub answer {
         elsif(/^請幫我/) {
             $reply = "好喔";
         }
-        elsif(/吃了/) {
-            $reply = "好吃嗎";
-        }
-        elsif(/喝了/) {
-            $reply = "好喝嗎";
-        }
     }
 
     return {
         body => $reply,
-        score => 1
+        score => 0.6,
     } if $reply;
 }
 
