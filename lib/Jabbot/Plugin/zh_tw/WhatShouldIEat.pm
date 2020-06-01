@@ -42,7 +42,13 @@ my @foods = (
 sub can_answer {
     my ($self, $message) = @_;
     my $text = $message->{body};
-    if ($message->{body} =~ /(?:早上|中午|晚上|早餐|午餐|晚餐|宵夜|現在|今天|明天|等一下|\A)?要?(吃|喫)(啥|什麼)?/) {
+    if ($message->{body} =~ /(早上|中午|晚上|早餐|午餐|晚餐|宵夜|現在|今天|明天|等一下|\A)?(要)?(吃|喫)(啥|[甚什]麼)?/) {
+        my $score = 1;
+        $score /= 2 unless $1;
+        $score /= 2 unless $2;
+        $score /= 2 unless $4;
+
+        $self->{__score} = $score;
         return 1;
     }
     return 0;
@@ -61,7 +67,7 @@ sub answer {
 
     return {
         body => $reply,
-        score => 0.9
+        score => $self->{__score},
     } if $reply;
 }
 
