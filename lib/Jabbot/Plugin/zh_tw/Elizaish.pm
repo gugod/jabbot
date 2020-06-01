@@ -27,6 +27,9 @@ my @RULES = (
     [ qr/ 好像|或許|可能|應該|大概 /x,
       'perhaps' ],
 
+    [ qr/ 對啊|沒錯|嗯 /x,
+      'confirmed' ],
+
     [ qr/ 真是 (?<thing>\p{Letter}+) /x,
       'why_do_you_say_so' ],
 
@@ -38,9 +41,12 @@ my @RULES = (
       'it_is_not_bad' ],
     [ qr/ 謝謝你?(?<tone>[喔啦])? /x,
       'you_are_welcome' ],
+
+    [ qr/\A ([^你]*) 你 /x, 'you' ],
+
     # Generic
-    [qr/./x,
-     'generic_neutral']
+    [qr/\p{Han}/x,
+     'nodding']
 );
 
 my %REACTIONS = (
@@ -48,7 +54,6 @@ my %REACTIONS = (
     you_are_welcome     => ['不客氣', '不客氣{{tone}}'],
     it_is_nice          => ['太好了呢', '讚喔', '好喔'],
     it_is_not_bad       => ['不錯喔', '還不賴喔'],
-    generic_neutral     => ['嗯嗯', '喔喔'],
 
     greeting => [
         '你好。最近過得如何？',
@@ -90,6 +95,20 @@ my %REACTIONS = (
         '你覺得呢？',
         '在你提出此問題時，心裡頭在想什麼？',
         '你有向其他人問過這個問題嗎',
+    ],
+
+    nodding => [
+        '嗯嗯',
+        '請繼續',
+        '請多說一點',
+        '我了解',
+        '我能體會',
+    ],
+
+    you => [
+        '我們不要一直講我的事，應該多聊你的事',
+        '我們應該多聊你的事',
+        '你現在心情如何？'
     ],
 );
 
