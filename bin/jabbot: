@@ -22,7 +22,7 @@ if (@ARGV > 0) {
         author  => $ENV{USER} // "console"
     });
     say "\nA:";
-    say "     [$_->{plugin}] $_->{body}" for @{$ans->{answers}};
+    say "     [$_->{plugin}][$_->{score}] $_->{body}" for sort { $b->{score} <=> $a->{score} } @{$ans->{answers}};
 }
 else {
     STDOUT->autoflush(1);
