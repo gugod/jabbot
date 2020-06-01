@@ -22,7 +22,7 @@ if (@ARGV > 0) {
         author  => $ENV{USER} // "console"
     });
     say "\nA:";
-    say "     [$_->{plugin}][$_->{score}] $_->{body}" for sort { $b->{score} <=> $a->{score} } @{$ans->{answers}};
+    say "     [$_->{plugin}][$_->{score}] $_->{body}" for rev_nsort_by { $_->{score} } @{$ans->{answers}};
 }
 else {
     STDOUT->autoflush(1);
@@ -41,7 +41,7 @@ else {
         });
 
         say "A: ";
-        say "    [$_->{plugin}] $_->{body}" for rev_nsort_by { $_->{score} } @{$ans->{answers}};
+        say "     [$_->{plugin}][$_->{score}] $_->{body}" for rev_nsort_by { $_->{score} } @{$ans->{answers}};
         print "\n";
         print "Q: ";
     }
