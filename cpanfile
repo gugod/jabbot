@@ -14,7 +14,7 @@ requires "LWP::Simple";
 requires "LWP::UserAgent";
 requires "List::UtilsBy";
 requires "Math::Expression::Evaluator";
-requires "Mojo::DOM";
+requires "Mojolicious", "8.51";
 requires "Mojo::IRC";
 requires "Object::Tiny";
 requires "Path::Class";
