@@ -2,18 +2,6 @@ package Jabbot::Plugin::Uni;
 use v5.18;
 use Object::Tiny qw(core);
 
-sub new {
-    my $class = shift;
-    my $self = bless { @_ }, $class;
-
-    my $x = require 'unicore/Name.pl';
-    die "On NO" if $x eq '1';
-
-    $self->{__corpus} = [ split /\cJ/, $x ];
-
-    return $self;
-}
-
 sub can_answer {
     my ($self, $message) = @_;
 
@@ -31,7 +19,7 @@ sub answer {
     my $query = $self->{query};
 
     my @terms = split /\s+/, $query;
-    my $chars = $self->chars_by_name(\@terms);
+    my $chars = chars_by_name(\@terms);
 
     if (@$chars) {
         if (@$chars > 100) {
@@ -55,11 +43,17 @@ sub answer {
 }
 
 sub chars_by_name {
-    my ($self, $terms) = @_;
+    my ($terms) = @_;
+
+    state $corpus //= do {
+        my $x = require 'unicore/Name.pl';
+        die "On NO" if $x eq '1';
+        [ split /\cJ/, $x ];
+    };
 
     my @chars;
     my %seen;
-    LINE: for my $line (@{$self->{__corpus}}) {
+    LINE: for my $line (@$corpus) {
         my $i = index($line, "\t");
         next if rindex($line, " ", $i) >= 0;
 
