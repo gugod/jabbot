@@ -13,10 +13,11 @@ sub can_answer {
 }
 
 sub answer {
+    my ($self, $message) = @_;
     return {
         body => "不客氣",
-        score => 1,
-    }
+        score => 2 / length($message->{body}),
+    };
 }
 
 1;

@@ -14,9 +14,10 @@ sub can_answer {
 }
 
 sub answer {
+    my ($self, $message) = @_;
     return {
         body  => "you are welcome.",
-        score => 0.8
+        score => 5 / length($message->{body}),
     }
 }
 
