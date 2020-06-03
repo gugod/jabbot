@@ -3,7 +3,6 @@ use v5.18;
 use utf8;
 use Object::Tiny qw(core);
 use Jabbot::Util qw(bag_eq);
-use Ref::Util qw( is_arrayref );
 
 my @RULES = (
     [ qr/ 你好 | 早安 | 午安 | 晚安 | 安安 /x,
@@ -17,6 +16,19 @@ my @RULES = (
 
     [ qr/ (為何|為什麼|什麼是|有沒有|誰[有能會]|什麼時候|何時|怎麼樣|怎樣|在哪裡) /x,
       'ask_back' ],
+
+    [ qr/ 誰是(?<thing>\p{Letter}+?)的人呢 /x,
+      'ask_back_whois' ],
+
+    [ qr/ 是誰(?<thing>\p{Letter}+) /x,
+      'ask_back_whois' ],
+
+    [ qr/ 我不知道(?<thing>\p{Letter}+) /x,
+      'i_may_have_some_idea', 'showing_interests' ],
+
+
+    [ qr/ 我 \p{Han}+? (沒用 | 膽小 | 衰弱 | 無辜 | 無望 | 敗壞 | 無力 | 柔弱 | 虛弱 | 自卑 | 平凡 | 淺薄 | 破碎 | 破裂 | 損傷 | 殘廢 | 薄弱 | 脆弱 | 不適合 | 無能為力 | 不滿意 | 發呆無助 | 微小 | 幼小 |  | 美中不足 | 不稱職 | 沒抗拒力 | 沒效率 | 無效力 | 不得時 | 低級 | 次等 | 意志薄弱 | 不合格 )/x,
+      'to_comfort' ],
 
     [ qr/ (\p{Han})不\1 /x,
       'ask_back' ],
@@ -84,9 +96,14 @@ my %REACTIONS = (
     ],
 
     why_do_you_say_so => [
-        '怎麼說呢？',
         '為何這麼說呢？',
         '為何說{{thing}}呢？',
+    ],
+
+    showing_interests => [
+        '喔？',
+        '是嗎？',
+        '怎麼說呢？',
     ],
 
     ask_back => [
@@ -97,18 +114,41 @@ my %REACTIONS = (
         '你有向其他人問過這個問題嗎',
     ],
 
+    ask_back_whois => [
+        '你覺得呢？',
+        '你心裡有人選嗎？',
+        '你覺得誰知道？',
+        '為什麼要問是誰{{thing}}？',
+        '為什麼你想知道是誰{{thing}}？',
+    ],
+
+    i_may_have_some_idea => [
+        '問我就對了',
+        '我應該知道',
+        '我可能知道',
+    ],
+
     nodding => [
+        '這樣啊',
         '嗯嗯',
         '請繼續',
         '請多說一點',
         '我了解',
         '我能體會',
+        '我似乎能體會',
     ],
 
     you => [
         '我們不要一直講我的事，應該多聊你的事',
         '我們應該多聊你的事',
         '你現在心情如何？'
+    ],
+
+    to_comfort => [
+        '你覺得沮喪嗎？',
+        '你可以向我訴苦',
+        '對自己好一點。',
+        '不要太苛責你自己。',
     ],
 );
 
@@ -119,9 +159,10 @@ sub can_answer {
     for my $rule (@RULES) {
         my $re = $rule->[0];
         if (my @matched = $body =~ m/($re)/) {
+            $self->{__rule} = $rule;
             $self->{__matched} = \@matched;
             $self->{__matched_vars} = { %+ };
-            $self->{__rule} = $rule;
+            $self->{__reactions} = [@{$rule}[1..$#$rule]];
             return 1;
         }
     }
@@ -135,12 +176,14 @@ sub answer {
         my @wanted = $_ =~ m/\{\{([a-z]+)\}\}/g;
         my @got = grep { defined($self->{__matched_vars}{$_}) } @wanted;
         bag_eq(\@got, \@wanted);
-    } @{$REACTIONS{ $self->{__rule}->[1] }};
+    } map { @{$REACTIONS{$_}} } @{$self->{__reactions}};
 
     my $res = $reactions[rand(@reactions)];
 
     for my $var (keys %{$self->{__matched_vars}}) {
-        $res =~ s/\{\{$var\}\}/$self->{__matched_vars}{$var}/g;
+        my $v = $self->{__matched_vars}{$var};
+        $v =~ tr/我你/你我/;
+        $res =~ s/\{\{$var\}\}/$v/g;
     }
 
     return {
