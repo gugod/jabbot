@@ -62,7 +62,7 @@ sub answer {
 
     my $reply = $foods[ int(rand( @foods )) ];
     if (rand > 0.8) {
-        $reply .= join(", ", map { $foods[ int(rand( @foods )) ] } (1..7));
+        $reply = join(", ", map { $foods[ int(rand( @foods )) ] } (1..7));
     }
 
     return {
