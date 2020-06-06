@@ -82,8 +82,6 @@ sub post_to_plurk {
 ## main
 
 my $message = random_image_message();
-say $message;
-exit;
 
 if (next_full_moon_is_tonight()) {
     $message .= "今晚是滿月呢。\n\n";
@@ -95,4 +93,3 @@ if ($reservoir) {
 }
 
 post_to_plurk($message);
-
