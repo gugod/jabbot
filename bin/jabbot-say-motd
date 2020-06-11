@@ -41,7 +41,7 @@ sub random_unsplash_image {
 
 sub random_image_message {
     my $image = (rand > .5) ? random_flickr_photo() : random_unsplash_image();
-    return "隨機選圖\n" . $image->{preview}. "\n來源： [$image->{source}]($image->{source_url})\n\n";
+    return "\n隨機選圖 來源： [$image->{source}]($image->{source_url}) \n" . $image->{preview} . "\n";
 }
 
 sub next_full_moon_is_tonight {
@@ -78,18 +78,29 @@ sub post_to_plurk {
     $plurk->post($message);
 }
 
+sub maybe_full_moon_message {
+    if (next_full_moon_is_tonight()) {
+        return "今晚是滿月呢。";
+    }
+    return "";
+}
+
+sub maybe_reservoir_condition {
+    my $reservoir = eval { random_reservoir_condition() };
+    if ($reservoir) {
+        return $reservoir;
+    }
+    return "";
+}
 
 ## main
 
-my $message = random_image_message();
-
-if (next_full_moon_is_tonight()) {
-    $message .= "今晚是滿月呢。\n\n";
-}
-
-my $reservoir = eval { random_reservoir_condition() };
-if ($reservoir) {
-    $message .= $reservoir . "\n\n";
-}
+my $message = join(
+    " ",
+    random_emoji(),
+    maybe_full_moon_message(),
+    maybe_reservoir_condition(),
+    random_image_message(),
+);
 
 post_to_plurk($message);
