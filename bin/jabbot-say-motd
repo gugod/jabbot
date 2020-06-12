@@ -4,8 +4,10 @@ use strict;
 use warnings;
 use utf8;
 
+use Time::Moment;
 use Acme::RandomEmoji qw(random_emoji);
 use Image::Randim::Source;
+use Mojo::UserAgent;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -13,8 +15,6 @@ use Jabbot;
 use Jabbot::Util qw(time_next_full_moon);
 use Jabbot::External::TaiwanReservoir;
 use Jabbot::External::FlickrPublicFeed;
-
-use Time::Moment;
 
 use PlurkPoster;
 
@@ -41,7 +41,7 @@ sub random_unsplash_image {
 
 sub random_image_message {
     my $image = (rand > .5) ? random_flickr_photo() : random_unsplash_image();
-    return "\n隨機選圖 來源： [$image->{source}]($image->{source_url}) \n" . $image->{preview} . "\n";
+    return "\n\n$image->{preview} [$image->{source}]($image->{source_url})";
 }
 
 sub next_full_moon_is_tonight {
@@ -79,10 +79,7 @@ sub post_to_plurk {
 }
 
 sub maybe_full_moon_message {
-    if (next_full_moon_is_tonight()) {
-        return "今晚是滿月呢。";
-    }
-    return "";
+    return next_full_moon_is_tonight() ? "今晚是滿月呢。" : "";
 }
 
 sub maybe_reservoir_condition {
@@ -93,13 +90,53 @@ sub maybe_reservoir_condition {
     return "";
 }
 
+sub maybe_today_in_history {
+    my $tm = Time::Moment->now;
+    my $mon = $tm->month;
+    my $mday = $tm->day_of_month;
+
+    my $url = 'https://zh.wikipedia.org/zh-tw/' . $mon . '%E6%9C%88' . $mday . '%E6%97%A5';
+
+    my $ua = Mojo::UserAgent->new;
+    my $res = $ua->get($url)->result;
+
+    return "" unless $res->is_success;
+
+    $res->dom->at("#toc")->remove;
+
+    my $section;
+    my %section;
+
+    $res->dom->at("#mw-content-text")->find("h2,li")->each(
+        sub {
+            my ($el) = @_;
+            if ($el->tag eq "h2") {
+                my $title = $el->at(".mw-headline")->all_text;
+                $section = $section{$title} = { items => [] };
+            } else {
+                push @{$section->{items}}, $el;
+            }
+        }
+    );
+
+    my @items = grep { /\A[0-9]+年：[^\n]+\z/ } map { $_->all_text } grep { not $_->at("sup.Template-Fact") } @{$section{"大事記"}{items}};
+
+    return "" unless @items;
+
+    my $pick = $items[rand(@items)];
+    $pick =~ s{\A([0-9]+年)：}{$1${mon}月${mday}日：};
+
+    return "\n🕮 [歷史上的今天]($url) ～ $pick\n";
+}
+
 ## main
 
 my $message = join(
-    " ",
+    "",
     random_emoji(),
     maybe_full_moon_message(),
     maybe_reservoir_condition(),
+    maybe_today_in_history(),
     random_image_message(),
 );
 
