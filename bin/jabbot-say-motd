@@ -91,6 +91,11 @@ sub maybe_reservoir_condition {
 }
 
 sub maybe_today_in_history {
+    my $o = eval { random_today_in_history() } // "";
+    return $o;
+}
+
+sub random_today_in_history {
     my $tm = Time::Moment->now;
     my $mon = $tm->month;
     my $mday = $tm->day_of_month;
