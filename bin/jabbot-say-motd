@@ -41,7 +41,7 @@ sub random_unsplash_image {
 
 sub random_image_message {
     my $image = (rand > .5) ? random_flickr_photo() : random_unsplash_image();
-    return "\n\n$image->{preview} [$image->{source}]($image->{source_url})";
+    return "\n$image->{preview}\n[$image->{source}]($image->{source_url})\n";
 }
 
 sub next_full_moon_is_tonight {
