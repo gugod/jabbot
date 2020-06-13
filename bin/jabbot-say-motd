@@ -103,6 +103,8 @@ sub random_today_in_history {
     my $url = 'https://zh.wikipedia.org/zh-tw/' . $mon . '%E6%9C%88' . $mday . '%E6%97%A5';
 
     my $ua = Mojo::UserAgent->new;
+    $ua->connect_timeout(15);
+
     my $res = $ua->get($url)->result;
 
     return "" unless $res->is_success;
