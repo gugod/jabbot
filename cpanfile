@@ -3,6 +3,7 @@ requires "Acme::CPANAuthors";
 requires "Acme::Lingua::ZH::Remix";
 requires "CHI";
 requires "Chatbot::Eliza";
+requires "Date::Japanese::Era";
 requires "DateTime";
 requires "HTML::TreeBuilder::Select";
 requires "HTTP::Request::Common";
