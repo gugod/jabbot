@@ -1,16 +1,19 @@
 package Jabbot::Plugin::zh_tw::EraConvert;
 use v5.18;
 use utf8;
+use strict;
+use warnings;
+
 use Object::Tiny qw(core);
+use Try::Tiny;
 use Date::Japanese::Era;
+
+my $RE_japanese_era = qr(明治|大正|昭和|平成|令和);
 
 sub can_answer {
     my ($self, $message) = @_;
     my $text = $message->{body};
-    if ($text =~ m/(明治|大正|昭和|平成|令和)([0-9]+)年/) {
-        $self->{__japanese_era} = $1;
-        $self->{__japanese_year} = $2;
-
+    if ($text =~ m/(?:$RE_japanese_era)(?:[0-9]+)年/o) {
         return 1;
     }
     return 0;
@@ -19,19 +22,18 @@ sub can_answer {
 sub answer {
     my ($self, $message) = @_;
 
-    my $text;
-
-    if ($self->{__japanese_era}) {
-        my $era = Date::Japanese::Era->new(
-            $self->{__japanese_era},
-            $self->{__japanese_year}
-        );
-        my $year = $era->gregorian_year;
-
-        $text = $self->{__japanese_era} . $self->{__japanese_year} . "年為西元" . $year . "年";
+    my @ans;
+    while ($message->{body} =~ m/(?<era> $RE_japanese_era)(?<year> [0-9]+)年/gx) {
+        my $year = try {
+            my $era = Date::Japanese::Era->new($+{era}, $+{year});
+            $era->gregorian_year;
+        };
+        push @ans, [$+{era} . $+{year} . "年", $year];
     }
 
-    return undef unless defined($text);
+    my $text = join "", map {
+        ($_->[1] ? ($_->[0] . "為西元" . $_->[1] . "年") : ("似乎沒有" . $_->[0])) . "。"
+    } @ans;
 
     return {
         body  => $text,
