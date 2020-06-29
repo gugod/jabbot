@@ -19,6 +19,11 @@ use Jabbot::External::NASAIotD;
 
 use PlurkPoster;
 
+sub random_emoji_message {
+    my $emoji = random_emoji();
+    return "今日表情符號： $emoji";
+}
+
 sub random_nasa_image {
     my $photos = Jabbot::External::NASAIotD->photos;
     my $photo = $photos->[rand(@$photos)];
@@ -56,7 +61,7 @@ sub random_image_message {
         \&random_unsplash_image,
         \&random_nasa_image,
     ]->[rand(3)]->();
-    return "\n$image->{preview}\n[$image->{source}]($image->{source_url})\n";
+    return "今日選圖： $image->{preview}\n[$image->{source}]($image->{source_url})\n";
 }
 
 sub next_full_moon_is_tonight {
@@ -100,7 +105,7 @@ sub maybe_full_moon_message {
 sub maybe_reservoir_condition {
     my $reservoir = eval { random_reservoir_condition() };
     if ($reservoir) {
-        return $reservoir;
+        return "🚰 " . $reservoir;
     }
     return "";
 }
@@ -162,7 +167,7 @@ sub maybe_wikiquote_of_the_day {
         my $el = $res->dom->at('.mw-parser-output > div:nth-child(10) > div:nth-child(1)');
         if ($el) {
             my $txt = $el->all_text =~ s/\A\s*(.+)\s*\z/$1/r;
-            $out = '❝ ' . $txt . " ❠\n\n";
+            $out = '❝ ' . $txt . " ❠";
         }
     };
     return $out;
@@ -170,14 +175,16 @@ sub maybe_wikiquote_of_the_day {
 
 ## main
 
-my $message = join(
-    "",
-    random_emoji(),
+my @messages = grep { defined($_) && /\S/ } (
     maybe_full_moon_message(),
     maybe_reservoir_condition(),
     maybe_today_in_history(),
     maybe_wikiquote_of_the_day(),
+    random_emoji_message(),
     random_image_message(),
 );
 
-post_to_plurk($message);
+for (@messages) {
+    post_to_plurk($_);
+    sleep(2);
+}
