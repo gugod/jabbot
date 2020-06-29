@@ -151,6 +151,23 @@ sub random_today_in_history {
     return "\n🕮 [歷史上的今天]($url) ～ $pick\n";
 }
 
+sub maybe_wikiquote_of_the_day {
+    my $out = "";
+    eval {
+        my $url = 'https://zh.wikiquote.org/zh-tw/Wikiquote:%E6%AF%8F%E6%97%A5%E5%90%8D%E8%A8%80';
+        my $ua = Mojo::UserAgent->new;
+        $ua->connect_timeout(15);
+
+        my $res = $ua->get($url)->result;
+        my $el = $res->dom->at('.mw-parser-output > div:nth-child(10) > div:nth-child(1)');
+        if ($el) {
+            my $txt = $el->all_text =~ s/\A\s*(.+)\s*\z/$1/r;
+            $out = '❝ ' . $txt . " ❠\n\n";
+        }
+    };
+    return $out;
+}
+
 ## main
 
 my $message = join(
@@ -159,6 +176,7 @@ my $message = join(
     maybe_full_moon_message(),
     maybe_reservoir_condition(),
     maybe_today_in_history(),
+    maybe_wikiquote_of_the_day(),
     random_image_message(),
 );
 
