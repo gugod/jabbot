@@ -8,6 +8,7 @@ use Time::Moment;
 use Acme::RandomEmoji qw(random_emoji);
 use Image::Randim::Source;
 use Mojo::UserAgent;
+use Net::Random;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -88,14 +89,19 @@ sub random_reservoir_condition {
 }
 
 sub post_to_plurk {
-    my ($message) = @_;
+    my @messages = @_;
+
     my $config = Jabbot->config->{plurk};
     my $plurk = PlurkPoster->new(
         username => $config->{username},
         password => $config->{password},
     );
     $plurk->login();
-    $plurk->post($message);
+
+    for my $message (@messages) {
+        $plurk->post($message);
+        sleep(2);
+    }
 }
 
 sub maybe_full_moon_message {
@@ -173,6 +179,19 @@ sub maybe_wikiquote_of_the_day {
     return $out;
 }
 
+sub random_number_message {
+    my $nr = Net::Random->new(
+        src => ['random.org', 'qrng.anu.edu.au']->[rand(2)],
+        min => 0,
+        max => 0xFFFFFFFE,
+    );
+
+    if (my @numbers = eval { $nr->get(6) }) {
+        return("今日亂數：" . join(' ', @numbers));
+    }
+    return undef;
+}
+
 ## main
 
 my @messages = grep { defined($_) && /\S/ } (
@@ -182,9 +201,9 @@ my @messages = grep { defined($_) && /\S/ } (
     maybe_wikiquote_of_the_day(),
     random_emoji_message(),
     random_image_message(),
+    random_number_message(),
 );
 
-for (@messages) {
-    post_to_plurk($_);
-    sleep(2);
-}
+say for @messages;
+
+post_to_plurk(@messages);
