@@ -8,6 +8,7 @@ use Time::Moment;
 use Acme::RandomEmoji qw(random_emoji);
 use Image::Randim::Source;
 use Mojo::UserAgent;
+use Mojo::URL;
 use Net::Random;
 
 use FindBin;
@@ -22,7 +23,9 @@ use PlurkPoster;
 
 sub random_emoji_message {
     my $emoji = random_emoji();
-    return "今日表情符號： $emoji";
+    my $url = Mojo::URL->new('https://emojipedia.org/search');
+    $url->query( q => $emoji );
+    return "今日表情符號： $emoji\n\n$url";
 }
 
 sub random_nasa_image {
@@ -194,6 +197,9 @@ sub random_number_message {
 
 ## main
 
+say random_emoji_message();
+
+exit;
 my @messages = grep { defined($_) && /\S/ } (
     maybe_full_moon_message(),
     maybe_reservoir_condition(),
