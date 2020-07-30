@@ -197,9 +197,6 @@ sub random_number_message {
 
 ## main
 
-say random_emoji_message();
-
-exit;
 my @messages = grep { defined($_) && /\S/ } (
     maybe_full_moon_message(),
     maybe_reservoir_condition(),
