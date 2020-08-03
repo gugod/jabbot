@@ -13,7 +13,7 @@ my $RE_japanese_era = qr(明治|大正|昭和|平成|令和);
 sub can_answer {
     my ($self, $message) = @_;
     my $text = $message->{body};
-    if ($text =~ m/(?:$RE_japanese_era)(?:[0-9]+)年/o) {
+    if ($text =~ m/(?:$RE_japanese_era)\s*(?:[0-9]+)\s*年/o) {
         return 1;
     }
     return 0;
