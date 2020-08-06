@@ -124,25 +124,38 @@ sub maybe_today_in_history {
     return $o;
 }
 
-sub random_today_in_history {
-    my $tm = Time::Moment->now;
-    my $mon = $tm->month;
-    my $mday = $tm->day_of_month;
+sub maybe_today_birth {
+    return eval { random_today_birth() } // "";
+}
 
-    my $url = 'https://zh.wikipedia.org/zh-tw/' . $mon . '%E6%9C%88' . $mday . '%E6%97%A5';
+sub maybe_today_death {
+    return eval { random_today_death() } // "";
+}
+
+sub _sections_on_wikipedia_page_today {
+    state ($res, $url, $mon, $mday, %section);
+
+    if (defined($res)) {
+        return ($url, $mon, $mday, \%section);
+    }
+
+    my $tm = Time::Moment->now;
+    $mon  = $tm->month;
+    $mday = $tm->day_of_month;
+    $url  = 'https://zh.wikipedia.org/zh-tw/' . $mon . '%E6%9C%88' . $mday . '%E6%97%A5';
 
     my $ua = Mojo::UserAgent->new;
     $ua->connect_timeout(15);
 
-    my $res = $ua->get($url)->result;
+    $res = $ua->get($url)->result;
 
-    return "" unless $res->is_success;
+    unless ($res->is_success) {
+        die "Failed to fetch wikipedia page: $url";
+    }
 
     $res->dom->at("#toc")->remove;
 
     my $section;
-    my %section;
-
     $res->dom->at("#mw-content-text")->find("h2,li")->each(
         sub {
             my ($el) = @_;
@@ -155,7 +168,56 @@ sub random_today_in_history {
         }
     );
 
-    my @items = grep { /\A[0-9]+年：[^\n]+\z/ } map { $_->all_text } grep { not $_->at("sup.Template-Fact") } @{$section{"大事記"}{items}};
+    return ($url, $mon, $mday, \%section);
+}
+
+sub _extract_year_subject_link {
+    my ($el) = @_;
+    my ($year) = $el->all_text() =~ m/^([0-9]+)年/;
+    my $links = $el->find("a");
+    my $subject = $links->first(sub { $_->all_text() !~ m/^([0-9]+)年/; });
+    return [
+        $year,
+        $subject->all_text(),
+        "https://zh.wikipedia.org" . $subject->attr("href")
+    ];
+}
+
+sub random_today_birth {
+    my ($url, $mon, $mday, $section) = _sections_on_wikipedia_page_today();
+
+    my @items = map { _extract_year_subject_link($_) } @{$section->{"出生"}{items}};
+    my $pick = $items[rand(@items)];
+    return join(
+        "",
+        "🎂 ",
+        $pick->[0],
+        "年${mon}月${mday}日：",
+        "[" . $pick->[1] . "]",
+        "(" . $pick->[2] . ")",
+        "出生"
+    );
+}
+
+sub random_today_death {
+    my ($url, $mon, $mday, $section) = _sections_on_wikipedia_page_today();
+    my @items = map { _extract_year_subject_link($_) } @{$section->{"逝世"}{items}};
+    my $pick = $items[rand(@items)];
+    return join(
+        "",
+        "⚰ ",
+        $pick->[0],
+        "年${mon}月${mday}日：",
+        "[" . $pick->[1] . "]",
+        "(" . $pick->[2] . ")",
+        "逝世"
+    );
+}
+
+sub random_today_in_history {
+    my ($url, $mon, $mday, $section) = _sections_on_wikipedia_page_today();
+
+    my @items = grep { /\A[0-9]+年：[^\n]+\z/ } map { $_->all_text } grep { not $_->at("sup.Template-Fact") } @{$section->{"大事記"}{items}};
 
     return "" unless @items;
 
@@ -201,6 +263,8 @@ my @messages = grep { defined($_) && /\S/ } (
     maybe_full_moon_message(),
     maybe_reservoir_condition(),
     maybe_today_in_history(),
+    maybe_today_birth(),
+    maybe_today_death(),
     maybe_wikiquote_of_the_day(),
     random_emoji_message(),
     random_image_message(),
