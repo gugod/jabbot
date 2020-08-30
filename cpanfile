@@ -105,3 +105,4 @@ requires 'Finance::Currency::Convert::SCSB';
 requires 'Finance::Currency::Convert::Esunbank';
 requires 'Importer';
 requires 'Net::Random';
+requires 'OAuth::Lite';

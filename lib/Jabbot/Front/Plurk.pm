@@ -8,28 +8,40 @@ use Jabbot;
 use Jabbot::Types qw(JabbotMessage);
 use PlurkPoster;
 
+use OAuth::Lite::Token;
+use OAuth::Lite::Consumer;
+
 use Mojo::JSON qw(decode_json);
 use Mojolicious::Lite;
 
 my $config = Jabbot->config->{plurk};
 
 sub plurk_this {
-    state $plurk_poster = do {
-        my $p = PlurkPoster->new(
-            username => $config->{username},
-            password => $config->{password},
-        );
-        $p->login;
-        $p;
-    };
     my $message = shift;
     JabbotMessage->assert_valid($message);
-    my $plurk_id;
-    eval {
-        $plurk_id = $plurk_poster->post($message->{body});
-        1;
-    };
-    return $plurk_id;
+
+    my $auth = OAuth::Lite::Consumer->new(
+        consumer_key    => $config->{consumer_key},
+        consumer_secret => $config->{consumer_secret},
+        site           => 'https://www.plurk.com',
+    );
+    my $access_token = OAuth::Lite::Token->new(
+        token => $config->{access_token},
+        secret => $config->{access_token_secret},
+    );
+
+    my $res = $auth->request(
+        method => 'POST',
+        url => 'https://www.plurk.com/APP/Timeline/plurkAdd',
+        token => $access_token,
+        params => {
+            content => $message->{body},
+            qualifier => ':',
+        }
+    );
+
+    my $body = decode_json($res->decoded_content);
+    return $body->{plurk_id};
 }
 
 get '/' => sub {
@@ -54,7 +66,7 @@ post '/' => sub {
         body => $req->{body},
     });
     if ($plurk_id) {
-        $res->{plurk_id} = $plurk_id;        
+        $res->{plurk_id} = $plurk_id;
     } else {
         $res->{error} = "failed plurking";
     }
