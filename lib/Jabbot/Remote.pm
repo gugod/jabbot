@@ -1,5 +1,6 @@
 package Jabbot::Remote;
 use Moo;
+use Mojo::UserAgent;
 use Mojo::JSON qw(encode_json);
 use URI;
 use Jabbot;
@@ -11,15 +12,11 @@ has target => (
 
 sub post {
     my ($self, $opt) = @_;
-
-    my $uri = URI->new( Jabbot->config->{$self->target}->{listen} );
-    my $res = Hijk::request({
-        method => "POST",
-        host   => $uri->host,
-        port   => $uri->port,
-        path   => "/",
-        body   => encode_json($opt),
-    });
+    my $uri = Jabbot->config->{$self->target}->{listen};
+    my $tx = Mojo::UserAgent->new->post(
+        $uri ,
+        {Accept => '*/*'} => json => $opt );
+    my $res = $tx->result->json;
     return $res;
 }
 
