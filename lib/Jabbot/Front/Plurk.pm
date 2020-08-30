@@ -6,7 +6,8 @@ use warnings;
 
 use Jabbot;
 use Jabbot::Types qw(JabbotMessage);
-use PlurkPoster;
+
+use Encode qw(encode_utf8);
 
 use OAuth::Lite::Token;
 use OAuth::Lite::Consumer;
@@ -35,7 +36,7 @@ sub plurk_this {
         url => 'https://www.plurk.com/APP/Timeline/plurkAdd',
         token => $access_token,
         params => {
-            content => $message->{body},
+            content   => encode_utf8($message->{body}),
             qualifier => ':',
         }
     );

@@ -18,8 +18,7 @@ use Jabbot::Util qw(time_next_full_moon);
 use Jabbot::External::TaiwanReservoir;
 use Jabbot::External::FlickrPublicFeed;
 use Jabbot::External::NASAIotD;
-
-use PlurkPoster;
+use Jabbot::Remote;
 
 sub random_emoji_message {
     my $emoji = random_emoji();
@@ -93,16 +92,10 @@ sub random_reservoir_condition {
 
 sub post_to_plurk {
     my @messages = @_;
-
-    my $config = Jabbot->config->{plurk};
-    my $plurk = PlurkPoster->new(
-        username => $config->{username},
-        password => $config->{password},
-    );
-    $plurk->login();
+    my $jabbot_plurk = Jabbot::Remote->new({ target => 'plurk' });
 
     for my $message (@messages) {
-        $plurk->post($message);
+        $jabbot_plurk->post({ body => $message });
         sleep(2);
     }
 }
