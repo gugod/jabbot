@@ -91,10 +91,11 @@ sub random_reservoir_condition {
 }
 
 sub post_to_plurk {
-    my @messages = @_;
+    my $messages = shift;
+
     my $jabbot_plurk = Jabbot::Remote->new({ target => 'plurk' });
 
-    for my $message (@messages) {
+    for my $message (@$messages) {
         $jabbot_plurk->post({ body => $message });
         sleep(2);
     }
@@ -266,4 +267,4 @@ my @messages = grep { defined($_) && /\S/ } (
 
 say for @messages;
 
-post_to_plurk(@messages);
+post_to_plurk(\@messages);
