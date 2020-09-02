@@ -4,7 +4,6 @@ use Mojo::UserAgent;
 use Mojo::JSON qw(encode_json);
 use URI;
 use Jabbot;
-use Hijk;
 
 has target => (
     is => "ro"
