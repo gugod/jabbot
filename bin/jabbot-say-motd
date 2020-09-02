@@ -10,9 +10,11 @@ use Image::Randim::Source;
 use Mojo::UserAgent;
 use Mojo::URL;
 use Net::Random;
+use Encode qw(encode_utf8);
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
+
 use Jabbot;
 use Jabbot::Util qw(time_next_full_moon);
 use Jabbot::External::TaiwanReservoir;
@@ -218,7 +220,7 @@ sub random_today_in_history {
     my $pick = $items[rand(@items)];
     $pick =~ s{\A([0-9]+年)：}{$1${mon}月${mday}日：};
 
-    return "\n🕮 [歷史上的今天]($url) ～ $pick\n";
+    return "🕮 [歷史上的今天]($url) ～ $pick\n";
 }
 
 sub maybe_wikiquote_of_the_day {
@@ -253,18 +255,21 @@ sub random_number_message {
 
 ## main
 
-my @messages = grep { defined($_) && /\S/ } (
-    maybe_full_moon_message(),
-    maybe_reservoir_condition(),
-    maybe_today_in_history(),
-    maybe_today_birth(),
-    maybe_today_death(),
-    maybe_wikiquote_of_the_day(),
-    random_emoji_message(),
-    random_image_message(),
-    random_number_message(),
+my @messagef = (
+    \&maybe_full_moon_message,
+    \&maybe_reservoir_condition,
+    \&maybe_today_in_history,
+    \&maybe_today_birth,
+    \&maybe_today_death,
+    \&maybe_wikiquote_of_the_day,
+    \&random_emoji_message,
+    \&random_image_message,
+    \&random_number_message,
 );
 
-say for @messages;
-
-post_to_plurk(\@messages);
+for my $f (@messagef) {
+    my $m = $f->() or next;
+    next unless $m =~ /\S/;
+    say encode_utf8( $m );
+    post_to_plurk([ $m ]);
+}
