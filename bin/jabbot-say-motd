@@ -92,15 +92,21 @@ sub random_reservoir_condition {
     );
 }
 
+sub post_to_irc {
+    my $message = shift;
+    my $text = $message =~ s/\n/ /gr;
+    my $remote = Jabbot::Remote->new({ target => 'ircbot' });
+    $remote->post({
+        text    => $text,
+        network => 'freenode',
+        channel => '#jabbot'
+    });
+}
+
 sub post_to_plurk {
-    my $messages = shift;
-
-    my $jabbot_plurk = Jabbot::Remote->new({ target => 'plurk' });
-
-    for my $message (@$messages) {
-        $jabbot_plurk->post({ body => $message });
-        sleep(2);
-    }
+    my $message = shift;
+    my $remote = Jabbot::Remote->new({ target => 'plurk' });
+    $remote->post({ body => $message });
 }
 
 sub maybe_full_moon_message {
@@ -162,7 +168,7 @@ sub _sections_on_wikipedia_page_today {
                 push @{$section->{items}}, $el;
             }
         }
-    );
+    );nn
 
     return ($url, $mon, $mday, \%section);
 }
@@ -271,5 +277,6 @@ for my $f (@messagef) {
     my $m = $f->() or next;
     next unless $m =~ /\S/;
     say encode_utf8( $m );
-    post_to_plurk([ $m ]);
+    post_to_irc( $m );
+    post_to_plurk( $m );
 }

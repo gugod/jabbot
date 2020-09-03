@@ -90,11 +90,11 @@ get '/' => sub {
 
 post '/' => sub {
     my $c = shift;
-    my $req = decode_json( $c->req->body );
+    my $req = $c->req->json;
 
     my $network = $req->{network};
     my $channel = $req->{channel};
-    my $text = decode_utf8( $req->{text} );
+    my $text = $req->{text};
 
     my $error;
     my $response = {};
