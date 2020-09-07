@@ -168,7 +168,7 @@ sub _sections_on_wikipedia_page_today {
                 push @{$section->{items}}, $el;
             }
         }
-    );nn
+    );
 
     return ($url, $mon, $mday, \%section);
 }
