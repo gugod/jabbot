@@ -190,6 +190,9 @@ sub random_today_birth {
 
     my @items = map { _extract_year_subject_link($_) } @{$section->{"出生"}{items}};
     my $pick = $items[rand(@items)];
+
+    return undef unless $pick;
+
     return join(
         "",
         "🎂 ",
@@ -205,6 +208,9 @@ sub random_today_death {
     my ($url, $mon, $mday, $section) = _sections_on_wikipedia_page_today();
     my @items = map { _extract_year_subject_link($_) } @{$section->{"逝世"}{items}};
     my $pick = $items[rand(@items)];
+
+    return undef unless $pick;
+
     return join(
         "",
         "⚰ ",
@@ -277,6 +283,6 @@ for my $f (@messagef) {
     my $m = $f->() or next;
     next unless $m =~ /\S/;
     say encode_utf8( $m );
-    post_to_irc( $m );
-    post_to_plurk( $m );
+    # post_to_irc( $m );
+    # post_to_plurk( $m );
 }
