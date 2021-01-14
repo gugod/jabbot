@@ -283,6 +283,6 @@ for my $f (@messagef) {
     my $m = $f->() or next;
     next unless $m =~ /\S/;
     say encode_utf8( $m );
-    # post_to_irc( $m );
-    # post_to_plurk( $m );
+    post_to_irc( $m );
+    post_to_plurk( $m );
 }
