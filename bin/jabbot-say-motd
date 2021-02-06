@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 use v5.26;
-use strict;
 use warnings;
 use utf8;
 
@@ -11,6 +10,7 @@ use Mojo::UserAgent;
 use Mojo::URL;
 use Net::Random;
 use Encode qw(encode_utf8);
+use Getopt::Long qw(GetOptions);
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -266,6 +266,13 @@ sub random_number_message {
 }
 
 ## main
+my %opts;
+GetOptions(
+    \%opts,
+    "plurk",
+    "irc",
+    "twitter",
+);
 
 my @messagef = (
     \&maybe_full_moon_message,
@@ -282,7 +289,7 @@ my @messagef = (
 for my $f (@messagef) {
     my $m = $f->() or next;
     next unless $m =~ /\S/;
-    say encode_utf8( $m );
-    post_to_irc( $m );
-    post_to_plurk( $m );
+    say encode_utf8( $m ) . "\n--------";
+    post_to_irc( $m )   if $opts{"irc"};
+    post_to_plurk( $m ) if $opts{"plurk"};
 }
