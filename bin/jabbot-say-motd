@@ -92,6 +92,34 @@ sub random_reservoir_condition {
     );
 }
 
+sub current_cns11643_char_of_the_day {
+    my $base = Mojo::URL->new("https://www.cns11643.gov.tw/");
+    my $res = Mojo::UserAgent->new->get($base)->result;
+    my $el = $res->dom->at(".homeBanner .diary td");
+    my $text = $el->all_text;
+
+    my ($char, $bopomofo) = $text =~ m/\s(\p{Letter})\|\s+(\S+)\s/;
+    my $permalink = Mojo::URL->new( $el->at("a")->attr("href") )->base($base)->to_abs;
+
+    return sprintf(
+        "每日一字： %s  %s\n%s",
+        $char,
+        $bopomofo,
+        $permalink,
+    );
+}
+
+sub maybe_character_of_the_day {
+    my $out = "";
+    eval {
+        $out = current_cns11643_char_of_the_day();
+        1;
+    } or do {
+        warn "Error: $@";
+    };
+    return $out;
+}
+
 sub post_to_irc {
     my $message = shift;
     my $text = $message =~ s/\n/ /gr;
@@ -284,6 +312,7 @@ my @messagef = (
     \&random_emoji_message,
     \&random_image_message,
     \&random_number_message,
+    \&maybe_character_of_the_day,
 );
 
 for my $f (@messagef) {
