@@ -18,7 +18,6 @@ use lib "$FindBin::Bin/../lib";
 use Jabbot;
 use Jabbot::Util qw(time_next_full_moon);
 use Jabbot::External::TaiwanReservoir;
-use Jabbot::External::FlickrPublicFeed;
 use Jabbot::External::NASAIotD;
 use Jabbot::Remote;
 
@@ -39,16 +38,6 @@ sub random_nasa_image {
     };
 }
 
-sub random_flickr_photo {
-    my $photos = Jabbot::External::FlickrPublicFeed->photos;
-    my $photo = $photos->[rand(@$photos)];
-    return {
-        preview    => $photo->{enclosure_url},
-        source_url => $photo->{photo_page_url},
-        source     => "flickr: $photo->{author}",
-    };
-}
-
 sub random_unsplash_image {
     my $source = Image::Randim::Source->new;
     $source->set_provider('Unsplash');
@@ -62,10 +51,9 @@ sub random_unsplash_image {
 
 sub random_image_message {
     my $image = [
-        \&random_flickr_photo,
         \&random_unsplash_image,
         \&random_nasa_image,
-    ]->[rand(3)]->();
+    ]->[rand(2)]->();
     return "今日選圖： $image->{preview}\n[$image->{source}]($image->{source_url})\n";
 }
 
