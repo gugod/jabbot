@@ -16,12 +16,13 @@ telegram:
 ircbot:
   listen: http://127.0.0.1:18011
   networks:
-    freenode:
+    'libera.chat':
       nick: jabbot
-      server: chat.freenode.net
-      port: 6667
+      server: irc.libera.chat
+      port: 6697
+      tls: yes
       channels:
-        - jabbot
+        - '##jabbot'
 
 xmpp:
   accounts: {}
@@ -51,22 +52,24 @@ feeds:
     appendurl: true
     shorturl: true
     publish_to:
-      - "freenode:jabbot"
+      - "libera.chat:##jabbot"
 
 cpantw:
   publish_to:
-    - "freenode:#chupei.pm"
-    - "freenode:#jabbot"
+    - "libera.chat:##jabbot"
 
 twitter:
   username:
   password:
   track: "#perl,#jabbot"
   publish_to:
-    - "freenode:#chupei.pm"
-    - "freenode:#jabbot"
+    - "libera.chat:##jabbot"
 
 plurk:
   listen: http://localhost:18020/
   username: ''
   password: ''
+  access_token: ''
+  access_token_secret: ''
+  consumer_key: ''
+  consumer_secret: ''
