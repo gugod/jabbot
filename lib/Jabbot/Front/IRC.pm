@@ -12,7 +12,7 @@ use Encode qw(decode_utf8);
 use IRC::Utils ();
 use Mojo::JSON qw(decode_json);
 use Mojolicious::Lite;
-use Mojo::IRC::UA;
+use Mojo::IRC;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Delay;
 
@@ -24,11 +24,12 @@ sub init_irc_client {
 
     my $nick = $config->{nick};
 
-    my $irc = Mojo::IRC::UA->new(
+    my $irc = Mojo::IRC->new(
         nick => $config->{nick},
         user => $config->{nick},
         server => $config->{server} . ":" . $config->{port},
     );
+    $irc->tls({}) if $config->{tls};
 
     $irc->on(
         error => sub {
