@@ -16,8 +16,8 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use Jabbot;
+use Jabbot::Fun;
 use Jabbot::Util qw(time_next_full_moon);
-use Jabbot::External::TaiwanReservoir;
 use Jabbot::External::NASAIotD;
 use Jabbot::Remote;
 
@@ -68,16 +68,8 @@ sub next_full_moon_is_tonight {
 }
 
 sub random_reservoir_condition {
-    my $o = Jabbot::External::TaiwanReservoir->new;
-    my $d = $o->usage_percentage;
-    my @rows = sort { $a->{"UsagePercentage"} <=> $b->{"UsagePercentage"} } grep { $_->{"UsagePercentage"} && $_->{"ReservoirName"} =~ /水庫$/; } values %$d;
-    my $picked = $rows[rand($#rows)];
-
-    return sprintf(
-        '現在 %s 的蓄水量是 %.2f%% 喔。',
-        $picked->{"ReservoirName"},
-        100*$picked->{"UsagePercentage"}
-    );
+    my $hbars = Jabbot::Fun::hbars_of_top10_reservoir_usage_percentage();
+    return "🚰十大水庫目前水量\n" . $hbars . "\n牡南烏曾霧日鯉德石翡\n";
 }
 
 sub current_cns11643_char_of_the_day {
@@ -125,16 +117,18 @@ sub post_to_plurk {
     $remote->post({ body => $message });
 }
 
+sub post_to_twitter {
+    my $message = shift;
+    my $remote = Jabbot::Remote->new({ target => 'twitter' });
+    $remote->post({ body => $message });
+}
+
 sub maybe_full_moon_message {
     return next_full_moon_is_tonight() ? "今晚是滿月呢。" : "";
 }
 
 sub maybe_reservoir_condition {
-    my $reservoir = eval { random_reservoir_condition() };
-    if ($reservoir) {
-        return "🚰 " . $reservoir;
-    }
-    return "";
+    return eval { random_reservoir_condition() } // "";
 }
 
 sub maybe_today_in_history {
@@ -309,4 +303,5 @@ for my $f (@messagef) {
     say encode_utf8( $m ) . "\n--------";
     post_to_irc( $m )   if $opts{"irc"};
     post_to_plurk( $m ) if $opts{"plurk"};
+    post_to_twitter( $m ) if $opts{"twitter"};
 }
