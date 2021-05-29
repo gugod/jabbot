@@ -2,7 +2,7 @@
 
 use Test2::V0;
 
-use Jabbot::Util qw(time_next_full_moon);
+use Jabbot::Fun qw(time_next_full_moon);
 
 
 my $now = time;
