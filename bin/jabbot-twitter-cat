@@ -1,0 +1,11 @@
+#!/usr/bin/env perl
+use v5.18;
+use warnings;
+use Jabbot::Remote;
+
+my $text = $ARGV[0] or die;
+
+utf8::decode($text);
+
+my $jabbot = Jabbot::Remote->new({ target => 'twitter' });
+$jabbot->post({ body => $text });

@@ -58,15 +58,17 @@ cpantw:
   publish_to:
     - "libera.chat:##jabbot"
 
-twitter:
-  username:
-  password:
-  track: "#perl,#jabbot"
-  publish_to:
-    - "libera.chat:##jabbot"
-
 plurk:
   listen: http://localhost:18020/
+  username: ''
+  password: ''
+  access_token: ''
+  access_token_secret: ''
+  consumer_key: ''
+  consumer_secret: ''
+
+twitter:
+  listen: http://localhost:18021/
   username: ''
   password: ''
   access_token: ''
