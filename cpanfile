@@ -109,3 +109,4 @@ requires 'Finance::Currency::Convert::Esunbank';
 requires 'Importer';
 requires 'Net::Random';
 requires 'OAuth::Lite';
+requires 'Twitter::API';
