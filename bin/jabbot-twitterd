@@ -6,11 +6,7 @@ use lib "$FindBin::Bin/../lib";
 use Jabbot;
 use Mojo::Server::Morbo;
 
-use Data::Dump qw(dump);
-
 my $config = Jabbot->config->{twitter};
-
-dump($config);
 
 my $morbo = Mojo::Server::Morbo->new;
 $morbo->daemon->listen([ $config->{listen} ]);
