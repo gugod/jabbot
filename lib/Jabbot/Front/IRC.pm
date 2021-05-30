@@ -1,8 +1,5 @@
 package Jabbot::Front::IRC;
-use 5.012;
-use strict;
-use utf8;
-use DDP;
+use Mojolicious::Lite;
 
 use Jabbot;
 use Jabbot::RemoteCore;
@@ -11,7 +8,6 @@ use Encode qw(decode_utf8);
 
 use IRC::Utils ();
 use Mojo::JSON qw(decode_json);
-use Mojolicious::Lite;
 use Mojo::IRC;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Delay;
