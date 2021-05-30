@@ -110,6 +110,8 @@ post '/' => sub {
 
 my $networks = Jabbot->config->{ircbot}{networks};
 for (keys %$networks) {
+    next if $IRC_CLIENTS->{$_};
+
     my $config = $networks->{$_};
     $config->{name} = $_;
     $config->{nick} ||= (Jabbot->config->{nick} || "jabbot_$$");
