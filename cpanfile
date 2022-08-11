@@ -34,7 +34,6 @@ requires "WWW::Shorten";
 requires "Weather::Underground";
 requires "Web::Query";
 requires "YAML";
-requires "common::sense";
 requires "self";
 requires "UnQLite";
 requires "Type::Tiny";
