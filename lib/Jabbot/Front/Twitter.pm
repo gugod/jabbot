@@ -1,6 +1,5 @@
 package Jabbot::Front::Twitter;
-use v5.18;
-use warnings;
+use v5.36;
 
 use Jabbot;
 use Jabbot::Types qw(JabbotMessage);

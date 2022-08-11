@@ -1,6 +1,5 @@
 package Jabbot::Plugin::en_us::Polite;
-use strict;
-use warnings;
+use v5.36;
 use Object::Tiny;
 
 sub can_answer {

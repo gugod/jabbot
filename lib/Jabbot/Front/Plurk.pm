@@ -1,8 +1,5 @@
-use v5.18;
-
 package Jabbot::Front::Plurk;
-use strict;
-use warnings;
+use v5.36;
 
 use Jabbot;
 use Jabbot::Types qw(JabbotMessage);

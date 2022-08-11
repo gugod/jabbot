@@ -1,5 +1,5 @@
 package Jabbot::Back::Core;
-use strict;
+use v5.36;
 
 use Jabbot;
 use Jabbot::Core;

@@ -1,6 +1,5 @@
 package Jabbot::External::FlickrPublicFeed;
-use strict;
-use warnings;
+use v5.36;
 
 use Object::Tiny;
 use constant FEED_URL => 'https://www.flickr.com/services/feeds/photos_public.gne';

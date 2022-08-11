@@ -1,8 +1,6 @@
 package Jabbot::Plugin::zh_tw::EraConvert;
-use v5.18;
+use v5.36;
 use utf8;
-use strict;
-use warnings;
 
 use Object::Tiny qw(core);
 use Try::Tiny;

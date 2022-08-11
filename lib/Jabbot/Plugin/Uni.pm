@@ -1,5 +1,5 @@
 package Jabbot::Plugin::Uni;
-use v5.18;
+use v5.36;
 use Object::Tiny qw(core);
 
 sub can_answer {

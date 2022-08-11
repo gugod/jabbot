@@ -1,5 +1,4 @@
-use v5.18;
-use strict;
+use v5.36;
 
 package Jabbot::Types {
     use Type::Library -base;

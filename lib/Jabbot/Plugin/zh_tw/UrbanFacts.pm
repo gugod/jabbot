@@ -1,6 +1,5 @@
 package Jabbot::Plugin::zh_tw::UrbanFacts;
-use strict;
-use warnings;
+use v5.36;
 use utf8;
 use Object::Tiny;
 

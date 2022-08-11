@@ -1,5 +1,5 @@
 package Jabbot::Plugin::zh_tw::BlackFriday;
-use v5.18;
+use v5.36;
 use utf8;
 use Object::Tiny qw(core);
 use Time::Moment;

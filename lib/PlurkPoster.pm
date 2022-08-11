@@ -1,5 +1,5 @@
 package PlurkPoster;
-use v5.26;
+use v5.36;
 use Mojo::UserAgent;
 
 sub new {

@@ -1,5 +1,5 @@
 package Jabbot::Plugin::zh_tw::NoIdea;
-use v5.18;
+use v5.36;
 use utf8;
 use Object::Tiny qw(core);
 

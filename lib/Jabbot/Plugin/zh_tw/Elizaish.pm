@@ -1,5 +1,5 @@
 package Jabbot::Plugin::zh_tw::Elizaish;
-use v5.18;
+use v5.36;
 use utf8;
 use Object::Tiny qw(core);
 use Jabbot::Fun qw(bag_eq);

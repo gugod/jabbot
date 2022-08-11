@@ -1,7 +1,7 @@
 package Jabbot::Memory;
 # ABSTRACT: client interface to jabbot-memoryd
 
-use v5.18;
+use v5.36;
 use Object::Tiny;
 
 use Mojo::UserAgent;

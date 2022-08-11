@@ -1,5 +1,5 @@
 package Jabbot;
-use v5.18;
+use v5.36;
 
 use Object::Tiny;
 use Hash::Merge;

@@ -1,5 +1,5 @@
 package Jabbot::Core;
-use v5.18;
+use v5.36;
 use utf8;
 
 use Jabbot;

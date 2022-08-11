@@ -1,4 +1,4 @@
-use v5.18;
+use v5.36;
 
 package Jabbot::External::G0vAirmap {
     use Object::Tiny;

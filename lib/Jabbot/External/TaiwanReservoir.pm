@@ -1,7 +1,5 @@
 package Jabbot::External::TaiwanReservoir;
-use v5.26;
-use strict;
-use warnings;
+use v5.36;
 
 use JSON;
 use Object::Tiny;

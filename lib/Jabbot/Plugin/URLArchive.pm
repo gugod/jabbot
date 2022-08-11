@@ -1,5 +1,5 @@
 package Jabbot::Plugin::URLArchive;
-use v5.18;
+use v5.36;
 use Object::Tiny;
 use Regexp::Common qw/URI/;
 

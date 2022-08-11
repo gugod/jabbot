@@ -1,4 +1,4 @@
 package Jabbot::Node;
-use strict;
+use v5.36;
 
 1;

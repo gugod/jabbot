@@ -1,5 +1,5 @@
 package Jabbot::Plugin::Seen;
-use strict;
+use v5.36;
 use Object::Tiny;
 use Mojo::JSON qw(decode_json encode_json);
 

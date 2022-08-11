@@ -1,6 +1,5 @@
 package Jabbot::External::NASAIotD;
-use strict;
-use warnings;
+use v5.36;
 
 use Object::Tiny;
 use constant FEED_URL => 'https://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss';

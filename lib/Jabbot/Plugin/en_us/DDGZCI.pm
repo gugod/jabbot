@@ -1,10 +1,7 @@
 package Jabbot::Plugin::en_us::DDGZCI;
-use v5.18;
-use strict;
-use warnings;
+use v5.36;
 
 use Object::Tiny;
-
 use WWW::DuckDuckGo;
 
 sub can_answer {

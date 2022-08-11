@@ -1,4 +1,4 @@
-FROM perl:5.28.0
+FROM perl:5.36
 RUN cpanm -q App::cpm
 
 WORKDIR /app

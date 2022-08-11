@@ -1,5 +1,5 @@
 package Jabbot::Plugin::en_us::Remember;
-use v5.18;
+use v5.36;
 use Object::Tiny qw(core);
 
 use Jabbot::Memory;

@@ -1,8 +1,7 @@
 #!/usr/bin/env perl
 # -*- cperl -*-
 
-use strict;
-use warnings;
+use v5.36;
 use File::Path;
 use File::Spec;
 

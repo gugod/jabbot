@@ -1,5 +1,5 @@
 package Jabbot::Back::Memory;
-use strict;
+use v5.36;
 our $VERSION = "0.1";
 
 use Time::HiRes;

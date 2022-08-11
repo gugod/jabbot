@@ -1,6 +1,5 @@
 package Jabbot::Fun;
-use v5.26;
-use warnings;
+use v5.36;
 use utf8;
 use Jabbot::External::TaiwanReservoir;
 

@@ -1,5 +1,5 @@
 package Jabbot::Plugin::RomanizeJapanese;
-use v5.18;
+use v5.36;
 use Object::Tiny;
 
 use Lingua::JA::Romanize::Japanese;

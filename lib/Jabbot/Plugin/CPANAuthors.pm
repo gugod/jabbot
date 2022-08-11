@@ -1,5 +1,5 @@
 package Jabbot::Plugin::CPANAuthors;
-use v5.12;
+use v5.36;
 use Object::Tiny;
 
 use Acme::CPANAuthors;
