@@ -6,23 +6,25 @@ use lib "$FindBin::Bin/../lib";
 use Jabbot;
 use Jabbot::RemoteCore;
 use List::UtilsBy qw(rev_nsort_by);
-
+use Encode qw(encode_utf8 decode_utf8);
 use IO::Handle;
 
-my $j = Jabbot::RemoteCore->new;
-my $ans = [];
-
-if (@ARGV > 0) {
-    my $q = join(" ", @ARGV);
-    $q = Encode::decode_utf8($q);
-    $ans = $j->answers({
+sub qa_once ($j, $q) {
+    my $ans = $j->answers({
         body    => $q,
         channel => "console",
         network => "console",
         author  => $ENV{USER} // "console"
     });
     say "\nA:";
-    say "     [$_->{plugin}][$_->{score}] $_->{body}" for rev_nsort_by { $_->{score} } @{$ans->{answers}};
+    say "     [$_->{plugin}][$_->{score}] " . encode_utf8($_->{body}) for rev_nsort_by { $_->{score} } @{$ans->{answers}};
+}
+
+my $j = Jabbot::RemoteCore->new;
+
+if (@ARGV > 0) {
+    my $q = encode_utf8 join " ", @ARGV;
+    qa_once $j, $q;
 }
 else {
     STDOUT->autoflush(1);
@@ -30,20 +32,8 @@ else {
     print "Q: ";
     while(<>) {
         chomp;
-        my $q = $_;
-        $q = Encode::decode_utf8($q);
-
-        $ans = $j->answers({
-            body => $q,
-            channel => "console",
-            network => "console",
-            author  => $ENV{USER} // "console"
-        });
-
-        say "A: ";
-        say "     [$_->{plugin}][$_->{score}] $_->{body}" for rev_nsort_by { $_->{score} } @{$ans->{answers}};
-        print "\n";
-        print "Q: ";
+        qa_once $j, decode_utf8($_);
+        print "\nQ: ";
     }
 }
 
