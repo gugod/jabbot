@@ -3,8 +3,7 @@ use v5.36;
 use utf8;
 use Object::Tiny qw(core);
 
-sub can_answer {
-    my ($self, $message) = @_;
+sub can_answer ($self, $message) {
     my $text = $message->{body};
     if ($text =~ /謝謝/) {
         return 1;
@@ -12,8 +11,7 @@ sub can_answer {
     return 0;
 }
 
-sub answer {
-    my ($self, $message) = @_;
+sub answer ($self, $message) {
     return {
         body => "不客氣",
         score => 2 / length($message->{body}),
