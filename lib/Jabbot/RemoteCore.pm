@@ -12,8 +12,7 @@ sub new {
     return bless { %params }, $class;
 }
 
-sub answers {
-    my ($self, $message) = @_;
+sub answers ($self, $message) {
     JabbotMessage->assert_valid($message);
     my $ua = Mojo::UserAgent->new;
     my $tx = $ua->get(
@@ -24,8 +23,7 @@ sub answers {
     return $tx->res->json();
 }
 
-sub answer {
-    my ($self, $message) = @_;
+sub answer ($self, $message) {
     my $res = $self->answers($message);
     my @all_answers = sort { $b->{score} <=> $a->{score} } @{$res->{answers}};
     my @best_answers = grep { $_->{score} == $all_answers[0]{score} } @all_answers;
