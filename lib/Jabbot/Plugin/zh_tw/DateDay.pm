@@ -20,8 +20,7 @@ sub trim {
     }
 }
 
-sub can_answer {
-    my ($self, $message) = @_;
+sub can_answer ($self, $message) {
     my $text = $message->{body};
 
     if ($text =~ /^(.*(?:號|日))(?:是)?(?:星期幾)?\s*/) {
@@ -32,9 +31,7 @@ sub can_answer {
     return 0;
 }
 
-sub day {
-    my ($m, $d, $y) = @_;
-
+sub day ($m, $d, $y) {
     if ($m !~ /[\d]{1,2}/ || $m > 12  || $m < 1 ) { return "ERR"; }
     if ($d !~ /[\d]{1,2}/ || $d > 31  || $d < 1 ) { return "ERR"; }
     if ($y !~ /[\d]+/ || $y < 1 ) { return "ERR"; }
@@ -53,8 +50,7 @@ sub day {
     return $weekday{$wday};
 }
 
-sub answer {
-    my $self = shift;
+sub answer ($self, $message) {
     my $target = $self->{matched};
 
     my $reply;
@@ -93,6 +89,5 @@ sub answer {
         }
     }
 }
-
 
 1;

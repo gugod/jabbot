@@ -109,3 +109,4 @@ requires 'Importer';
 requires 'Net::Random';
 requires 'OAuth::Lite';
 requires 'Twitter::API';
+requires 'Test2::V0';
